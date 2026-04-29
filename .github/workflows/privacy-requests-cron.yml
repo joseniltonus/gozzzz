@@ -1,0 +1,54 @@
+name: Process Privacy Requests
+
+on:
+  schedule:
+    # Every 10 minutes
+    - cron: "*/10 * * * *"
+  workflow_dispatch: {}
+
+jobs:
+  process:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Trigger privacy processor
+        env:
+          SUPABASE_PROJECT_REF: ${{ secrets.SUPABASE_PROJECT_REF }}
+          PRIVACY_PROCESSOR_SECRET: ${{ secrets.PRIVACY_PROCESSOR_SECRET }}
+        run: |
+          if [ -z "$SUPABASE_PROJECT_REF" ] || [ -z "$PRIVACY_PROCESSOR_SECRET" ]; then
+            echo "Missing required secrets: SUPABASE_PROJECT_REF or PRIVACY_PROCESSOR_SECRET"
+            exit 1
+          fi
+
+          ATTEMPTS=3
+          DELAY_SECONDS=20
+          SUCCESS=0
+
+          for i in $(seq 1 $ATTEMPTS); do
+            echo "Attempt ${i}/${ATTEMPTS}"
+
+            RESPONSE=$(curl -sS -w "\n%{http_code}" -X POST "https://${SUPABASE_PROJECT_REF}.supabase.co/functions/v1/process-privacy-requests" \
+              -H "Authorization: Bearer ${PRIVACY_PROCESSOR_SECRET}" \
+              -H "Content-Type: application/json")
+
+            BODY=$(echo "$RESPONSE" | sed '$d')
+            STATUS=$(echo "$RESPONSE" | tail -n 1)
+
+            echo "HTTP ${STATUS}"
+            echo "${BODY}"
+
+            if [ "$STATUS" -ge 200 ] && [ "$STATUS" -lt 300 ]; then
+              SUCCESS=1
+              break
+            fi
+
+            if [ "$i" -lt "$ATTEMPTS" ]; then
+              echo "Request failed, waiting ${DELAY_SECONDS}s before retry..."
+              sleep "$DELAY_SECONDS"
+            fi
+          done
+
+          if [ "$SUCCESS" -ne 1 ]; then
+            echo "Processor request failed after retries"
+            exit 1
+          fi

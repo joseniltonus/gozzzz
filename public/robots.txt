@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://gozzzz.com.br/sitemap.xml
