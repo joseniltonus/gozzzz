@@ -16,6 +16,7 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { useAuth } from '@/contexts/AuthContext';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { supabase } from '@/lib/supabase';
+import { syncQuizCompletionFromServer } from '@/lib/syncQuizCompletion';
 import { ShareableCard } from './ShareableCard';
 import * as SecureStore from 'expo-secure-store';
 
@@ -150,35 +151,73 @@ async function persistLatestChronotype(chronotype: Chronotype, userId?: string) 
 
 async function persistQuizResultRemotely(params: {
   userId: string;
-  email: string;
   chronotype: Chronotype;
   language: 'pt' | 'en';
 }) {
-  const { userId, email, chronotype, language } = params;
+  const { userId, chronotype, language } = params;
   try {
-    const { error } = await supabase
-      .from('profiles')
-      .upsert({
-        id: userId,
-        email,
+    const { error: authErr } = await supabase.auth.updateUser({
+      data: {
+        quiz_completed: true,
         chronotype,
         language,
-        subscription_type: 'free',
-        quiz_completed: true,
-        quiz_progress: null,
-        quiz_completed_at: new Date().toISOString(),
-      } as any, { onConflict: 'id' });
-    if (error) {
-      if ((error as any)?.code === '42501') {
-        // Expected for users without insert permission under current RLS.
-        console.warn('[QUIZ:UPSERT:RLS_BLOCKED]', (error as any)?.message ?? 'blocked');
-        return;
-      }
-      console.warn('[QUIZ:UPSERT:ERROR]', error);
+      },
+    });
+    if (authErr) {
+      console.warn('[QUIZ:AUTH_META:ERROR]', authErr.message ?? authErr);
     }
+
+    const sb = supabase as any;
+    const rowPayload = {
+      chronotype,
+      language,
+      quiz_completed: true,
+      quiz_progress: null,
+      quiz_completed_at: new Date().toISOString(),
+    };
+
+    const { data: updatedRows, error: updateErr } = await sb
+      .from('profiles')
+      .update(rowPayload)
+      .eq('id', userId)
+      .select('id');
+
+    const updated =
+      Array.isArray(updatedRows) && updatedRows.length > 0;
+
+    if (updateErr) {
+      if ((updateErr as any)?.code === '42501') {
+        console.warn('[QUIZ:PROFILE_UPDATE:RLS_BLOCKED]', (updateErr as any)?.message ?? 'blocked');
+      } else {
+        console.warn('[QUIZ:PROFILE_UPDATE:ERROR]', updateErr);
+      }
+    }
+
+    if (!updated || updateErr) {
+      const { data: authUserResp } = await supabase.auth.getUser();
+      const email = authUserResp?.user?.email ?? '';
+
+      const { error: upsertErr } = await sb
+        .from('profiles')
+        .upsert(
+          {
+            id: userId,
+            email,
+            subscription_type: 'free',
+            ...rowPayload,
+          },
+          { onConflict: 'id' }
+        );
+      if (upsertErr && (upsertErr as any)?.code !== '42501') {
+        console.warn('[QUIZ:PROFILE_UPSERT:ERROR]', upsertErr);
+      }
+    }
+
+    const { data: freshAuth } = await supabase.auth.getUser();
+    await syncQuizCompletionFromServer(freshAuth?.user ?? null);
   } catch (err) {
     // Never block UX on transient network/server failures.
-    console.warn('[QUIZ:UPSERT:EXCEPTION]', err);
+    console.warn('[QUIZ:PERSIST_REMOTE:EXCEPTION]', err);
   }
 }
 
@@ -250,7 +289,6 @@ export default function ChronotypeQuizModal({ visible, onComplete }: Props) {
     if (user) {
       void persistQuizResultRemotely({
         userId: user.id,
-        email: user.email ?? '',
         chronotype: finalizedChronotype,
         language: lang,
       });

@@ -3,6 +3,17 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { FileText, ArrowLeft } from 'lucide-react-native';
 import { useRouter } from 'expo-router';
 
+const QUIZ_DISCLAIMER_EN =
+  'The GoZzzz chronotype identification questionnaire was developed ' +
+  'independently and does not reproduce Dr. Breus\' original quiz ' +
+  'available at thepowerofwhenquiz.com.';
+
+const CHRONOTYPE_NAMES_EN =
+  'The chronotype names (Dolphin, Lion, Bear, and Wolf) are used ' +
+  'as descriptive terms for scientific categories, with attribution to ' +
+  'Dr. Michael J. Breus, PhD\'s original model, as published in ' +
+  '"The Power of When" (2016).';
+
 export default function TermsEnScreen() {
   const router = useRouter();
 
@@ -64,6 +75,9 @@ export default function TermsEnScreen() {
           <Text style={styles.bulletPoint}>• Charles Czeisler, Ph.D., M.D. — Harvard Medical School</Text>
           <Text style={styles.text}>
             GoZzzz applies these concepts independently. We are not affiliated, sponsored, or endorsed by any of the researchers or their respective institutions. None of the researchers have reviewed or approved this content.
+          </Text>
+          <Text style={styles.disclaimerText}>
+            {QUIZ_DISCLAIMER_EN}
           </Text>
         </View>
 
@@ -132,6 +146,9 @@ export default function TermsEnScreen() {
           </Text>
           <Text style={styles.text}>
             References to researchers, scientists and their published work are for educational purposes only. Such references do not imply endorsement or affiliation. All content is based on published scientific research.
+          </Text>
+          <Text style={styles.disclaimerText}>
+            {CHRONOTYPE_NAMES_EN}
           </Text>
         </View>
 
@@ -320,6 +337,12 @@ const styles = StyleSheet.create({
     lineHeight: 24,
     marginLeft: 8,
     marginBottom: 8,
+  },
+  disclaimerText: {
+    fontSize: 13,
+    color: '#888',
+    fontStyle: 'italic',
+    marginTop: 8,
   },
   divider: {
     height: 1,

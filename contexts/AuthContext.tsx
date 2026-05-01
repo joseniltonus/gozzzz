@@ -3,6 +3,7 @@ import { Platform } from 'react-native';
 import { Session, User } from '@supabase/supabase-js';
 import { supabase } from '@/lib/supabase';
 import { generateToken, setLocalToken, removeLocalToken } from '@/lib/sessionToken';
+import { syncQuizCompletionFromServer } from '@/lib/syncQuizCompletion';
 
 interface ConsentData {
   terms: boolean;
@@ -66,7 +67,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
     let subscription: any = null;
     try {
-      const authResult = supabase.auth.onAuthStateChange(async (_event, newSession) => {
+      const authResult = supabase.auth.onAuthStateChange(async (event, newSession) => {
         if (!isMounted) return;
         try {
           setSession(newSession);
@@ -74,6 +75,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           if (!initialLoadDone.current) {
             initialLoadDone.current = true;
             setLoading(false);
+          }
+          if (
+            newSession?.user &&
+            (event === 'INITIAL_SESSION' || event === 'SIGNED_IN' || event === 'USER_UPDATED')
+          ) {
+            void syncQuizCompletionFromServer(newSession.user);
           }
         } catch {
           if (isMounted && !initialLoadDone.current) {
@@ -113,6 +120,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       if (data.session) {
         const token = generateToken();
         await setLocalToken(token);
+        if (data.session.user) {
+          void syncQuizCompletionFromServer(data.session.user);
+        }
       }
 
       return { error: null };
@@ -152,6 +162,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       // confirmation email. If auto-confirm is enabled, keep behavior graceful.
       if (!data?.session) {
         return { error: null };
+      }
+      if (data.session.user) {
+        void syncQuizCompletionFromServer(data.session.user);
       }
       return { error: null };
     } catch (err) {

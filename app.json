@@ -10,11 +10,15 @@
     "newArchEnabled": false,
     "description": "Transforme seu sono com ciência. Os maiores especialistas do mundo em um só app.",
     "updates": {
-      "enabled": false
+      "enabled": false,
+      "url": "https://u.expo.dev/b16c1fa5-bfaa-47b1-9a69-0343db4737ca"
     },
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.gozzzz.app"
+      "bundleIdentifier": "com.gozzzz.app",
+      "infoPlist": {
+        "ITSAppUsesNonExemptEncryption": false
+      }
     },
     "android": {
       "package": "com.gozzzz.app",
@@ -37,6 +41,16 @@
     ],
     "experiments": {
       "typedRoutes": true
+    },
+    "extra": {
+      "router": {},
+      "eas": {
+        "projectId": "b16c1fa5-bfaa-47b1-9a69-0343db4737ca"
+      }
+    },
+    "owner": "josenilto",
+    "runtimeVersion": {
+      "policy": "appVersion"
     }
   }
 }

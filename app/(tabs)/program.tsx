@@ -10,6 +10,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/lib/supabase';
 import FreeTierPaywallModal from '@/components/FreeTierPaywallModal';
 import { useUserProfile } from '@/hooks/useUserProfile';
+import { hasPremiumProgramAccess } from '@/lib/subscriptionAccess';
 import { useState, useEffect, useCallback } from 'react';
 import * as SecureStore from 'expo-secure-store';
 
@@ -99,13 +100,17 @@ function ProgramContent() {
     availableBg: isDark ? '#14172a' : '#eff6ff',
   };
 
-  // Derive premium access from profile hook (avoids duplicate Supabase round-trip)
+  // Subscription + QA allowlist (see lib/subscriptionAccess.ts)
   useEffect(() => {
-    if (profile) {
-      setHasPremiumAccess(profile.subscription_type === 'premium');
-    } else if (!user) {
+    if (!user) {
       setHasPremiumAccess(false);
+      return;
     }
+    if (profile) {
+      setHasPremiumAccess(hasPremiumProgramAccess(profile.subscription_type, user.email));
+      return;
+    }
+    setHasPremiumAccess(hasPremiumProgramAccess(null, user.email));
   }, [profile, user]);
 
   useEffect(() => {
@@ -351,7 +356,7 @@ function ProgramContent() {
                   language === 'pt' ? '21 lições interativas que guiam você passo a passo para noites melhores' : '21 interactive lessons that guide you step by step to better nights',
                   language === 'pt' ? 'Cada etapa fundamentada nas pesquisas das melhores universidades e publicações científicas dos EUA' : 'Each step based on research from the best universities and scientific publications in the USA',
                   language === 'pt' ? 'Avance no seu próprio ritmo — sem pressa, com propósito' : 'Progress at your own pace — no rush, with purpose',
-                  language === 'pt' ? 'Já disponível para iOS e Android, com versão Web chegando em breve' : 'Already available for iOS and Android, with Web version coming soon',
+                  language === 'pt' ? 'Disponível na Web, iOS e Android' : 'Available on Web, iOS, and Android',
                 ].map((text, idx) => (
                   <View key={idx} style={styles.featureItem}>
                     <Text style={styles.featureIcon}>✓</Text>

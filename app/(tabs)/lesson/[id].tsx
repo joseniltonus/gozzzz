@@ -16,6 +16,7 @@ import { SleepLessonCard } from '@/components/SleepLessonCard';
 import { SLEEP_LESSON_CONTENT } from '@/data/sleepLessonContent';
 import { getChronotypeOneLiner } from '@/data/chronotypeOneLiner';
 import { useUserProfile } from '@/hooks/useUserProfile';
+import { hasPremiumProgramAccess } from '@/lib/subscriptionAccess';
 import { ShareableCard } from '@/components/ShareableCard';
 import { useProgress } from '@/contexts/ProgressContext';
 import * as SecureStore from 'expo-secure-store';
@@ -27,7 +28,7 @@ export default function LessonDetailScreen() {
   const { user } = useAuth();
   const { isDark } = useTheme();
   const insets = useSafeAreaInsets();
-  const { profile } = useUserProfile();
+  const { profile, loading: profileLoading } = useUserProfile();
   const { refreshProgress } = useProgress();
   const [hasPremiumAccess, setHasPremiumAccess] = useState(false);
   const [accessChecked, setAccessChecked] = useState(false);
@@ -49,18 +50,44 @@ export default function LessonDetailScreen() {
       : (['rgba(240,244,248,0)', 'rgba(240,244,248,0.97)', '#f0f4f8'] as [string, string, string]),
   };
 
-  // Derive premium access from profile hook (single source of truth)
+  // Premium / gift access: wait for profile load, then fallback to direct fetch (same pattern as web)
   useEffect(() => {
-    if (profile) {
-      setHasPremiumAccess(profile.subscription_type === 'premium');
-      setAccessChecked(true);
-      return;
-    }
     if (!user) {
       setHasPremiumAccess(false);
       setAccessChecked(true);
+      return;
     }
-  }, [user, profile]);
+
+    if (profileLoading) {
+      setAccessChecked(false);
+      return;
+    }
+
+    if (profile) {
+      setHasPremiumAccess(hasPremiumProgramAccess(profile.subscription_type, user.email));
+      setAccessChecked(true);
+      return;
+    }
+
+    let cancelled = false;
+    const fetchAccess = async () => {
+      const { data } = await supabase
+        .from('profiles')
+        .select('subscription_type')
+        .eq('id', user.id)
+        .maybeSingle();
+      if (cancelled) return;
+      setHasPremiumAccess(
+        hasPremiumProgramAccess((data as { subscription_type?: string } | null)?.subscription_type, user.email),
+      );
+      setAccessChecked(true);
+    };
+    fetchAccess();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [user, profile, profileLoading]);
 
   useEffect(() => {
     setSleepLessonComplete(false);

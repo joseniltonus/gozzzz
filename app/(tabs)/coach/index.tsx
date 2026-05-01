@@ -7,6 +7,7 @@ import { useLanguage } from '@/contexts/LanguageContext';
 import { useTheme } from '@/contexts/ThemeContext';
 import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/lib/supabase';
+import { hasPremiumProgramAccess } from '@/lib/subscriptionAccess';
 import { useState, useEffect } from 'react';
 
 import { ErrorBoundary } from '@/components/ErrorBoundary';
@@ -30,7 +31,7 @@ function CoachContent() {
         .select('subscription_type')
         .eq('id', user.id)
         .maybeSingle() as any;
-      setHasPremiumAccess(data?.subscription_type === 'premium');
+      setHasPremiumAccess(hasPremiumProgramAccess(data?.subscription_type, user.email));
     };
     checkAccess();
   }, [user]);

@@ -10,7 +10,7 @@ import { CookieConsent } from '@/components/CookieConsent';
 import { ToastContainer } from '@/components/Toast';
 import { ErrorBoundary } from '@/components/ErrorBoundary';
 import { useEffect, useRef, useState } from 'react';
-import * as SecureStore from 'expo-secure-store';
+import { saveQuizDoneLocal, readQuizDoneLocal } from '@/lib/quizDevicePersistence';
 import { supabase } from '@/lib/supabase';
 
 function AuthGate() {
@@ -19,6 +19,10 @@ function AuthGate() {
   const router = useRouter();
   const isNavigating = useRef(false);
   const [quizChecked, setQuizChecked] = useState(false);
+
+  useEffect(() => {
+    setQuizChecked(false);
+  }, [user?.id]);
 
   useEffect(() => {
     if (loading) return;
@@ -63,11 +67,18 @@ function AuthGate() {
 
     (async () => {
       try {
-        const localKey = `quiz_done_${user.id}`;
-        const local = await SecureStore.getItemAsync(localKey);
+        const localDone = await readQuizDoneLocal(user.id);
 
-        if (local === 'true') {
+        if (localDone) {
           console.log('[QUIZ_GATE:LOCAL] Quiz already done locally');
+          return;
+        }
+
+        const metaDone =
+          (user?.user_metadata as { quiz_completed?: boolean } | undefined)?.quiz_completed === true;
+        if (metaDone) {
+          console.log('[QUIZ_GATE:AUTH_META] Quiz done in JWT metadata');
+          await saveQuizDoneLocal(user.id);
           return;
         }
 
@@ -85,7 +96,7 @@ function AuthGate() {
         const profileData = profile as { quiz_completed?: boolean } | null;
         if (profileData?.quiz_completed === true) {
           console.log('[QUIZ_GATE:SUPABASE] Quiz already done, saving locally');
-          await SecureStore.setItemAsync(localKey, 'true');
+          await saveQuizDoneLocal(user.id);
           return;
         }
 

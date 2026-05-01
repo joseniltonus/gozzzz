@@ -23,15 +23,17 @@ Este documento explica como configurar o Supabase para o app GoZzzz.
 
 ## Passo 3: Configurar o Arquivo .env
 
-1. Abra o arquivo `.env` na raiz do projeto
-2. Substitua os valores pelas suas credenciais:
+1. Na raiz do projeto: `cp .env.example .env` (ou crie `.env` manualmente).
+2. Copie **URL** e **anon key** de *Settings → API* no Supabase (o mesmo projeto que a Vercel usa em produção).
+3. Rode `npm run verify:env` para validar antes de `npm run dev`.
 
 ```env
 EXPO_PUBLIC_SUPABASE_URL=https://seu-projeto.supabase.co
 EXPO_PUBLIC_SUPABASE_ANON_KEY=sua-chave-anon-publica
+EXPO_PUBLIC_STRIPE_PUBLISHABLE_KEY=pk_test_...
 ```
 
-3. Salve o arquivo
+4. Salve o arquivo
 
 ## Passo 4: Verificar o Banco de Dados
 

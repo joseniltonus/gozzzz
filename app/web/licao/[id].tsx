@@ -23,6 +23,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { useUserProfile } from '@/hooks/useUserProfile';
 import { useProgress } from '@/contexts/ProgressContext';
 import { supabase } from '@/lib/supabase';
+import { hasPremiumProgramAccess } from '@/lib/subscriptionAccess';
 import { useState, useEffect } from 'react';
 import { Lesson1InteractiveCardWeb } from '@/components/Lesson1InteractiveCardWeb';
 import { LessonInteractiveCardWeb } from '@/components/LessonInteractiveCardWeb';
@@ -37,7 +38,7 @@ export default function WebLessonPage() {
   const router = useRouter();
   const { language, t } = useLanguage();
   const { user } = useAuth();
-  const { profile } = useUserProfile();
+  const { profile, loading: profileLoading } = useUserProfile();
   const { refreshProgress } = useProgress();
   const [hasPremiumAccess, setHasPremiumAccess] = useState(false);
   const [accessChecked, setAccessChecked] = useState(false);
@@ -47,29 +48,41 @@ export default function WebLessonPage() {
   // Derive chronotype from profile (single source of truth: database)
   const chronotype = profile?.chronotype || null;
 
-  // Check premium access from profile when available, otherwise fetch
+  // Check premium / gift access: wait for profile hook, then direct fetch fallback
   useEffect(() => {
-    if (profile) {
-      setHasPremiumAccess(profile.subscription_type === 'premium');
-      setAccessChecked(true);
-      return;
-    }
     if (!user) {
       setHasPremiumAccess(false);
       setAccessChecked(true);
       return;
     }
+
+    if (profileLoading) {
+      setAccessChecked(false);
+      return;
+    }
+
+    if (profile) {
+      setHasPremiumAccess(hasPremiumProgramAccess(profile.subscription_type, user.email));
+      setAccessChecked(true);
+      return;
+    }
+
+    let cancelled = false;
     const checkAccess = async () => {
       const { data } = await supabase
         .from('profiles')
         .select('subscription_type')
         .eq('id', user.id)
         .maybeSingle() as any;
-      setHasPremiumAccess(data?.subscription_type === 'premium');
+      if (cancelled) return;
+      setHasPremiumAccess(hasPremiumProgramAccess(data?.subscription_type, user.email));
       setAccessChecked(true);
     };
     checkAccess();
-  }, [user, profile]);
+    return () => {
+      cancelled = true;
+    };
+  }, [user, profile, profileLoading]);
 
   const lesson = LESSONS_DATA.find((l) => l.id === id);
   const enhancement = LESSON_ENHANCEMENTS.find((e) => e.lessonId === id);

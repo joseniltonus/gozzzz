@@ -20,14 +20,22 @@
 DO $$
 BEGIN
   -- Revoke execute on handle_new_user
-  REVOKE EXECUTE ON FUNCTION public.handle_new_user() FROM anon, authenticated, public;
+  IF to_regprocedure('public.handle_new_user()') IS NOT NULL THEN
+    REVOKE EXECUTE ON FUNCTION public.handle_new_user() FROM anon, authenticated, public;
+  END IF;
   
   -- Revoke execute on prevent_gift_code_reuse
-  REVOKE EXECUTE ON FUNCTION public.prevent_gift_code_reuse() FROM anon, authenticated, public;
+  IF to_regprocedure('public.prevent_gift_code_reuse()') IS NOT NULL THEN
+    REVOKE EXECUTE ON FUNCTION public.prevent_gift_code_reuse() FROM anon, authenticated, public;
+  END IF;
   
   -- Revoke execute on update_lesson_feedback_updated_at
-  REVOKE EXECUTE ON FUNCTION public.update_lesson_feedback_updated_at() FROM anon, authenticated, public;
+  IF to_regprocedure('public.update_lesson_feedback_updated_at()') IS NOT NULL THEN
+    REVOKE EXECUTE ON FUNCTION public.update_lesson_feedback_updated_at() FROM anon, authenticated, public;
+  END IF;
   
   -- Revoke execute on update_updated_at_column
-  REVOKE EXECUTE ON FUNCTION public.update_updated_at_column() FROM anon, authenticated, public;
+  IF to_regprocedure('public.update_updated_at_column()') IS NOT NULL THEN
+    REVOKE EXECUTE ON FUNCTION public.update_updated_at_column() FROM anon, authenticated, public;
+  END IF;
 END $$;

@@ -12,15 +12,36 @@
   4. Check constraint ensuring `used_by` and `used_at` are always set together
 */
 
-ALTER TABLE gift_codes
-  ADD CONSTRAINT gift_codes_code_unique UNIQUE (code);
+DO $$
+BEGIN
+  IF to_regclass('public.gift_codes') IS NULL THEN
+    RAISE NOTICE 'Skipping gift code constraints because public.gift_codes does not exist.';
+    RETURN;
+  END IF;
 
-ALTER TABLE gift_codes
-  ADD CONSTRAINT gift_codes_used_together
-  CHECK (
-    (used_by IS NULL AND used_at IS NULL) OR
-    (used_by IS NOT NULL AND used_at IS NOT NULL)
-  );
+  IF NOT EXISTS (
+    SELECT 1
+    FROM pg_constraint
+    WHERE conname = 'gift_codes_code_unique'
+  ) THEN
+    ALTER TABLE gift_codes
+      ADD CONSTRAINT gift_codes_code_unique UNIQUE (code);
+  END IF;
+
+  IF NOT EXISTS (
+    SELECT 1
+    FROM pg_constraint
+    WHERE conname = 'gift_codes_used_together'
+  ) THEN
+    ALTER TABLE gift_codes
+      ADD CONSTRAINT gift_codes_used_together
+      CHECK (
+        (used_by IS NULL AND used_at IS NULL) OR
+        (used_by IS NOT NULL AND used_at IS NOT NULL)
+      );
+  END IF;
+END
+$$;
 
 CREATE OR REPLACE FUNCTION prevent_gift_code_reuse()
 RETURNS TRIGGER
@@ -36,9 +57,18 @@ BEGIN
 END;
 $$;
 
-DROP TRIGGER IF EXISTS gift_code_single_use_guard ON gift_codes;
+DO $$
+BEGIN
+  IF to_regclass('public.gift_codes') IS NULL THEN
+    RAISE NOTICE 'Skipping gift code trigger because public.gift_codes does not exist.';
+    RETURN;
+  END IF;
 
-CREATE TRIGGER gift_code_single_use_guard
-  BEFORE UPDATE ON gift_codes
-  FOR EACH ROW
-  EXECUTE FUNCTION prevent_gift_code_reuse();
+  DROP TRIGGER IF EXISTS gift_code_single_use_guard ON gift_codes;
+
+  CREATE TRIGGER gift_code_single_use_guard
+    BEFORE UPDATE ON gift_codes
+    FOR EACH ROW
+    EXECUTE FUNCTION prevent_gift_code_reuse();
+END
+$$;

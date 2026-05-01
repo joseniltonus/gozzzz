@@ -9,6 +9,7 @@ import { getChronotypeInfo } from '@/data/chronotypes';
 import { ErrorBoundary } from '@/components/ErrorBoundary';
 import ChronotypeQuizModal from '@/components/ChronotypeQuizModal';
 import * as SecureStore from 'expo-secure-store';
+import { saveQuizDoneLocal, readQuizDoneLocal } from '@/lib/quizDevicePersistence';
 import { supabase } from '@/lib/supabase';
 
 type Chronotype = 'lion' | 'bear' | 'wolf' | 'dolphin';
@@ -18,20 +19,6 @@ const PURPLE = '#7c6fff';
 const BG = '#0f0e1a';
 const CARD_BG = '#1a1830';
 const GOLD = '#d4a96a';
-
-const saveQuizDone = async (userId: string) => {
-  try {
-    const key = `quiz_done_${userId}`;
-    if (Platform.OS === 'web') {
-      localStorage.setItem(key, 'true');
-    } else {
-      await SecureStore.setItemAsync(key, 'true');
-    }
-    console.log('QUIZ FLAG SAVED LOCALLY:', key);
-  } catch (err) {
-    console.error('Local save error:', err);
-  }
-};
 
 const saveQuizChronotype = async (userId: string, chronotype: string) => {
   try {
@@ -89,21 +76,8 @@ const readQuizChronotype = async (userId: string): Promise<Chronotype | null> =>
   }
 };
 
-const readQuizDone = async (userId: string): Promise<boolean> => {
-  try {
-    const key = `quiz_done_${userId}`;
-    if (Platform.OS === 'web') {
-      return localStorage.getItem(key) === 'true';
-    } else {
-      const value = await SecureStore.getItemAsync(key);
-      console.log('SECURESTORE READ:', key, value);
-      return value === 'true';
-    }
-  } catch (err) {
-    console.error('Local read error:', err);
-    return false;
-  }
-};
+const isChronotype = (value: string | null | undefined): value is Chronotype =>
+  value === 'lion' || value === 'bear' || value === 'wolf' || value === 'dolphin';
 
 // ─── DASHBOARD ─────────────────────────────────────────────────
 function ReturningUserScreen({ profile, lang, progress }: { profile: any; lang: Lang; progress: any }) {
@@ -281,6 +255,13 @@ function HomeContent() {
   const [localQuizDone, setLocalQuizDone] = useState<boolean | null>(null);
   const [localChronotype, setLocalChronotype] = useState<Chronotype | null>(null);
   const [localChronotypeVerified, setLocalChronotypeVerified] = useState<boolean | null>(null);
+  const chronotypeFromAuthMeta =
+    isChronotype((user?.user_metadata as { chronotype?: string } | undefined)?.chronotype)
+      ? ((user?.user_metadata as { chronotype: Chronotype }).chronotype)
+      : null;
+  const quizCompletedFromMeta =
+    (user?.user_metadata as { quiz_completed?: boolean } | undefined)?.quiz_completed === true;
+
   const effectiveProfile = {
     id: profile?.id ?? user?.id ?? '',
     email: profile?.email ?? user?.email ?? '',
@@ -289,36 +270,52 @@ function HomeContent() {
       (user?.user_metadata as any)?.full_name ??
       user?.email?.split('@')[0] ??
       null,
-    chronotype: localChronotype ?? (profile?.chronotype as Chronotype | null) ?? null,
+    chronotype: localChronotype ?? (profile?.chronotype as Chronotype | null) ?? chronotypeFromAuthMeta,
     language: (profile?.language as Lang | undefined) ?? (language as Lang) ?? 'pt',
     subscription_type: profile?.subscription_type ?? 'free',
-    quiz_completed: profile?.quiz_completed ?? false,
+    quiz_completed: (profile?.quiz_completed ?? false) || quizCompletedFromMeta,
     quiz_progress: (profile?.quiz_progress as number | null | undefined) ?? null,
   };
 
-  // READ SECURESTORE FIRST — before anything renders
+  // Disk + JWT metadata together (avoid async disk read overwriting quiz_done from Auth).
   useEffect(() => {
-    if (!user?.id) return;
+    if (!user?.id || !user) return;
 
     const checkLocalFlag = async () => {
-      const [done, chrono] = await Promise.all([
-        readQuizDone(user.id),
+      const metaDone = quizCompletedFromMeta;
+      const [doneDisk, chronoDisk] = await Promise.all([
+        readQuizDoneLocal(user.id),
         readQuizChronotype(user.id),
       ]);
-      setLocalQuizDone(done);
-      setLocalChronotype(chrono);
-      setLocalChronotypeVerified(await readChronotypeVerified(user.id));
+      setLocalQuizDone(doneDisk || metaDone);
+      setLocalChronotype(chronoDisk ?? chronotypeFromAuthMeta ?? null);
+
+      const diskVerifiedFlag = await readChronotypeVerified(user.id);
+      const verified =
+        metaDone ||
+        diskVerifiedFlag ||
+        !!chronoDisk ||
+        !!chronotypeFromAuthMeta;
+      setLocalChronotypeVerified(verified);
+
+      if (metaDone) void saveQuizDoneLocal(user.id);
     };
-    checkLocalFlag();
-  }, [user?.id]);
+    void checkLocalFlag();
+  }, [user?.id, quizCompletedFromMeta, chronotypeFromAuthMeta]);
 
   useEffect(() => {
     if (profile?.quiz_completed && user?.id) {
       // Keep local flag aligned with Supabase to prevent quiz regressions.
-      saveQuizDone(user.id);
+      void saveQuizDoneLocal(user.id);
       setLocalQuizDone(true);
     }
   }, [profile?.quiz_completed, user?.id]);
+
+  useEffect(() => {
+    if (profile?.quiz_completed && profile.chronotype) {
+      setLocalChronotypeVerified(true);
+    }
+  }, [profile?.quiz_completed, profile?.chronotype]);
 
   useEffect(() => {
     if (!user?.id || !localChronotype || !profile?.chronotype) return;
@@ -355,7 +352,7 @@ function HomeContent() {
     // Persist in background and refresh state when done.
     if (user?.id) {
       void Promise.all([
-        saveQuizDone(user.id),
+        saveQuizDoneLocal(user.id),
         saveQuizChronotype(user.id, chronotype),
       ]).finally(() => {
         refetchProfile();
@@ -368,6 +365,28 @@ function HomeContent() {
     refreshProgress();
   }, [user?.id, refetchProfile, refreshProgress, router]);
 
+  // QUIZ DONE = device flag OR profile OR JWT user_metadata OR derived effectiveProfile
+  const quizDone =
+    localQuizDone === true ||
+    quizCompletedFromMeta ||
+    profile?.quiz_completed === true ||
+    effectiveProfile.quiz_completed === true;
+
+  useEffect(() => {
+    if (!user?.id || !quizDone || localChronotypeVerified !== false) return;
+    const chronotypeToPersist = isChronotype(localChronotype)
+      ? localChronotype
+      : isChronotype(effectiveProfile.chronotype)
+        ? effectiveProfile.chronotype
+        : null;
+    if (!chronotypeToPersist) return;
+
+    // Repair old/local missing verification in background without reopening quiz.
+    void saveQuizChronotype(user.id, chronotypeToPersist).then(() => {
+      setLocalChronotypeVerified(true);
+    });
+  }, [user?.id, quizDone, localChronotypeVerified, localChronotype, effectiveProfile.chronotype]);
+
   // Wait for local flag check AND profile fetch
   if (localQuizDone === null || localChronotypeVerified === null || !hasFetched || loading) {
     return (
@@ -377,7 +396,7 @@ function HomeContent() {
     );
   }
 
-  if (error && localQuizDone !== true && !profile?.quiz_completed) {
+  if (error && localQuizDone !== true && !profile?.quiz_completed && !quizCompletedFromMeta) {
     return (
       <View style={styles.container}>
         <ActivityIndicator size="large" color={PURPLE} />
@@ -393,11 +412,7 @@ function HomeContent() {
     );
   }
 
-  // QUIZ DONE = local flag OR Supabase flag
-  const quizDone = localQuizDone === true || profile?.quiz_completed === true || effectiveProfile.quiz_completed === true;
-  const needsChronotypeRepair = quizDone && localChronotypeVerified === false && effectiveProfile.chronotype === 'bear';
-
-  if (!quizDone || needsChronotypeRepair) {
+  if (!quizDone) {
     return <ChronotypeQuizModal visible onComplete={handleQuizComplete} />;
   }
 

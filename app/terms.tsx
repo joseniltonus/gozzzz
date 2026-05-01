@@ -4,6 +4,17 @@ import { FileText, ArrowLeft } from 'lucide-react-native';
 import { useRouter } from 'expo-router';
 import { useLanguage } from '@/contexts/LanguageContext';
 
+const QUIZ_DISCLAIMER =
+  'O questionário de identificação de cronotipo do GoZzzz foi desenvolvido ' +
+  'de forma independente e não reproduz o quiz original do Dr. Breus ' +
+  'disponível em thepowerofwhenquiz.com.';
+
+const CHRONOTYPE_NAMES =
+  'Os nomes dos cronotipos (Golfinho, Leão, Urso e Lobo) são utilizados ' +
+  'como termos descritivos de categorias científicas, com atribuição ao ' +
+  'modelo original do Dr. Michael J. Breus, PhD, conforme publicado em ' +
+  '"O Poder do Quando" (The Power of When, 2016).';
+
 export default function TermsScreen() {
   const router = useRouter();
   const { t } = useLanguage();
@@ -66,6 +77,9 @@ export default function TermsScreen() {
           <Text style={styles.bulletPoint}>• Charles Czeisler, Ph.D., M.D. — Harvard Medical School</Text>
           <Text style={styles.text}>
             GoZzzz aplica esses conceitos de forma independente. Não somos afiliados, patrocinados ou endossados por nenhum dos pesquisadores ou suas respectivas instituições. Nenhum dos pesquisadores revisou ou aprovou este conteúdo.
+          </Text>
+          <Text style={styles.disclaimerText}>
+            {QUIZ_DISCLAIMER}
           </Text>
         </View>
 
@@ -135,6 +149,9 @@ export default function TermsScreen() {
           </Text>
           <Text style={styles.text}>
             Referências a pesquisadores, cientistas e seus trabalhos publicados são apenas para fins educativos. Tais referências não implicam endosso ou afiliação. Todo o conteúdo é baseado em pesquisas científicas publicadas.
+          </Text>
+          <Text style={styles.disclaimerText}>
+            {CHRONOTYPE_NAMES}
           </Text>
         </View>
 
@@ -323,6 +340,12 @@ const styles = StyleSheet.create({
     lineHeight: 24,
     marginLeft: 8,
     marginBottom: 8,
+  },
+  disclaimerText: {
+    fontSize: 13,
+    color: '#888',
+    fontStyle: 'italic',
+    marginTop: 8,
   },
   divider: {
     height: 1,

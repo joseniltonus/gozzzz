@@ -13,36 +13,58 @@ DECLARE
 BEGIN
   FOREACH v_user_id IN ARRAY v_user_ids LOOP
     -- Delete from lesson_feedback
-    DELETE FROM lesson_feedback WHERE user_id = v_user_id;
+    IF to_regclass('public.lesson_feedback') IS NOT NULL THEN
+      DELETE FROM lesson_feedback WHERE user_id = v_user_id;
+    END IF;
     
     -- Delete from user_roles
-    DELETE FROM user_roles WHERE user_id = v_user_id;
+    IF to_regclass('public.user_roles') IS NOT NULL THEN
+      DELETE FROM user_roles WHERE user_id = v_user_id;
+    END IF;
     
     -- Delete from email_tokens
-    DELETE FROM email_tokens WHERE user_id = v_user_id;
+    IF to_regclass('public.email_tokens') IS NOT NULL THEN
+      DELETE FROM email_tokens WHERE user_id = v_user_id;
+    END IF;
     
     -- Delete from password_reset_tokens
-    DELETE FROM password_reset_tokens WHERE user_id = v_user_id;
+    IF to_regclass('public.password_reset_tokens') IS NOT NULL THEN
+      DELETE FROM password_reset_tokens WHERE user_id = v_user_id;
+    END IF;
     
     -- Delete from email_confirmations
-    DELETE FROM email_confirmations WHERE user_id = v_user_id;
+    IF to_regclass('public.email_confirmations') IS NOT NULL THEN
+      DELETE FROM email_confirmations WHERE user_id = v_user_id;
+    END IF;
     
     -- Delete from data_export_requests
-    DELETE FROM data_export_requests WHERE user_id = v_user_id;
+    IF to_regclass('public.data_export_requests') IS NOT NULL THEN
+      DELETE FROM data_export_requests WHERE user_id = v_user_id;
+    END IF;
     
     -- Delete from data_deletion_requests
-    DELETE FROM data_deletion_requests WHERE user_id = v_user_id;
+    IF to_regclass('public.data_deletion_requests') IS NOT NULL THEN
+      DELETE FROM data_deletion_requests WHERE user_id = v_user_id;
+    END IF;
     
     -- Delete from consent_records
-    DELETE FROM consent_records WHERE user_id = v_user_id;
+    IF to_regclass('public.consent_records') IS NOT NULL THEN
+      DELETE FROM consent_records WHERE user_id = v_user_id;
+    END IF;
     
     -- Delete from gift_codes (clear if used by this user)
-    UPDATE gift_codes SET used_by = NULL, used_at = NULL WHERE used_by = v_user_id;
+    IF to_regclass('public.gift_codes') IS NOT NULL THEN
+      UPDATE gift_codes SET used_by = NULL, used_at = NULL WHERE used_by = v_user_id;
+    END IF;
     
     -- Delete from user_progress
-    DELETE FROM user_progress WHERE user_id = v_user_id;
+    IF to_regclass('public.user_progress') IS NOT NULL THEN
+      DELETE FROM user_progress WHERE user_id = v_user_id;
+    END IF;
     
     -- Delete from profiles (cascades to dependent records)
-    DELETE FROM profiles WHERE id = v_user_id;
+    IF to_regclass('public.profiles') IS NOT NULL THEN
+      DELETE FROM profiles WHERE id = v_user_id;
+    END IF;
   END LOOP;
 END $$;

@@ -30,18 +30,31 @@ GoZzzz foi criado após 15 anos de luta contra insônia. A dor se transformou em
 npm install
 ```
 
-### 2. Configurar Supabase
+### 2. Variáveis de ambiente (local + Vercel + EAS)
 
-1. Acesse [supabase.com](https://supabase.com) e crie um novo projeto
-2. Vá em Settings > API para obter suas credenciais
-3. Atualize o arquivo `.env` com suas credenciais:
+1. Copie o modelo: `cp .env.example .env` e preencha com as chaves do **mesmo** projeto Supabase que usa em produção.
+2. No **Bolt.new** exportavas `.env` ou variáveis no painel — copie **URL + anon key + Stripe publishable** para o `.env` local e para **Vercel → Project → Settings → Environment Variables** (Production e Preview). O site `gozzzz.app` só funciona se o Supabase da Vercel for o mesmo onde correste SQL / migrações.
+3. Confirme localmente:
+
+```bash
+npm run verify:env
+```
+
+4. Detalhes de Auth, RLS e tabelas: veja [SUPABASE_SETUP.md](./SUPABASE_SETUP.md).
+
+### 3. Configurar Supabase (credenciais)
+
+1. Acesse [supabase.com](https://supabase.com) e abra o projeto correto
+2. **Settings → API**: Project URL e **anon public** key
+3. Cole em `.env` (ver `.env.example`)
 
 ```env
 EXPO_PUBLIC_SUPABASE_URL=sua_url_do_supabase
 EXPO_PUBLIC_SUPABASE_ANON_KEY=sua_chave_anon_do_supabase
+EXPO_PUBLIC_STRIPE_PUBLISHABLE_KEY=sua_chave_publica_stripe
 ```
 
-### 3. Banco de Dados
+### 4. Banco de Dados
 
 O schema do banco de dados já foi criado automaticamente com as seguintes tabelas:
 
@@ -52,11 +65,31 @@ O schema do banco de dados já foi criado automaticamente com as seguintes tabel
 
 As 21 lições e dicas diárias já foram populadas no banco.
 
-### 4. Executar o Projeto
+### 5. Migrações SQL (alinhar BD com o código)
+
+Na máquina (com [Supabase CLI](https://supabase.com/docs/guides/cli) ligado ao projeto):
+
+```bash
+npx supabase db push
+```
+
+No **SQL Editor** do dashboard só colas **SQL** (blocos `DO $$ ... $$`), nunca comandos de terminal como `cd` ou `npx`.
+
+### 6. Executar o Projeto
 
 ```bash
 npm run dev
 ```
+
+### Checklist rápido pós-Bolt.new / novo clone
+
+| Passo | O quê |
+|--------|--------|
+| 1 | `npm install` |
+| 2 | `.env` a partir de `.env.example` + `npm run verify:env` |
+| 3 | Vercel / EAS com **os mesmos** `EXPO_PUBLIC_*` |
+| 4 | `npx supabase db push` (ou SQL manual no projeto certo) |
+| 5 | `npm run typecheck` antes de abrir PR |
 
 ## Estrutura do Projeto
 
