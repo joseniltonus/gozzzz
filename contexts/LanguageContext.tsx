@@ -571,6 +571,8 @@ const translations = {
     'auth.login.errorMsg': 'E-mail ou senha incorretos. Verifique e tente novamente.',
     'auth.login.errorEmailNotConfirmed': 'Seu e-mail ainda não foi confirmado. Verifique sua caixa de entrada e clique no link de confirmação.',
     'auth.login.errorUnexpected': 'Ocorreu um erro inesperado. Tente novamente.',
+    'auth.login.errorSupabaseEnv':
+      'O site não está ligado ao servidor (Supabase). No painel da Vercel, em Environment Variables, defina EXPO_PUBLIC_SUPABASE_URL e EXPO_PUBLIC_SUPABASE_ANON_KEY com os valores do projeto Supabase (Settings → API) e faça um novo deploy.',
     'auth.signup.title': 'Criar Conta',
     'auth.signup.name': 'Nome completo',
     'auth.signup.email': 'Email',
@@ -1540,6 +1542,8 @@ const translations = {
     'auth.login.errorMsg': 'Incorrect email or password. Please try again.',
     'auth.login.errorEmailNotConfirmed': 'Your email has not been confirmed yet. Please check your inbox and click the confirmation link.',
     'auth.login.errorUnexpected': 'An unexpected error occurred. Please try again.',
+    'auth.login.errorSupabaseEnv':
+      'This site is not connected to the backend (Supabase). In the Vercel dashboard, set EXPO_PUBLIC_SUPABASE_URL and EXPO_PUBLIC_SUPABASE_ANON_KEY under Environment Variables (use your Supabase project: Settings → API), then redeploy.',
     'auth.signup.title': 'Create Account',
     'auth.signup.name': 'Full name',
     'auth.signup.email': 'Email',

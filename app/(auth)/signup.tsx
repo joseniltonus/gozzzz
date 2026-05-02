@@ -3,6 +3,7 @@ import { useState } from 'react';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Moon, Mail, Lock, User, ArrowRight, ArrowLeft, Check } from 'lucide-react-native';
 import { useAuth } from '@/contexts/AuthContext';
+import { AUTH_CONFIG_INCOMPLETE } from '@/lib/supabase';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useRouter } from 'expo-router';
 import { useToast } from '@/contexts/ToastContext';
@@ -62,6 +63,10 @@ export default function SignUpScreen() {
 
       if (error) {
         setLoading(false);
+        if ((error as any)?.message === AUTH_CONFIG_INCOMPLETE) {
+          showError(t('auth.login.errorSupabaseEnv'));
+          return;
+        }
         const code = (error as any)?.code;
         const msgLower = (error as any)?.message?.toLowerCase?.() ?? '';
         let msg = t('auth.signup.errorMsg');

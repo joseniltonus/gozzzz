@@ -1,8 +1,9 @@
 import { View, Text, StyleSheet, TextInput, TouchableOpacity, KeyboardAvoidingView, Platform, ScrollView, SafeAreaView } from 'react-native';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Moon, Mail, Lock, ArrowRight, TriangleAlert } from 'lucide-react-native';
 import { useAuth } from '@/contexts/AuthContext';
+import { AUTH_CONFIG_INCOMPLETE, isSupabaseConfigured } from '@/lib/supabase';
 import { useRouter } from 'expo-router';
 import { useLanguage } from '@/contexts/LanguageContext';
 
@@ -14,6 +15,12 @@ export default function LoginScreen() {
   const { signIn } = useAuth();
   const router = useRouter();
   const { t } = useLanguage();
+
+  useEffect(() => {
+    if (!isSupabaseConfigured) {
+      setErrorMsg(t('auth.login.errorSupabaseEnv'));
+    }
+  }, [t]);
 
   const handleLogin = async () => {
     setErrorMsg('');
@@ -29,6 +36,10 @@ export default function LoginScreen() {
 
       if (error) {
         setLoading(false);
+        if (error?.message === AUTH_CONFIG_INCOMPLETE) {
+          setErrorMsg(t('auth.login.errorSupabaseEnv'));
+          return;
+        }
         const msg = error?.message?.toLowerCase() ?? '';
         if (msg.includes('email not confirmed') || msg.includes('email_not_confirmed')) {
           setErrorMsg(t('auth.login.errorEmailNotConfirmed'));

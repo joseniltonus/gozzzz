@@ -1,7 +1,7 @@
 import { createContext, useContext, useEffect, useState, useRef } from 'react';
 import { Platform } from 'react-native';
 import { Session, User } from '@supabase/supabase-js';
-import { supabase } from '@/lib/supabase';
+import { supabase, isSupabaseConfigured, AUTH_CONFIG_INCOMPLETE } from '@/lib/supabase';
 import { generateToken, setLocalToken, removeLocalToken } from '@/lib/sessionToken';
 import { syncQuizCompletionFromServer } from '@/lib/syncQuizCompletion';
 
@@ -111,6 +111,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const signIn = async (email: string, password: string) => {
     try {
+      if (!isSupabaseConfigured) {
+        return { error: { message: AUTH_CONFIG_INCOMPLETE } as any };
+      }
       if (isBlockedAuthEmail(email)) {
         return { error: new Error('This account is not allowed to access the app.') as any };
       }
@@ -133,6 +136,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const signUp = async (email: string, password: string, fullName: string, consents: ConsentData, language?: string) => {
     try {
+      if (!isSupabaseConfigured) {
+        return { error: { message: AUTH_CONFIG_INCOMPLETE } as any };
+      }
       if (isBlockedAuthEmail(email)) {
         return { error: new Error('This account is not allowed to access the app.') as any };
       }

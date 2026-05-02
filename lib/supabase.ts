@@ -5,6 +5,43 @@ import { Profile, UserProgress, Lesson, DailyTip } from '@/types/database';
 const supabaseUrl = process.env.EXPO_PUBLIC_SUPABASE_URL || '';
 const supabaseAnonKey = process.env.EXPO_PUBLIC_SUPABASE_ANON_KEY || '';
 
+/** Expo inlines EXPO_PUBLIC_* at build time — placeholder values break auth in production. */
+export const AUTH_CONFIG_INCOMPLETE = 'AUTH_CONFIG_INCOMPLETE';
+
+function isUsableSupabaseUrl(url: string): boolean {
+  const u = url.trim();
+  try {
+    const parsed = new URL(u);
+    if (parsed.protocol !== 'https:') return false;
+    const host = parsed.hostname;
+    if (!host.includes('.')) return false;
+    if (/^xxxx\./i.test(host) || host === 'xxxx.supabase.co') return false;
+    return true;
+  } catch {
+    return false;
+  }
+}
+
+function isUsableSupabaseAnonKey(key: string): boolean {
+  const k = key.trim();
+  if (k.length < 120) return false;
+  if (k.includes('...')) return false;
+  return k.startsWith('eyJ');
+}
+
+export const isSupabaseConfigured =
+  isUsableSupabaseUrl(supabaseUrl) && isUsableSupabaseAnonKey(supabaseAnonKey);
+
+function authStorageKeyForUrl(url: string): string | null {
+  try {
+    const host = new URL(url.trim()).hostname;
+    const ref = host.split('.')[0];
+    return ref && ref !== 'xxxx' ? `sb-${ref}-auth-token` : null;
+  } catch {
+    return null;
+  }
+}
+
 const storageAdapter = {
   getItem: (key: string): string | null => {
     if (typeof window === 'undefined') {
@@ -130,7 +167,8 @@ try {
 
   supabase.auth.onAuthStateChange((event, session) => {
     if (event === 'INITIAL_SESSION' && !session) {
-      storageAdapter.removeItem('sb-cmekyhdkenoymfftwjod-auth-token');
+      const key = authStorageKeyForUrl(supabaseUrl);
+      if (key) storageAdapter.removeItem(key);
     }
   });
 } catch {
