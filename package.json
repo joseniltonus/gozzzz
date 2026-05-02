@@ -16,6 +16,7 @@
     "lint": "expo lint",
     "typecheck": "tsc --noEmit",
     "validate:science": "node scripts/validate-science-references.mjs",
+    "vercel:print-ci-ids": "node scripts/print-vercel-ci-ids.mjs",
     "verify:env": "node scripts/verify-env.mjs",
     "deploy:vercel": "node scripts/sync-dotenv-to-vercel.mjs",
     "eas:build:ios": "npx eas-cli build --profile production --platform ios",
