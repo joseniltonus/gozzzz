@@ -1,0 +1,60 @@
+name: Store Builds (EAS)
+
+on:
+  push:
+    tags:
+      - "v*"
+  workflow_dispatch:
+    inputs:
+      platform:
+        description: "Platform to build"
+        required: true
+        default: all
+        type: choice
+        options:
+          - all
+          - ios
+          - android
+
+jobs:
+  build-and-submit:
+    name: Build and auto-submit to stores
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Resolve platform
+        id: resolve
+        run: |
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            echo "platform=${{ github.event.inputs.platform }}" >> "$GITHUB_OUTPUT"
+          else
+            echo "platform=all" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Build + submit via EAS
+        env:
+          EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
+        run: |
+          if [ -z "$EXPO_TOKEN" ]; then
+            echo "Missing required secret: EXPO_TOKEN"
+            exit 1
+          fi
+
+          PLATFORM="${{ steps.resolve.outputs.platform }}"
+          echo "Running EAS production build for platform: ${PLATFORM}"
+          npx eas-cli build \
+            --platform "${PLATFORM}" \
+            --profile production \
+            --non-interactive \
+            --auto-submit
