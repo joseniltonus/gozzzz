@@ -49,8 +49,9 @@ jobs:
           VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
           VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
         run: |
-          if [ -z "$VERCEL_TOKEN" ] || [ -z "$VERCEL_ORG_ID" ] || [ -z "$VERCEL_PROJECT_ID" ]; then
-            echo "Missing required Vercel secrets: VERCEL_TOKEN, VERCEL_ORG_ID, VERCEL_PROJECT_ID"
+          if [ -z "$VERCEL_TOKEN" ] || [ -z "$VERCEL_PROJECT_ID" ]; then
+            echo "Missing required Vercel secrets: VERCEL_TOKEN, VERCEL_PROJECT_ID"
+            echo "Tip: VERCEL_ORG_ID is optional for some Hobby accounts — leave blank if unsure."
             exit 1
           fi
           npm run vercel:verify-project
@@ -75,11 +76,9 @@ jobs:
       - name: Deploy to Vercel (production)
         env:
           VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
-          VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
-          VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
         run: |
-          if [ -z "$VERCEL_TOKEN" ] || [ -z "$VERCEL_ORG_ID" ] || [ -z "$VERCEL_PROJECT_ID" ]; then
-            echo "Missing required Vercel secrets: VERCEL_TOKEN, VERCEL_ORG_ID, VERCEL_PROJECT_ID"
+          if [ -z "$VERCEL_TOKEN" ]; then
+            echo "Missing required Vercel secret: VERCEL_TOKEN"
             exit 1
           fi
           npx vercel deploy --prod --yes --token "$VERCEL_TOKEN"
