@@ -9,7 +9,12 @@ import { getChronotypeInfo } from '@/data/chronotypes';
 import { ErrorBoundary } from '@/components/ErrorBoundary';
 import ChronotypeQuizModal from '@/components/ChronotypeQuizModal';
 import * as SecureStore from 'expo-secure-store';
-import { saveQuizDoneLocal, readQuizDoneLocal } from '@/lib/quizDevicePersistence';
+import {
+  saveQuizDoneLocal,
+  readQuizDoneLocal,
+  readPreRegistrationQuizDone,
+  clearPreRegistrationQuizDone,
+} from '@/lib/quizDevicePersistence';
 import { supabase } from '@/lib/supabase';
 
 type Chronotype = 'lion' | 'bear' | 'wolf' | 'dolphin';
@@ -283,11 +288,28 @@ function HomeContent() {
 
     const checkLocalFlag = async () => {
       const metaDone = quizCompletedFromMeta;
-      const [doneDisk, chronoDisk] = await Promise.all([
+      const [doneDisk, chronoDisk, preRegDone] = await Promise.all([
         readQuizDoneLocal(user.id),
         readQuizChronotype(user.id),
+        readPreRegistrationQuizDone(),
       ]);
-      setLocalQuizDone(doneDisk || metaDone);
+
+      let effectiveDone = doneDisk || metaDone;
+      if (!effectiveDone && preRegDone) {
+        const chrono = chronoDisk ?? chronotypeFromAuthMeta;
+        if (isChronotype(chrono)) {
+          await Promise.all([
+            saveQuizDoneLocal(user.id),
+            saveQuizChronotype(user.id, chrono),
+            clearPreRegistrationQuizDone(),
+          ]);
+          effectiveDone = true;
+        } else {
+          await clearPreRegistrationQuizDone();
+        }
+      }
+
+      setLocalQuizDone(effectiveDone || metaDone);
       setLocalChronotype(chronoDisk ?? chronotypeFromAuthMeta ?? null);
 
       const diskVerifiedFlag = await readChronotypeVerified(user.id);

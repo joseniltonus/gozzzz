@@ -17,6 +17,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { supabase } from '@/lib/supabase';
 import { syncQuizCompletionFromServer } from '@/lib/syncQuizCompletion';
+import { savePreRegistrationQuizDone } from '@/lib/quizDevicePersistence';
 import { ShareableCard } from './ShareableCard';
 import * as SecureStore from 'expo-secure-store';
 
@@ -128,6 +129,8 @@ function calcChronotype(answers: string[][]): Chronotype {
 interface Props {
   visible: boolean;
   onComplete: (chronotype: string) => void;
+  /** Use on a Stack screen (/quiz): no RN Modal wrapper (avoids double sheet / web glitches). */
+  presentation?: 'modal' | 'fullscreen';
 }
 
 async function persistLatestChronotype(chronotype: Chronotype, userId?: string) {
@@ -221,7 +224,11 @@ async function persistQuizResultRemotely(params: {
   }
 }
 
-export default function ChronotypeQuizModal({ visible, onComplete }: Props) {
+export default function ChronotypeQuizModal({
+  visible,
+  onComplete,
+  presentation = 'modal',
+}: Props) {
   const { user } = useAuth();
   const { language } = useLanguage();
   const insets = useSafeAreaInsets();
@@ -281,11 +288,15 @@ export default function ChronotypeQuizModal({ visible, onComplete }: Props) {
     setResult(null);
     setSaving(false);
 
+    // Persist before navigation so post-signup home sees quiz + chronotype.
+    await persistLatestChronotype(finalizedChronotype, user?.id);
+    if (!user) {
+      await savePreRegistrationQuizDone();
+    }
+
     // Navigate immediately for responsive UX.
     onComplete(finalizedChronotype);
 
-    // Persist local/remote profile in background so button never feels stuck.
-    void persistLatestChronotype(finalizedChronotype, user?.id);
     if (user) {
       void persistQuizResultRemotely({
         userId: user.id,
@@ -319,9 +330,11 @@ export default function ChronotypeQuizModal({ visible, onComplete }: Props) {
     return () => glowLoop.stop();
   }, [scienceGlow]);
 
-  return (
-    <Modal visible={visible} animationType="slide" presentationStyle="pageSheet">
-      <LinearGradient colors={['#07070f', '#0f1a2e']} style={styles.container}>
+  const gradientColors =
+    presentation === 'fullscreen' ? (['#0c0e1a', '#0f1428'] as const) : (['#07070f', '#0f1a2e'] as const);
+
+  const body = (
+    <LinearGradient colors={gradientColors} style={styles.container}>
         {!isResultScreen ? (
           <ScrollView
             contentContainerStyle={[
@@ -484,7 +497,17 @@ export default function ChronotypeQuizModal({ visible, onComplete }: Props) {
             </TouchableOpacity>
           </ScrollView>
         )}
-      </LinearGradient>
+    </LinearGradient>
+  );
+
+  if (presentation === 'fullscreen') {
+    if (!visible) return null;
+    return body;
+  }
+
+  return (
+    <Modal visible={visible} animationType="slide" presentationStyle="pageSheet">
+      {body}
     </Modal>
   );
 }

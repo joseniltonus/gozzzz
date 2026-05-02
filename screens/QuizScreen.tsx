@@ -15,7 +15,7 @@ export default function QuizScreen() {
 
   return (
     <View style={styles.root}>
-      <ChronotypeQuizModal visible onComplete={onComplete} />
+      <ChronotypeQuizModal visible presentation="fullscreen" onComplete={onComplete} />
     </View>
   );
 }
