@@ -31,6 +31,8 @@ yarn-error.*
 .env*.local
 .env
 .env.backup*
+.env.vercel.pulled
+.env.production.pull
 
 # typescript
 *.tsbuildinfo
