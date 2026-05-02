@@ -18,6 +18,10 @@ on:
           - ios
           - android
 
+concurrency:
+  group: eas-store-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: false
+
 jobs:
   build-and-submit:
     name: Build and auto-submit to stores
@@ -37,6 +41,16 @@ jobs:
 
       - name: Validate science references policy
         run: npm run validate:science
+
+      - name: Verify EAS production variables (Expo dashboard)
+        env:
+          EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
+        run: |
+          if [ -z "$EXPO_TOKEN" ]; then
+            echo "Missing required secret: EXPO_TOKEN"
+            exit 1
+          fi
+          npm run verify:eas-env
 
       - name: Resolve platform
         id: resolve

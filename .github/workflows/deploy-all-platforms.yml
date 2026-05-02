@@ -100,6 +100,16 @@ jobs:
       - name: Install deps
         run: npm ci
 
+      - name: Verify EAS production variables (Expo dashboard)
+        env:
+          EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
+        run: |
+          if [ -z "$EXPO_TOKEN" ]; then
+            echo "Missing required secret: EXPO_TOKEN"
+            exit 1
+          fi
+          npm run verify:eas-env
+
       - name: Publish production OTA
         env:
           EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
@@ -108,4 +118,8 @@ jobs:
             echo "Missing required secret: EXPO_TOKEN"
             exit 1
           fi
-          npx eas-cli update --branch production --non-interactive --message "Auto update from main (${GITHUB_SHA})"
+          npx eas-cli update \
+            --branch production \
+            --environment production \
+            --non-interactive \
+            --message "Auto update from main (${GITHUB_SHA})"

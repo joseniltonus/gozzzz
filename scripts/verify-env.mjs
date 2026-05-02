@@ -63,7 +63,10 @@ if (process.env.EXPO_PUBLIC_PROGRAM_ACCESS_EMAILS !== undefined) {
 }
 
 if (failed) {
-  console.error('\n[verify-env] Copia .env.example para .env e preenche. Ver README (secção Bolt / Vercel).\n');
+  console.error(
+    '\n[verify-env] Preenche .env local ou define as variáveis. Para builds de loja/OTA, as mesmas chaves EXPO_PUBLIC_* ' +
+      'também precisam existir no Expo (EAS → Environment variables → production). npm run verify:eas-env\n',
+  );
   process.exit(1);
 }
 
