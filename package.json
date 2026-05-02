@@ -5,6 +5,8 @@
   "private": true,
   "scripts": {
     "dev": "EXPO_NO_TELEMETRY=1 expo start",
+    "ios": "bash scripts/start-ios-simple.sh",
+    "ios:clear": "bash scripts/start-ios-simple.sh --clear",
     "android": "bash scripts/start-android-with-emulator.sh",
     "android:raw": "EXPO_NO_TELEMETRY=1 expo start --android",
     "android:clear": "bash scripts/start-android-with-emulator.sh --clear",
