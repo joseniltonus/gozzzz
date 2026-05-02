@@ -10,8 +10,10 @@
     "newArchEnabled": false,
     "description": "Transforme seu sono com ciência. Os maiores especialistas do mundo em um só app.",
     "updates": {
-      "enabled": false,
-      "url": "https://u.expo.dev/b16c1fa5-bfaa-47b1-9a69-0343db4737ca"
+      "enabled": true,
+      "url": "https://u.expo.dev/b16c1fa5-bfaa-47b1-9a69-0343db4737ca",
+      "checkAutomatically": "ON_LOAD",
+      "fallbackToCacheTimeout": 0
     },
     "ios": {
       "supportsTablet": true,
