@@ -5,6 +5,11 @@ import { Profile, UserProgress, Lesson, DailyTip } from '@/types/database';
 const supabaseUrl = process.env.EXPO_PUBLIC_SUPABASE_URL || '';
 const supabaseAnonKey = process.env.EXPO_PUBLIC_SUPABASE_ANON_KEY || '';
 
+// Safe placeholders keep bundling alive when CI env is missing.
+const FALLBACK_SUPABASE_URL = 'https://placeholder.supabase.co';
+const FALLBACK_SUPABASE_ANON_KEY =
+  'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJwbGFjZWhvbGRlciIsInJlZiI6InBsYWNlaG9sZGVyIiwicm9sZSI6ImFub24iLCJpYXQiOjE1MTYyMzkwMjJ9.placeholder-signature';
+
 /** Expo inlines EXPO_PUBLIC_* at build time — placeholder values break auth in production. */
 export const AUTH_CONFIG_INCOMPLETE = 'AUTH_CONFIG_INCOMPLETE';
 
@@ -153,32 +158,23 @@ type Database = {
   };
 };
 
-let supabase: SupabaseClient<Database>;
+const runtimeSupabaseUrl = isSupabaseConfigured ? supabaseUrl : FALLBACK_SUPABASE_URL;
+const runtimeSupabaseAnonKey = isSupabaseConfigured ? supabaseAnonKey : FALLBACK_SUPABASE_ANON_KEY;
 
-try {
-  supabase = createClient<Database>(supabaseUrl, supabaseAnonKey, {
-    auth: {
-      autoRefreshToken: true,
-      persistSession: true,
-      detectSessionInUrl: false,
-      storage: storageAdapter,
-    },
-  });
+const supabase: SupabaseClient<Database> = createClient<Database>(runtimeSupabaseUrl, runtimeSupabaseAnonKey, {
+  auth: {
+    autoRefreshToken: true,
+    persistSession: true,
+    detectSessionInUrl: false,
+    storage: storageAdapter,
+  },
+});
 
-  supabase.auth.onAuthStateChange((event, session) => {
-    if (event === 'INITIAL_SESSION' && !session) {
-      const key = authStorageKeyForUrl(supabaseUrl);
-      if (key) storageAdapter.removeItem(key);
-    }
-  });
-} catch {
-  supabase = createClient<Database>('', '', {
-    auth: {
-      autoRefreshToken: false,
-      persistSession: false,
-      detectSessionInUrl: false,
-    },
-  });
-}
+supabase.auth.onAuthStateChange((event, session) => {
+  if (event === 'INITIAL_SESSION' && !session) {
+    const key = authStorageKeyForUrl(runtimeSupabaseUrl);
+    if (key) storageAdapter.removeItem(key);
+  }
+});
 
 export { supabase };
