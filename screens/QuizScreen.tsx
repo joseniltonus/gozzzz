@@ -9,8 +9,8 @@ import ChronotypeQuizModal from '@/components/ChronotypeQuizModal';
 export default function QuizScreen() {
   const router = useRouter();
 
-  const onComplete = useCallback((_chronotype: string) => {
-    router.replace('/(auth)/signup');
+  const onComplete = useCallback((chronotype: string) => {
+    router.push({ pathname: '/(auth)/result', params: { chronotype } });
   }, [router]);
 
   return (

@@ -336,9 +336,6 @@ export default function ChronotypeQuizModal({ visible, onComplete }: Props) {
             showsVerticalScrollIndicator={false}
           >
             <View style={styles.progressHeader}>
-              <Text style={styles.progressLabel}>
-                {lang === 'pt' ? `Pergunta ${screen + 1} de 4` : `Question ${screen + 1} of 4`}
-              </Text>
               <View style={styles.progressBar}>
                 <View style={[styles.progressFill, { width: `${((screen + 1) / 4) * 100}%` as any }]} />
               </View>
@@ -503,26 +500,20 @@ const styles = StyleSheet.create({
     flexGrow: 1,
   },
   progressHeader: {
-    marginBottom: 28,
-    gap: 8,
-  },
-  progressLabel: {
-    fontSize: 11,
-    fontWeight: '600',
-    color: '#9aa4b8',
-    letterSpacing: 1.1,
-    textTransform: 'uppercase',
+    marginBottom: 24,
+    width: '100%',
   },
   progressBar: {
-    height: 4,
+    height: 3,
     backgroundColor: 'rgba(255,255,255,0.08)',
-    borderRadius: 4,
+    borderRadius: 2,
     overflow: 'hidden',
+    width: '100%',
   },
   progressFill: {
-    height: '100%',
-    backgroundColor: '#6366f1',
-    borderRadius: 4,
+    height: 3,
+    backgroundColor: '#7c6fff',
+    borderRadius: 2,
   },
   question: {
     fontSize: 28,

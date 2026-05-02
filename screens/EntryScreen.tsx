@@ -172,6 +172,15 @@ export default function EntryScreen() {
           <View style={styles.inner}>
             <View style={styles.notch} />
 
+            <View style={styles.brandWrap}>
+              <Text style={styles.brandTitle}>
+                <Text style={styles.brandGo}>Go</Text>
+                <Text style={styles.brandZzz}>Zzz</Text>
+              </Text>
+              <Text style={styles.brandSub}>Programa de sono em 21 passos</Text>
+              <View style={styles.brandDivider} />
+            </View>
+
             <View style={styles.badgePill}>
               <PulsingBadgeDot />
               <Text style={styles.badgeText}>CIÊNCIA DO SONO</Text>
@@ -317,6 +326,36 @@ const styles = StyleSheet.create({
     borderRadius: 3,
     alignSelf: 'center',
     marginBottom: 36,
+  },
+  brandWrap: {
+    alignItems: 'center',
+    marginBottom: 20,
+  },
+  brandTitle: {
+    fontSize: 34,
+    fontWeight: '500',
+  },
+  brandGo: {
+    color: '#ffffff',
+  },
+  brandZzz: {
+    color: '#a99fff',
+  },
+  brandSub: {
+    fontSize: 10,
+    color: '#4a5275',
+    letterSpacing: 1.5,
+    textTransform: 'uppercase',
+    textAlign: 'center',
+    marginTop: 4,
+  },
+  brandDivider: {
+    width: 32,
+    height: 1,
+    backgroundColor: 'rgba(255,255,255,0.08)',
+    alignSelf: 'center',
+    marginTop: 16,
+    marginBottom: 4,
   },
   badgePill: {
     flexDirection: 'row',
