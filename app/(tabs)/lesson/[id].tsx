@@ -118,9 +118,20 @@ export default function LessonDetailScreen() {
         router.push('/(tabs)/program');
         return;
       }
+      if (lesson.step_number === 7) {
+        router.push('/(tabs)/lesson/step-seven-checkin');
+        return;
+      }
+      if (lesson.step_number === 14) {
+        router.push('/(tabs)/lesson/step-fourteen-quiz');
+        return;
+      }
       router.push(`/(tabs)/lesson/${nextLesson.id}`);
     } else {
-      // Last step - go to home/dashboard
+      if (lesson.step_number === 21) {
+        router.push('/(tabs)/lesson/step-twenty-one-conclusion');
+        return;
+      }
       router.push('/(tabs)/home');
     }
   };

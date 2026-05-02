@@ -84,7 +84,7 @@ export default function TabLayout() {
         }}
       />
       <Tabs.Screen
-        name="lesson/[id]"
+        name="lesson"
         options={{
           title: 'Lesson',
           href: null,

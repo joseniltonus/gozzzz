@@ -301,7 +301,7 @@ function HomeContent() {
       if (metaDone) void saveQuizDoneLocal(user.id);
     };
     void checkLocalFlag();
-  }, [user?.id, quizCompletedFromMeta, chronotypeFromAuthMeta]);
+  }, [user, user?.id, quizCompletedFromMeta, chronotypeFromAuthMeta]);
 
   useEffect(() => {
     if (profile?.quiz_completed && user?.id) {
