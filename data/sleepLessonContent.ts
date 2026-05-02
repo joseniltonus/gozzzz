@@ -228,7 +228,7 @@ export const SLEEP_LESSON_CONTENT: SleepLesson[] = [
         },
         {
           citation: "Matthew Walker (UC Berkeley) in Why We Sleep describes adenosine pressure as a 'sleep debt clock' — accumulating from the moment you wake and only fully cleared during adequate, uninterrupted sleep.",
-          source: "Why We Sleep, Walker, 2017",
+          source: "Walker MP. Why We Sleep. Scribner, 2017 (fonte secundária de divulgação; priorize estudos revisados por pares).",
         },
       ],
       nextPreview: "Tomorrow: your body runs dozens of biological clocks — and the one controlling your sleep is only 20,000 neurons. Here's how to reset it.",
@@ -271,7 +271,7 @@ export const SLEEP_LESSON_CONTENT: SleepLesson[] = [
         },
         {
           citation: "Matthew Walker (UC Berkeley) em Por Que Dormimos descreve a pressão de adenosina como um 'relógio de dívida de sono' — acumulando desde o momento em que você acorda e apenas completamente eliminado durante o sono adequado e ininterrupto.",
-          source: "Por Que Dormimos, Walker, 2017",
+          source: "Walker MP. Por Que Nós Dormimos (ed. PT), 2017 (fonte secundária de divulgação; priorize estudos revisados por pares).",
         },
       ],
       nextPreview: "Amanhã: seu corpo opera dezenas de relógios biológicos — e o que controla o sono tem apenas 20.000 neurônios. Veja como redefiní-lo.",
@@ -859,7 +859,7 @@ export const SLEEP_LESSON_CONTENT: SleepLesson[] = [
         },
         {
           citation: "In Why We Sleep, Matthew Walker (UC Berkeley, 2017) describes adenosine as the brain's chemical barometer for sleep need — and caffeine as a molecule that temporarily disconnects that gauge without clearing the underlying fatigue.",
-          source: "Why We Sleep, 2017",
+          source: "Walker MP. Why We Sleep. Scribner, 2017 (fonte secundária; interpretar junto com evidência primária).",
         },
       ],
       nextPreview: "Tomorrow: the overlooked thermostat setting that's keeping you out of deep sleep — and costs nothing to fix.",
@@ -902,7 +902,7 @@ export const SLEEP_LESSON_CONTENT: SleepLesson[] = [
         },
         {
           citation: "Em Por que Dormimos, Matthew Walker (UC Berkeley, 2017) descreve a adenosina como o barômetro químico do cérebro para a necessidade de sono — e a cafeína como uma molécula que desconecta temporariamente esse medidor sem eliminar o cansaço subjacente.",
-          source: "Por que Dormimos, 2017",
+          source: "Walker MP. Por Que Nós Dormimos (ed. PT), 2017 (fonte secundária; interpretar junto com evidência primária).",
         },
       ],
       nextPreview: "Amanhã: a configuração esquecida do termostato que está te impedindo de ter sono profundo — e não custa nada corrigir.",
@@ -948,7 +948,7 @@ export const SLEEP_LESSON_CONTENT: SleepLesson[] = [
         },
         {
           citation: "Michael Breus's clinical work confirmed that the thermoneutral zone for sleep onset in adults is 15–19°C — above this range, sleep onset is delayed and N3 sleep is reduced.",
-          source: "The Sleep Doctor's Diet Plan, 2011",
+          source: "Breus M. The Sleep Doctor's Diet Plan. Rodale, 2011 (livro de orientação; não substitui evidência clínica primária).",
         },
       ],
       nextPreview: "Tomorrow: the specific type of light exposure after dark that suppresses your melatonin by 50% — even at low intensities.",
@@ -991,7 +991,7 @@ export const SLEEP_LESSON_CONTENT: SleepLesson[] = [
         },
         {
           citation: "O trabalho clínico de Michael Breus confirmou que a zona termoneutra para o início do sono em adultos é de 15–19°C — acima dessa faixa, o início do sono é atrasado e o sono N3 é reduzido.",
-          source: "The Sleep Doctor's Diet Plan, 2011",
+          source: "Breus M. The Sleep Doctor's Diet Plan. Rodale, 2011 (livro de orientação; não substitui evidência clínica primária).",
         },
       ],
       nextPreview: "Amanhã: o tipo específico de exposição à luz após escurecer que suprime sua melatonina em 50% — mesmo em baixas intensidades.",
@@ -1215,7 +1215,7 @@ export const SLEEP_LESSON_CONTENT: SleepLesson[] = [
         },
         {
           citation: "Based on research by Andrew Huberman, Neuroscientist · Stanford",
-          source: "Why Zebras Don't Get Ulcers, 2004",
+          source: "Sapolsky RM. Why Zebras Don't Get Ulcers (3rd ed.). Holt Paperbacks, 2004 (fonte de contexto, não ensaio clínico).",
         },
       ],
       nextPreview: "Tomorrow: why your morning alarm is the single most powerful lever for sleep — and how setting it differently changes everything.",
@@ -1258,7 +1258,7 @@ export const SLEEP_LESSON_CONTENT: SleepLesson[] = [
         },
         {
           citation: "Baseado em pesquisas de Andrew Huberman, Neurocientista · Stanford",
-          source: "Por que as Zebras Não Têm Úlcera, 2004",
+          source: "Sapolsky RM. Por Que as Zebras Não Têm Úlcera (ed. PT), 2004 (fonte de contexto, não ensaio clínico).",
         },
       ],
       nextPreview: "Amanhã: por que o alarme matinal é a alavanca mais poderosa para o sono — e como configurá-lo de forma diferente muda tudo.",
@@ -1482,7 +1482,7 @@ export const SLEEP_LESSON_CONTENT: SleepLesson[] = [
         },
         {
           citation: "Matthew Walker (UC Berkeley, 2017) describes in Why We Sleep how sleep-deprived individuals show 60% more amygdala reactivity — meaning emotional decision-making is dramatically impaired even when cognitive performance appears intact.",
-          source: "Why We Sleep, 2017",
+          source: "Walker MP. Why We Sleep. Scribner, 2017 (fonte secundária; interpretar junto com evidência primária).",
         },
       ],
       nextPreview: "Tomorrow: the surprising relationship between sleep and your immune system — and why sleeping well is better prevention than any supplement.",
@@ -1525,7 +1525,7 @@ export const SLEEP_LESSON_CONTENT: SleepLesson[] = [
         },
         {
           citation: "Matthew Walker (UC Berkeley, 2017) descreve em Por que Dormimos como indivíduos privados de sono mostram 60% mais reatividade da amígdala — significando que a tomada de decisão emocional é dramaticamente prejudicada mesmo quando o desempenho cognitivo parece intacto.",
-          source: "Por que Dormimos, 2017",
+          source: "Walker MP. Por Que Nós Dormimos (ed. PT), 2017 (fonte secundária; interpretar junto com evidência primária).",
         },
       ],
       nextPreview: "Amanhã: a relação surpreendente entre sono e seu sistema imunológico — e por que dormir bem é melhor prevenção do que qualquer suplemento.",
@@ -1571,7 +1571,7 @@ export const SLEEP_LESSON_CONTENT: SleepLesson[] = [
         },
         {
           citation: "Matthew Walker (UC Berkeley, 2017) describes in Why We Sleep how REM sleep is the stage responsible for emotional memory processing — and how alcohol-suppressed REM produces not only worse sleep, but measurably impaired emotional regulation the following day.",
-          source: "Why We Sleep, 2017",
+          source: "Walker MP. Why We Sleep. Scribner, 2017 (fonte secundária; interpretar junto com evidência primária).",
         },
       ],
       nextPreview: "Tomorrow: how your immune system repairs itself exclusively during sleep — and why sick people sleep more for a very specific biological reason.",
@@ -1614,7 +1614,7 @@ export const SLEEP_LESSON_CONTENT: SleepLesson[] = [
         },
         {
           citation: "Matthew Walker (UC Berkeley, 2017) descreve em Por que Dormimos como o sono REM é o estágio responsável pelo processamento de memórias emocionais — e como o REM suprimido pelo álcool produz não apenas sono pior, mas regulação emocional mensuravelmente prejudicada no dia seguinte.",
-          source: "Por que Dormimos, 2017",
+          source: "Walker MP. Por Que Nós Dormimos (ed. PT), 2017 (fonte secundária; interpretar junto com evidência primária).",
         },
       ],
       nextPreview: "Amanhã: como seu sistema imunológico se repara exclusivamente durante o sono — e por que pessoas doentes dormem mais por uma razão biológica muito específica.",
@@ -1660,7 +1660,7 @@ export const SLEEP_LESSON_CONTENT: SleepLesson[] = [
         },
         {
           citation: "Matthew Walker (UC Berkeley, 2017) describes how a single night of 4–5 hours reduces natural killer cell activity by 70% — cells that identify and eliminate cancerous and virally infected cells.",
-          source: "Why We Sleep, 2017",
+          source: "Walker MP. Why We Sleep. Scribner, 2017 (fonte secundária; interpretar junto com evidência primária).",
         },
       ],
       nextPreview: "Tomorrow: why crossing time zones feels like it does — and the 3-day protocol that resets circadian timing faster than any medication.",
@@ -1703,7 +1703,7 @@ export const SLEEP_LESSON_CONTENT: SleepLesson[] = [
         },
         {
           citation: "Matthew Walker (UC Berkeley, 2017) descreve como uma única noite de 4–5 horas reduz a atividade das células exterminadoras naturais em 70% — células que identificam e eliminam células cancerosas e infectadas por vírus.",
-          source: "Por que Dormimos, 2017",
+          source: "Walker MP. Por Que Nós Dormimos (ed. PT), 2017 (fonte secundária; interpretar junto com evidência primária).",
         },
       ],
       nextPreview: "Amanhã: por que cruzar fusos horários causa aquela sensação — e o protocolo de 3 dias que redefine o timing circadiano mais rápido do que qualquer medicamento.",
@@ -1834,7 +1834,7 @@ export const SLEEP_LESSON_CONTENT: SleepLesson[] = [
       science: [
         {
           citation: "Based on research by Andrew Huberman, Neuroscientist · Stanford",
-          source: "Atomic Habits, 2018",
+          source: "Clear J. Atomic Habits. Avery, 2018 (fonte comportamental de apoio; não ensaio clínico).",
         },
         {
           citation: "Based on research by Matthew Walker, Neuroscientist · UC Berkeley",
@@ -1877,7 +1877,7 @@ export const SLEEP_LESSON_CONTENT: SleepLesson[] = [
       science: [
         {
           citation: "Baseado em pesquisas de Andrew Huberman, Neurocientista · Stanford",
-          source: "Hábitos Atômicos, 2018",
+          source: "Clear J. Hábitos Atômicos (ed. PT), 2018 (fonte comportamental de apoio; não ensaio clínico).",
         },
         {
           citation: "Baseado em pesquisas de Matthew Walker, Neurocientista · UC Berkeley",

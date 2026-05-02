@@ -5,6 +5,7 @@ import {
   ScrollView,
   TouchableOpacity,
   TextInput,
+  Linking,
 } from 'react-native';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { ArrowRight, Moon, Check, ChevronDown, ChevronUp, FlaskConical } from 'lucide-react-native';
@@ -83,7 +84,7 @@ const STEPS_PT = [
       },
       {
         citation: 'Em Why We Sleep, Matthew Walker (UC Berkeley, 2017) descreve como a arquitetura dos ciclos determina a restauração cognitiva e emocional ao longo da noite.',
-        source: 'Why We Sleep, Matthew Walker, 2017',
+        source: 'Walker MP. Why We Sleep. Scribner, 2017 (fonte secundária; priorize estudos revisados por pares).',
       },
     ],
     cta: 'O que fazer esta noite',
@@ -106,7 +107,7 @@ const STEPS_PT = [
     science: [
       {
         citation: 'Em Sleep, Nick Littlehales (2016) descreve o protocolo R90 — baseado em ciclos de 90 minutos — como a estrutura mais eficaz para maximizar a recuperação física e mental em atletas de elite.',
-        source: 'Sleep, Nick Littlehales, 2016',
+        source: 'Littlehales N. Sleep (book). Penguin, 2016 (fonte de prática esportiva; não ensaio clínico).',
       },
     ],
     cta: 'Quase lá',
@@ -204,7 +205,7 @@ const STEPS_EN = [
       },
       {
         citation: 'In Why We Sleep, Matthew Walker (UC Berkeley, 2017) describes how cycle architecture determines cognitive and emotional restoration across the night.',
-        source: 'Why We Sleep, Matthew Walker, 2017',
+        source: 'Walker MP. Why We Sleep. Scribner, 2017 (secondary source; pair with peer-reviewed studies).',
       },
     ],
     cta: 'What to do tonight',
@@ -227,7 +228,7 @@ const STEPS_EN = [
     science: [
       {
         citation: 'In Sleep, Nick Littlehales (2016) describes the R90 protocol — built on 90-minute cycles — as the most effective framework for maximising physical and mental recovery in elite athletes.',
-        source: 'Sleep, Nick Littlehales, 2016',
+        source: 'Littlehales N. Sleep (book). Penguin, 2016 (practice-oriented source; not a clinical trial).',
       },
     ],
     cta: 'Almost there',
@@ -269,6 +270,19 @@ const STAGES_EN = [
   { label: 'N3', sublabel: 'Deep sleep', color: '#1d4ed8', depth: 4 },
   { label: 'REM', sublabel: 'Memory & emotion', color: '#fbbf24', depth: 2 },
 ];
+
+function buildPubMedSearchUrl(source: string, citation: string) {
+  const query = `${source} ${citation}`.trim();
+  return `https://pubmed.ncbi.nlm.nih.gov/?term=${encodeURIComponent(query)}`;
+}
+
+type SourceKind = 'peer' | 'secondary';
+
+function classifySource(source: string): SourceKind {
+  const s = source.toLowerCase();
+  const secondaryHints = ['why we sleep', 'por que nós dormimos', 'por que dormimos', 'sleep (book)', 'penguin', 'scribner'];
+  return secondaryHints.some((hint) => s.includes(hint)) ? 'secondary' : 'peer';
+}
 
 export const Lesson1InteractiveCard = ({ renderCompleteButton }: Lesson1InteractiveCardProps) => {
   const { language } = useLanguage();
@@ -501,12 +515,42 @@ function ScienceExpander({
 
       {open && (
         <View style={sci.body}>
-          {entries.map((entry, i) => (
+          <Text style={sci.disclaimer}>
+            {isPt
+              ? 'Resumo autoral das evidências (sem cópia literal de conteúdo protegido).'
+              : 'Author-written evidence summary (no verbatim copyrighted content).'}
+          </Text>
+          {[...entries]
+            .sort((a, b) => {
+              const aRank = classifySource(a.source) === 'peer' ? 0 : 1;
+              const bRank = classifySource(b.source) === 'peer' ? 0 : 1;
+              return aRank - bRank;
+            })
+            .map((entry, i) => {
+              const kind = classifySource(entry.source);
+              return (
             <View key={i} style={[sci.entry, i > 0 && sci.entryBorder]}>
+              <View style={[sci.credibilityBadge, kind === 'peer' ? sci.credibilityPeer : sci.credibilitySecondary]}>
+                <Text style={sci.credibilityBadgeText}>
+                  {kind === 'peer'
+                    ? (isPt ? 'Artigo revisado por pares' : 'Peer-reviewed article')
+                    : (isPt ? 'Fonte secundária' : 'Secondary source')}
+                </Text>
+              </View>
               <Text style={sci.citation}>{entry.citation}</Text>
               <Text style={sci.entrySource}>{isPt ? 'Fonte' : 'Source'}: {entry.source}</Text>
+              <TouchableOpacity
+                onPress={() => void Linking.openURL(buildPubMedSearchUrl(entry.source, entry.citation))}
+                style={sci.linkBtn}
+                activeOpacity={0.8}
+              >
+                <Text style={sci.linkText}>
+                  {isPt ? 'Abrir referência no PubMed' : 'Open reference on PubMed'}
+                </Text>
+              </TouchableOpacity>
             </View>
-          ))}
+              );
+            })}
         </View>
       )}
     </View>
@@ -974,6 +1018,44 @@ const sci = StyleSheet.create({
     fontSize: 11,
     color: '#475569',
     fontStyle: 'italic',
+  },
+  disclaimer: {
+    fontSize: 11,
+    color: '#7aa6bf',
+    lineHeight: 16,
+    marginBottom: 2,
+  },
+  linkBtn: {
+    marginTop: 2,
+    alignSelf: 'flex-start',
+  },
+  linkText: {
+    fontSize: 11,
+    color: '#5fb4df',
+    textDecorationLine: 'underline',
+    fontWeight: '600',
+  },
+  credibilityBadge: {
+    alignSelf: 'flex-start',
+    borderRadius: 999,
+    paddingHorizontal: 8,
+    paddingVertical: 3,
+    marginBottom: 6,
+  },
+  credibilityPeer: {
+    backgroundColor: 'rgba(16,185,129,0.18)',
+    borderWidth: 1,
+    borderColor: 'rgba(16,185,129,0.45)',
+  },
+  credibilitySecondary: {
+    backgroundColor: 'rgba(251,191,36,0.16)',
+    borderWidth: 1,
+    borderColor: 'rgba(251,191,36,0.45)',
+  },
+  credibilityBadgeText: {
+    fontSize: 10,
+    fontWeight: '700',
+    color: '#d5e9f5',
   },
 });
 

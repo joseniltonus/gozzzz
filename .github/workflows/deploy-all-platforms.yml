@@ -7,8 +7,28 @@ on:
   workflow_dispatch: {}
 
 jobs:
+  validate-science:
+    name: Validate science references
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - name: Install deps
+        run: npm ci
+
+      - name: Validate references
+        run: npm run validate:science
+
   deploy-web:
     name: Deploy Web to Vercel
+    needs: validate-science
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -40,6 +60,7 @@ jobs:
 
   publish-ota:
     name: Publish OTA update (iOS + Android)
+    needs: validate-science
     runs-on: ubuntu-latest
     steps:
       - name: Checkout

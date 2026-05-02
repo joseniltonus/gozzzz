@@ -5,6 +5,7 @@ import {
   StyleSheet,
   ScrollView,
   TouchableOpacity,
+  Linking,
 } from 'react-native';
 import { useLanguage } from '@/contexts/LanguageContext';
 import {
@@ -18,6 +19,34 @@ interface Props {
 }
 
 const STEPS = ['hook', 'insight', 'mechanism', 'application', 'commit'];
+
+function buildPubMedSearchUrl(source: string, citation: string) {
+  const query = `${source} ${citation}`.trim();
+  return `https://pubmed.ncbi.nlm.nih.gov/?term=${encodeURIComponent(query)}`;
+}
+
+type SourceKind = 'peer' | 'secondary';
+
+function classifySource(source: string): SourceKind {
+  const s = source.toLowerCase();
+  const secondaryHints = [
+    'why we sleep',
+    'por que nós dormimos',
+    'por que dormimos',
+    'atomic habits',
+    'hábitos atômicos',
+    'diet plan',
+    '(book)',
+    'nobel prize',
+    'nobel de',
+    'holt paperbacks',
+    'scribner',
+    'penguin',
+    'avery',
+    'rodale',
+  ];
+  return secondaryHints.some((hint) => s.includes(hint)) ? 'secondary' : 'peer';
+}
 
 function DifficultyBadge({ difficulty, isPt }: { difficulty: string; isPt: boolean }) {
   const map: Record<string, { emoji: string; label: string; color: string; bg: string }> = {
@@ -190,12 +219,42 @@ export function SleepLessonCard({ lessonId, onComplete }: Props) {
 
             {scienceOpen && (
               <View style={s.scienceBox}>
-                {data.science.map((c, i) => (
+                <Text style={s.scienceDisclaimer}>
+                  {isPt
+                    ? 'Resumo autoral do estudo (sem reprodução de texto protegido).'
+                    : 'Author-written summary of the study (no copyrighted text reproduction).'}
+                </Text>
+                {[...data.science]
+                  .sort((a, b) => {
+                    const aRank = classifySource(a.source) === 'peer' ? 0 : 1;
+                    const bRank = classifySource(b.source) === 'peer' ? 0 : 1;
+                    return aRank - bRank;
+                  })
+                  .map((c, i) => {
+                    const kind = classifySource(c.source);
+                    return (
                   <View key={i} style={s.citationRow}>
+                    <View style={[s.credibilityBadge, kind === 'peer' ? s.credibilityPeer : s.credibilitySecondary]}>
+                      <Text style={s.credibilityBadgeText}>
+                        {kind === 'peer'
+                          ? (isPt ? 'Artigo revisado por pares' : 'Peer-reviewed article')
+                          : (isPt ? 'Fonte secundária' : 'Secondary source')}
+                      </Text>
+                    </View>
                     <Text style={s.citationText}>{c.citation}</Text>
                     <Text style={s.citationSource}>{c.source}</Text>
+                    <TouchableOpacity
+                      onPress={() => void Linking.openURL(buildPubMedSearchUrl(c.source, c.citation))}
+                      style={s.referenceLinkBtn}
+                      activeOpacity={0.8}
+                    >
+                      <Text style={s.referenceLinkText}>
+                        {isPt ? 'Abrir referência no PubMed' : 'Open reference on PubMed'}
+                      </Text>
+                    </TouchableOpacity>
                   </View>
-                ))}
+                    );
+                  })}
               </View>
             )}
 
@@ -475,6 +534,44 @@ const s = StyleSheet.create({
     fontSize: 11,
     color: '#4a5568',
     fontWeight: '600',
+  },
+  referenceLinkBtn: {
+    marginTop: 6,
+    alignSelf: 'flex-start',
+  },
+  referenceLinkText: {
+    fontSize: 11,
+    color: '#5fb4df',
+    textDecorationLine: 'underline',
+    fontWeight: '600',
+  },
+  credibilityBadge: {
+    alignSelf: 'flex-start',
+    borderRadius: 999,
+    paddingHorizontal: 8,
+    paddingVertical: 3,
+    marginBottom: 6,
+  },
+  credibilityPeer: {
+    backgroundColor: 'rgba(16,185,129,0.18)',
+    borderWidth: 1,
+    borderColor: 'rgba(16,185,129,0.45)',
+  },
+  credibilitySecondary: {
+    backgroundColor: 'rgba(251,191,36,0.16)',
+    borderWidth: 1,
+    borderColor: 'rgba(251,191,36,0.45)',
+  },
+  credibilityBadgeText: {
+    fontSize: 10,
+    fontWeight: '700',
+    color: '#d5e9f5',
+  },
+  scienceDisclaimer: {
+    fontSize: 11,
+    color: '#7aa6bf',
+    lineHeight: 16,
+    marginBottom: 2,
   },
 
   feedbackCard: {
