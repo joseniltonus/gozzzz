@@ -14,6 +14,7 @@ import { useLanguage } from '@/contexts/LanguageContext';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Moon, ArrowLeft, Crown, Check, Shield, Lock, BadgeCheck, Star, CircleAlert as AlertCircle } from 'lucide-react-native';
 import { supabase } from '@/lib/supabase';
+import { WEB_OG_IMAGE_URL, WEB_OG_SITE_NAME, WEB_ORIGIN } from '@/lib/webOgConstants';
 const isWeb = Platform.OS === 'web';
 
 interface PricingData {
@@ -195,7 +196,12 @@ export default function WebAssinarPage() {
         <meta name="description" content={t('web.subscribe.headDesc')} />
         <meta property="og:title" content={t('web.subscribe.headTitle')} />
         <meta property="og:description" content={t('web.subscribe.ogDesc')} />
+        <meta property="og:image" content={WEB_OG_IMAGE_URL} />
         <meta property="og:type" content="website" />
+        <meta property="og:url" content={`${WEB_ORIGIN}/web/assinar`} />
+        <meta property="og:site_name" content={WEB_OG_SITE_NAME} />
+        <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:image" content={WEB_OG_IMAGE_URL} />
         <link rel="canonical" href="https://gozzzz.app/web/assinar" />
       </Head>
       <ScrollView style={styles.page} showsVerticalScrollIndicator={false}>

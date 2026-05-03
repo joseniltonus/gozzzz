@@ -14,7 +14,6 @@ export default function WebLayout() {
       <Stack.Screen name="sobre" />
       <Stack.Screen name="assinar" />
       <Stack.Screen name="licao/[id]" />
-      <Stack.Screen name="cronotipo" />
     </Stack>
   );
 }

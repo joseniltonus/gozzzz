@@ -16,7 +16,9 @@ export type TraitIconKey =
   | 'sunrise'
   | 'target'
   | 'check'
-  | 'sparkles';
+  | 'sparkles'
+  | 'leaf'
+  | 'meditation';
 
 export type ChronotypeColor = 'blue' | 'green' | 'orange' | 'purple';
 
@@ -56,13 +58,13 @@ const pt = {
       { icon: 'bolt' as const, title: 'Sempre em alerta' },
     ],
     cause: [
-      { icon: 'moon' as const, line: 'Demora para adormecer' },
-      { icon: 'bolt' as const, line: 'Acorda com facilidade' },
-      { icon: 'brain' as const, line: 'Mente ativa na cama' },
+      { icon: 'brain' as const, line: 'Demora para adormecer' },
+      { icon: 'moon' as const, line: 'Acorda com facilidade' },
+      { icon: 'sparkles' as const, line: 'Mente ativa na cama' },
     ],
     solutions: [
-      { icon: 'moon' as const, line: 'Reduzir estímulos à noite' },
-      { icon: 'brain' as const, line: 'Desacelerar a mente' },
+      { icon: 'leaf' as const, line: 'Reduzir estímulos à noite' },
+      { icon: 'meditation' as const, line: 'Desacelerar a mente' },
       { icon: 'clock' as const, line: 'Criar rotina consistente' },
     ],
     insight: 'Isso não é falta de disciplina. É como seu cérebro funciona.',
@@ -103,8 +105,8 @@ const pt = {
       { icon: 'bolt' as const, line: 'Funciona melhor de dia' },
     ],
     solutions: [
-      { icon: 'sunrise' as const, line: 'Aproveitar manhã' },
-      { icon: 'moon' as const, line: 'Evitar excesso à noite' },
+      { icon: 'sun' as const, line: 'Aproveitar manhã' },
+      { icon: 'leaf' as const, line: 'Evitar excesso à noite' },
       { icon: 'clock' as const, line: 'Manter consistência' },
     ],
     insight: 'Seu ritmo já é sua vantagem.',
@@ -140,7 +142,7 @@ const pt = {
       { icon: 'check' as const, title: 'Foco matinal' },
     ],
     cause: [
-      { icon: 'sunrise' as const, line: 'Acorda com facilidade' },
+      { icon: 'sun' as const, line: 'Acorda com facilidade' },
       { icon: 'moon' as const, line: 'Cansa cedo' },
       { icon: 'bolt' as const, line: 'Queda à noite' },
     ],
@@ -182,13 +184,13 @@ const pt = {
       { icon: 'brain' as const, title: 'Pensamento profundo' },
     ],
     cause: [
-      { icon: 'sun' as const, line: 'Dificuldade cedo' },
-      { icon: 'bolt' as const, line: 'Energia à noite' },
-      { icon: 'brain' as const, line: 'Foco tardio' },
+      { icon: 'clock' as const, line: 'Dificuldade cedo' },
+      { icon: 'moon' as const, line: 'Energia à noite' },
+      { icon: 'bolt' as const, line: 'Foco tardio' },
     ],
     solutions: [
-      { icon: 'sun' as const, line: 'Ajuste gradual' },
-      { icon: 'sunrise' as const, line: 'Exposição à luz cedo' },
+      { icon: 'clock' as const, line: 'Ajuste gradual' },
+      { icon: 'sun' as const, line: 'Exposição à luz cedo' },
       { icon: 'moon' as const, line: 'Evitar telas tarde' },
     ],
     insight: 'Seu ritmo é diferente, não errado.',
@@ -227,13 +229,13 @@ const en: Record<ChronotypeExpKey, LocaleChronotypeBlock> = {
       { icon: 'bolt', title: 'Always on guard' },
     ],
     cause: [
-      { icon: 'moon', line: 'Takes long to fall asleep' },
-      { icon: 'bolt', line: 'Wakes easily' },
-      { icon: 'brain', line: 'Active mind in bed' },
+      { icon: 'brain', line: 'Takes long to fall asleep' },
+      { icon: 'moon', line: 'Wakes easily' },
+      { icon: 'sparkles', line: 'Active mind in bed' },
     ],
     solutions: [
-      { icon: 'moon', line: 'Reduce night stimulation' },
-      { icon: 'brain', line: 'Slow the mind down' },
+      { icon: 'leaf', line: 'Reduce night stimulation' },
+      { icon: 'meditation', line: 'Slow the mind down' },
       { icon: 'clock', line: 'Build a steady routine' },
     ],
     insight: 'This is not lack of discipline. It is how your brain works.',
@@ -274,8 +276,8 @@ const en: Record<ChronotypeExpKey, LocaleChronotypeBlock> = {
       { icon: 'bolt', line: 'Best performance by day' },
     ],
     solutions: [
-      { icon: 'sunrise', line: 'Use the morning' },
-      { icon: 'moon', line: 'Avoid excess at night' },
+      { icon: 'sun', line: 'Use the morning' },
+      { icon: 'leaf', line: 'Avoid excess at night' },
       { icon: 'clock', line: 'Stay consistent' },
     ],
     insight: 'Your rhythm is already your edge.',
@@ -311,7 +313,7 @@ const en: Record<ChronotypeExpKey, LocaleChronotypeBlock> = {
       { icon: 'check', title: 'Morning focus' },
     ],
     cause: [
-      { icon: 'sunrise', line: 'Wakes easily' },
+      { icon: 'sun', line: 'Wakes easily' },
       { icon: 'moon', line: 'Tires early' },
       { icon: 'bolt', line: 'Evening dip' },
     ],
@@ -353,13 +355,13 @@ const en: Record<ChronotypeExpKey, LocaleChronotypeBlock> = {
       { icon: 'brain', title: 'Deep thinking' },
     ],
     cause: [
-      { icon: 'sun', line: 'Hard early start' },
-      { icon: 'bolt', line: 'Energy at night' },
-      { icon: 'brain', line: 'Late focus' },
+      { icon: 'clock', line: 'Hard early start' },
+      { icon: 'moon', line: 'Energy at night' },
+      { icon: 'bolt', line: 'Late focus' },
     ],
     solutions: [
-      { icon: 'sun', line: 'Gradual adjustment' },
-      { icon: 'sunrise', line: 'Morning light exposure' },
+      { icon: 'clock', line: 'Gradual adjustment' },
+      { icon: 'sun', line: 'Morning light exposure' },
       { icon: 'moon', line: 'Limit late screens' },
     ],
     insight: 'Your rhythm is different, not wrong.',
@@ -413,7 +415,12 @@ export function normalizeChronotypeExpKey(raw?: string | string[] | null): Chron
   return null;
 }
 
-export function tiktokScriptText(block: LocaleChronotypeBlock): string {
+export function tiktokScriptText(block: LocaleChronotypeBlock, locale: 'pt' | 'en' = 'pt'): string {
   const { hook, identify, explain, cta } = block.tiktok;
-  return `${hook}\n\n${identify}\n${explain}\n\n${cta}`;
+  const core = `${hook}\n\n${identify}\n${explain}\n\n${cta}`;
+  const visual =
+    locale === 'pt'
+      ? '\n\n—\nVídeo: no último plano mostre gozzzz.app ou o logo GoZzzz em destaque.'
+      : '\n\n—\nVideo: on the last beat show gozzzz.app or the GoZzzz logo clearly.';
+  return `${core}${visual}`;
 }

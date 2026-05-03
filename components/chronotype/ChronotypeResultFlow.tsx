@@ -106,7 +106,7 @@ export default function ChronotypeResultFlow({ chronotypeKey, locale, onDay1 }: 
   };
 
   const onTiktok = async () => {
-    await shareTikTokScript(tiktokScriptText(block), locale);
+    await shareTikTokScript(tiktokScriptText(block, locale), locale);
   };
 
   return (
@@ -129,6 +129,8 @@ export default function ChronotypeResultFlow({ chronotypeKey, locale, onDay1 }: 
           <ChronotypeIdentityScreen block={block} onNext={() => setStep(1)} />
         ) : (
           <ChronotypeUtilityScreen
+            chronotypeKey={chronotypeKey}
+            locale={locale}
             block={block}
             labels={labels}
             sharing={sharing}
@@ -163,14 +165,14 @@ const styles = StyleSheet.create({
     paddingBottom: 4,
   },
   dot: {
-    width: 8,
-    height: 8,
-    borderRadius: 4,
-    backgroundColor: 'rgba(148,163,184,0.35)',
+    width: 5,
+    height: 5,
+    borderRadius: 3,
+    backgroundColor: 'rgba(148,163,184,0.4)',
   },
   dotOn: {
-    backgroundColor: 'rgba(248,250,252,0.9)',
-    width: 22,
+    backgroundColor: 'rgba(248,250,252,0.85)',
+    width: 14,
   },
   kicker: {
     alignItems: 'center',

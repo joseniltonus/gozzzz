@@ -8,14 +8,17 @@ import {
   ScrollView,
   ActivityIndicator,
   Pressable,
+  Platform,
+  useWindowDimensions,
 } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
+import * as Haptics from 'expo-haptics';
 import Animated, { FadeInDown } from 'react-native-reanimated';
 import { MessageCircle, Instagram, Music2, X } from 'lucide-react-native';
-import type { LocaleChronotypeBlock } from '@/data/chronotypesExperience';
-import { tiktokScriptText } from '@/data/chronotypesExperience';
+import type { ChronotypeExpKey, LocaleChronotypeBlock } from '@/data/chronotypesExperience';
+import { getChronotypeContentPack } from '@/lib/chronotypeContentPack';
 import PrimaryButton from '@/src/components/PrimaryButton';
-import ChronotypeEnergyBars from '@/components/chronotype/ChronotypeEnergyBars';
+import ChronotypeEnergyLineChart from '@/components/chronotype/ChronotypeEnergyLineChart';
 import { TraitGlyph } from '@/components/chronotype/chronotypeTraitIcons';
 
 function accentFor(color: LocaleChronotypeBlock['color']): string {
@@ -45,6 +48,8 @@ export type UtilityShareLabels = {
 };
 
 type Props = {
+  chronotypeKey: ChronotypeExpKey;
+  locale: 'pt' | 'en';
   block: LocaleChronotypeBlock;
   labels: UtilityShareLabels;
   sharing: boolean;
@@ -56,6 +61,8 @@ type Props = {
 };
 
 export default function ChronotypeUtilityScreen({
+  chronotypeKey,
+  locale,
   block,
   labels,
   sharing,
@@ -67,19 +74,25 @@ export default function ChronotypeUtilityScreen({
 }: Props) {
   const accent = accentFor(block.color);
   const [tikOpen, setTikOpen] = useState(false);
-  const script = tiktokScriptText(block);
+  const pack = getChronotypeContentPack(chronotypeKey, locale);
+  const script = pack.tiktok.scriptText;
+  const { width: winW } = useWindowDimensions();
+  const maxWrap = Math.min(390, winW);
+
+  const bump = () => {
+    if (Platform.OS === 'web') return;
+    void Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+  };
 
   return (
-    <View style={styles.wrap}>
+    <View style={[styles.wrap, { maxWidth: maxWrap }]}>
       <Animated.View entering={FadeInDown.duration(380)} style={styles.block}>
         <Text style={styles.section}>{block.sectionWhy}</Text>
-        <ChronotypeEnergyBars
-          morning={block.energy.morning}
-          night={block.energy.night}
-          accent={accent}
-          morningLabel={labels.morning}
-          nightLabel={labels.night}
-        />
+        <ChronotypeEnergyLineChart morning={block.energy.morning} night={block.energy.night} accent={accent} />
+        <View style={styles.axisRow}>
+          <Text style={styles.axisLab}>{labels.morning}</Text>
+          <Text style={styles.axisLab}>{labels.night}</Text>
+        </View>
         <Text style={styles.caption}>{block.energyCaption}</Text>
       </Animated.View>
 
@@ -104,22 +117,33 @@ export default function ChronotypeUtilityScreen({
         <View style={styles.solStack}>
           {block.solutions.map((s, i) => (
             <Animated.View key={s.line} entering={FadeInDown.duration(360).delay(120 + i * 100)}>
-              <LinearGradient
-                colors={['rgba(255,255,255,0.08)', 'rgba(255,255,255,0.02)']}
-                style={styles.solCard}
+              <Pressable
+                onPress={bump}
+                style={({ pressed }) => [pressed && styles.solPressed]}
+                accessibilityRole="button"
+                accessibilityLabel={s.line}
               >
-                <TraitGlyph name={s.icon} color={accent} size={22} />
-                <Text style={styles.solText}>{s.line}</Text>
-              </LinearGradient>
+                <LinearGradient
+                  colors={['rgba(255,255,255,0.1)', 'rgba(255,255,255,0.02)']}
+                  style={styles.solCard}
+                >
+                  <TraitGlyph name={s.icon} color={accent} size={22} />
+                  <Text style={styles.solText}>{s.line}</Text>
+                </LinearGradient>
+              </Pressable>
             </Animated.View>
           ))}
         </View>
       </Animated.View>
 
       <Animated.View entering={FadeInDown.delay(260).duration(400)} style={styles.finalBox}>
-        <LinearGradient colors={[`${accent}22`, 'rgba(255,255,255,0.04)']} style={styles.finalInner}>
+        <LinearGradient colors={[`${accent}28`, 'rgba(255,255,255,0.04)']} style={styles.finalInner}>
           <Text style={[styles.finalText, { color: accent }]}>{block.final}</Text>
         </LinearGradient>
+      </Animated.View>
+
+      <Animated.View entering={FadeInDown.delay(300).duration(400)} style={styles.cta}>
+        <PrimaryButton label={block.ctaDay1} onPress={onDay1} />
       </Animated.View>
 
       <Animated.View entering={FadeInDown.delay(320).duration(360)}>
@@ -172,19 +196,33 @@ export default function ChronotypeUtilityScreen({
         </View>
       ) : null}
 
-      <Animated.View entering={FadeInDown.delay(400).duration(400)} style={styles.cta}>
-        <PrimaryButton label={block.ctaDay1} onPress={onDay1} />
-      </Animated.View>
-
       <Modal visible={tikOpen} transparent animationType="fade" onRequestClose={() => setTikOpen(false)}>
         <Pressable style={styles.modalBackdrop} onPress={() => setTikOpen(false)}>
           <Pressable style={styles.modalCard} onPress={(e) => e.stopPropagation()}>
             <TouchableOpacity style={styles.modalClose} onPress={() => setTikOpen(false)} hitSlop={12}>
               <X size={22} color="#94a3b8" />
             </TouchableOpacity>
-            <Text style={styles.modalTitle}>TikTok (10–15s)</Text>
+            <Text style={styles.modalTitle}>TikTok ({pack.tiktok.suggestedDurationLabel})</Text>
             <ScrollView style={styles.modalScroll} showsVerticalScrollIndicator={false}>
-              <Text style={styles.modalBody}>{script}</Text>
+              {(locale === 'pt'
+                ? [
+                    ['Gancho', pack.tiktok.hook],
+                    ['Identificar', pack.tiktok.identify],
+                    ['Explicar', pack.tiktok.explain],
+                    ['CTA', pack.tiktok.cta],
+                  ]
+                : [
+                    ['Hook', pack.tiktok.hook],
+                    ['ID', pack.tiktok.identify],
+                    ['Explain', pack.tiktok.explain],
+                    ['CTA', pack.tiktok.cta],
+                  ]
+              ).map(([label, text], i) => (
+                <View key={label}>
+                  <Text style={[styles.modalSegHead, i === 0 && styles.modalSegHeadFirst]}>{label}</Text>
+                  <Text style={styles.modalBody}>{text}</Text>
+                </View>
+              ))}
             </ScrollView>
             <TouchableOpacity
               style={[styles.modalBtn, { backgroundColor: accent }]}
@@ -203,13 +241,12 @@ export default function ChronotypeUtilityScreen({
 
 const styles = StyleSheet.create({
   wrap: {
-    paddingHorizontal: 20,
+    paddingHorizontal: 24,
     paddingBottom: 36,
-    maxWidth: 520,
     width: '100%',
     alignSelf: 'center',
   },
-  block: { marginBottom: 18 },
+  block: { marginBottom: 22 },
   section: {
     fontSize: 11,
     letterSpacing: 1.8,
@@ -218,12 +255,26 @@ const styles = StyleSheet.create({
     fontWeight: '700',
     marginBottom: 10,
   },
+  axisRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    paddingHorizontal: 8,
+    marginTop: 2,
+    marginBottom: 4,
+  },
+  axisLab: {
+    fontSize: 11,
+    fontWeight: '700',
+    letterSpacing: 0.8,
+    textTransform: 'uppercase',
+    color: 'rgba(148,163,184,0.75)',
+  },
   caption: {
     fontSize: 14,
     lineHeight: 21,
     color: 'rgba(148,163,184,0.95)',
     textAlign: 'center',
-    marginTop: 8,
+    marginTop: 6,
     fontWeight: '500',
   },
   iconGrid: {
@@ -237,9 +288,9 @@ const styles = StyleSheet.create({
     minWidth: 100,
     flexGrow: 1,
     backgroundColor: 'rgba(255,255,255,0.05)',
-    borderRadius: 14,
+    borderRadius: 22,
     borderWidth: 1,
-    borderColor: 'rgba(255,255,255,0.07)',
+    borderColor: 'rgba(255,255,255,0.08)',
     paddingVertical: 14,
     paddingHorizontal: 8,
     alignItems: 'center',
@@ -252,16 +303,17 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     lineHeight: 16,
   },
-  solStack: { gap: 10 },
+  solStack: { gap: 12 },
+  solPressed: { opacity: 0.88, transform: [{ scale: 0.99 }] },
   solCard: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: 12,
-    paddingVertical: 14,
-    paddingHorizontal: 14,
-    borderRadius: 14,
+    paddingVertical: 16,
+    paddingHorizontal: 16,
+    borderRadius: 22,
     borderWidth: 1,
-    borderColor: 'rgba(255,255,255,0.07)',
+    borderColor: 'rgba(255,255,255,0.1)',
   },
   solText: {
     flex: 1,
@@ -271,10 +323,10 @@ const styles = StyleSheet.create({
   },
   finalBox: {
     marginBottom: 20,
-    borderRadius: 16,
+    borderRadius: 22,
     overflow: 'hidden',
     borderWidth: 1,
-    borderColor: 'rgba(255,255,255,0.08)',
+    borderColor: 'rgba(255,255,255,0.1)',
   },
   finalInner: { padding: 18 },
   finalText: {
@@ -317,7 +369,7 @@ const styles = StyleSheet.create({
     color: '#e2e8f0',
   },
   busy: { alignItems: 'center', marginVertical: 8 },
-  cta: { marginTop: 8 },
+  cta: { marginTop: 4, marginBottom: 16 },
   modalBackdrop: {
     flex: 1,
     backgroundColor: 'rgba(0,0,0,0.65)',
@@ -341,6 +393,16 @@ const styles = StyleSheet.create({
     paddingRight: 32,
   },
   modalScroll: { maxHeight: 280, marginBottom: 16 },
+  modalSegHead: {
+    fontSize: 10,
+    fontWeight: '800',
+    letterSpacing: 1.4,
+    color: 'rgba(148,163,184,0.85)',
+    textTransform: 'uppercase',
+    marginTop: 10,
+    marginBottom: 4,
+  },
+  modalSegHeadFirst: { marginTop: 0 },
   modalBody: {
     fontSize: 14,
     lineHeight: 22,

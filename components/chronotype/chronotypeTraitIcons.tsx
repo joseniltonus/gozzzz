@@ -10,6 +10,8 @@ import {
   Target,
   Check,
   Sparkles,
+  Leaf,
+  Wind,
 } from 'lucide-react-native';
 
 const MAP: Record<TraitIconKey, typeof Brain> = {
@@ -23,6 +25,8 @@ const MAP: Record<TraitIconKey, typeof Brain> = {
   target: Target,
   check: Check,
   sparkles: Sparkles,
+  leaf: Leaf,
+  meditation: Wind,
 };
 
 export function TraitGlyph({ name, color, size = 22 }: { name: TraitIconKey; color: string; size?: number }) {

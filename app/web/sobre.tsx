@@ -20,6 +20,8 @@ import {
   Shield,
 } from 'lucide-react-native';
 
+import { WEB_OG_IMAGE_URL, WEB_OG_SITE_NAME, WEB_ORIGIN } from '@/lib/webOgConstants';
+
 const isWeb = Platform.OS === 'web';
 
 export default function WebSobrePage() {
@@ -35,7 +37,12 @@ export default function WebSobrePage() {
         <meta name="description" content={t('web.about.headDesc')} />
         <meta property="og:title" content={t('web.about.headTitle')} />
         <meta property="og:description" content={t('web.about.ogDesc')} />
+        <meta property="og:image" content={WEB_OG_IMAGE_URL} />
         <meta property="og:type" content="website" />
+        <meta property="og:url" content={`${WEB_ORIGIN}/web/sobre`} />
+        <meta property="og:site_name" content={WEB_OG_SITE_NAME} />
+        <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:image" content={WEB_OG_IMAGE_URL} />
         <link rel="canonical" href="https://gozzzz.app/web/sobre" />
       </Head>
       <ScrollView style={styles.page} showsVerticalScrollIndicator={false}>

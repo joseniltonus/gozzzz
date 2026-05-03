@@ -17,11 +17,9 @@ import {
   Coffee,
   ArrowRight,
   Check,
-  ChevronDown,
   Crown,
   BookOpen,
   Heart,
-  Sparkles,
   Shield,
   Headphones,
   Lock,
@@ -30,8 +28,9 @@ import {
   Bed,
 } from 'lucide-react-native';
 import { useLanguage } from '@/contexts/LanguageContext';
-import { useUserProfile } from '@/hooks/useUserProfile';
 import GozzzzWordmark from '@/components/branding/GozzzzWordmark';
+import ChronotypePremiumWebFunnel from '@/components/web/chronotype/ChronotypePremiumWebFunnel';
+import { WEB_OG_IMAGE_URL, WEB_OG_SITE_NAME, WEB_ORIGIN } from '@/lib/webOgConstants';
 
 const isWeb = Platform.OS === 'web';
 
@@ -67,9 +66,6 @@ function WebNav() {
             <TouchableOpacity onPress={() => router.push('/web/coach')}>
               <Text style={styles.navLink}>{t('web.nav.coach')}</Text>
             </TouchableOpacity>
-            <TouchableOpacity onPress={() => router.push('/web/cronotipo')}>
-              <Text style={styles.navLink}>{t('web.nav.chronotype')}</Text>
-            </TouchableOpacity>
             <TouchableOpacity onPress={() => router.push('/web/sobre')}>
               <Text style={styles.navLink}>{t('web.nav.about')}</Text>
             </TouchableOpacity>
@@ -78,14 +74,9 @@ function WebNav() {
             </TouchableOpacity>
           </View>
         ) : (
-          <View style={styles.navMobileRight}>
-            <TouchableOpacity onPress={() => router.push('/web/cronotipo')}>
-              <Text style={styles.navLink}>{t('web.nav.chronotype')}</Text>
-            </TouchableOpacity>
-            <TouchableOpacity onPress={() => router.push('/web/assinar')} style={styles.navCta}>
-              <Text style={styles.navCtaText}>{t('web.nav.subscribe')}</Text>
-            </TouchableOpacity>
-          </View>
+          <TouchableOpacity onPress={() => router.push('/web/assinar')} style={styles.navCta}>
+            <Text style={styles.navCtaText}>{t('web.nav.subscribe')}</Text>
+          </TouchableOpacity>
         )}
       </View>
     </View>
@@ -96,41 +87,21 @@ export default function WebLandingPage() {
   const router = useRouter();
   const { t, language } = useLanguage();
   const { width: windowWidth } = useWindowDimensions();
-  const { profile } = useUserProfile();
-  const [visible, setVisible] = useState(false);
   const [hoveredPricingBtn, setHoveredPricingBtn] = useState<number | null>(null);
   const [hoveredCtaBtn, setHoveredCtaBtn] = useState(false);
   const [scrollY, setScrollY] = useState(0);
-
-  // Use profile as source of truth for chronotype; no localStorage needed
-  const chronotype = profile?.chronotype || null;
 
   const isDesktop = windowWidth >= 1024;
   const isTablet = windowWidth >= 768 && windowWidth < 1024;
 
   useEffect(() => {
     if (!isWeb) return;
-    const timer = setTimeout(() => setVisible(true), 60);
     const handleScroll = () => setScrollY(window.scrollY);
     window.addEventListener('scroll', handleScroll);
     return () => {
-      clearTimeout(timer);
       window.removeEventListener('scroll', handleScroll);
     };
   }, []);
-
-  const fade = (delay: number) =>
-    isWeb
-      ? ({
-          opacity: visible ? 1 : 0,
-          transform: visible ? 'translateY(0px)' : 'translateY(32px)',
-          transition: `opacity 0.75s ease ${delay}ms, transform 0.75s ease ${delay}ms`,
-        } as any)
-      : {};
-
-  const parallaxStyle = isWeb
-    ? ({ transform: `translateY(${scrollY * 0.3}px)` } as any)
-    : {};
 
   const testimonials = [
     {
@@ -231,12 +202,15 @@ export default function WebLandingPage() {
         <meta name="keywords" content="sono, insônia, dormir melhor, sono profundo, ciência do sono, programa de sono, higiene do sono" />
         <meta property="og:title" content={t('web.meta.home.title')} />
         <meta property="og:description" content={t('web.meta.home.description')} />
+        <meta property="og:image" content={WEB_OG_IMAGE_URL} />
         <meta property="og:type" content="website" />
-        <meta property="og:url" content="https://gozzzz.app" />
+        <meta property="og:url" content={WEB_ORIGIN} />
+        <meta property="og:site_name" content={WEB_OG_SITE_NAME} />
         <meta name="twitter:card" content="summary_large_image" />
         <meta name="twitter:title" content={t('web.meta.home.title')} />
         <meta name="twitter:description" content={t('web.meta.home.description')} />
-        <link rel="canonical" href="https://gozzzz.app" />
+        <meta name="twitter:image" content={WEB_OG_IMAGE_URL} />
+        <link rel="canonical" href={WEB_ORIGIN} />
         <script type="application/ld+json">{JSON.stringify({
           "@context": "https://schema.org",
           "@type": "WebSite",
@@ -264,65 +238,7 @@ export default function WebLandingPage() {
       <ScrollView style={styles.page} showsVerticalScrollIndicator={false}>
         <WebNav />
 
-      {/* HERO */}
-      <LinearGradient colors={['#0f172a', '#1e293b', '#0f172a']} style={styles.hero}>
-        {isWeb && <View style={[styles.heroParallaxBg, parallaxStyle]} />}
-        <View style={fade(0)}>
-          <View style={styles.heroBadge}>
-            <Sparkles size={14} color="#fbbf24" />
-            <Text style={styles.heroBadgeText}>
-              {language === 'pt' ? 'Otimização do Sono Baseada em Ciência' : 'Science-Based Sleep Optimization'}
-            </Text>
-          </View>
-        </View>
-        <Text style={[styles.heroTitle, fade(100)]}>{t('web.hero.title')}</Text>
-        {chronotype && (() => {
-          const badges: Record<string, { pt: string; en: string }> = {
-            dolphin: { pt: 'Plano 🐬 Golfinho', en: '🐬 Dolphin Plan' },
-            lion:    { pt: 'Plano 🦁 Leão',     en: '🦁 Lion Plan' },
-            bear:    { pt: 'Plano 🐻 Urso',      en: '🐻 Bear Plan' },
-            wolf:    { pt: 'Plano 🐺 Lobo',      en: '🐺 Wolf Plan' },
-          };
-          const label = badges[chronotype]?.[language] ?? null;
-          if (!label) return null;
-          return (
-            <View style={[styles.chronotypeBadge, fade(120)]}>
-              <Text style={styles.chronotypeBadgeText}>{label}</Text>
-            </View>
-          );
-        })()}
-        <Text style={[styles.heroTitleSub, fade(150)]}>{t('web.hero.titleSub')}</Text>
-        <Text style={[styles.heroSubtitle, fade(200)]}>{t('web.hero.subtitle')}</Text>
-
-        <View style={[styles.heroActions, fade(300)]}>
-          <TouchableOpacity style={styles.heroBtn} onPress={() => router.push('/web/assinar')}>
-            <Text style={styles.heroBtnText}>{t('web.hero.startNow')}</Text>
-            <ArrowRight size={20} color="#1e293b" />
-          </TouchableOpacity>
-          <TouchableOpacity style={styles.heroBtnSecondary} onPress={() => router.push('/web/programa')}>
-            <Text style={styles.heroBtnSecondaryText}>{t('web.hero.viewProgram')}</Text>
-          </TouchableOpacity>
-        </View>
-
-        <View style={[styles.heroStats, fade(400)]}>
-          <View style={styles.heroStat}>
-            <Text style={styles.heroStatNum}>21</Text>
-            <Text style={styles.heroStatLabel}>{t('web.hero.stat1')}</Text>
-          </View>
-          <View style={styles.heroStatDivider} />
-          <View style={styles.heroStat}>
-            <Text style={styles.heroStatNum}>10+</Text>
-            <Text style={styles.heroStatLabel}>{language === 'pt' ? 'Horas de Conteúdo' : 'Hours of Content'}</Text>
-          </View>
-          <View style={styles.heroStatDivider} />
-          <View style={styles.heroStat}>
-            <Text style={styles.heroStatNum}>4</Text>
-            <Text style={styles.heroStatLabel}>{t('web.hero.stat3')}</Text>
-          </View>
-        </View>
-
-        <ChevronDown size={28} color="rgba(255,255,255,0.3)" style={styles.heroChevron} />
-      </LinearGradient>
+      <ChronotypePremiumWebFunnel scrollY={scrollY} />
 
       {/* PROBLEM */}
       <View style={styles.problemSection}>
@@ -593,9 +509,6 @@ export default function WebLandingPage() {
             <TouchableOpacity onPress={() => router.push('/web/coach')}>
               <Text style={styles.footerLink}>{t('web.nav.coach')}</Text>
             </TouchableOpacity>
-            <TouchableOpacity onPress={() => router.push('/web/cronotipo')}>
-              <Text style={styles.footerLink}>{t('web.nav.chronotype')}</Text>
-            </TouchableOpacity>
             <TouchableOpacity onPress={() => router.push('/web/sobre')}>
               <Text style={styles.footerLink}>{t('web.nav.about')}</Text>
             </TouchableOpacity>
@@ -657,11 +570,6 @@ const styles = StyleSheet.create({
     color: 'rgba(255,255,255,0.85)',
     transition: isWeb ? 'color 0.3s ease' : undefined,
   } as any,
-  navMobileRight: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 14,
-  },
   navCta: {
     backgroundColor: '#fbbf24',
     paddingHorizontal: 20,
@@ -670,168 +578,6 @@ const styles = StyleSheet.create({
     transition: isWeb ? 'transform 0.3s ease, opacity 0.3s ease' : undefined,
   } as any,
   navCtaText: { fontSize: 14, fontWeight: '700', color: '#1e293b' },
-
-  hero: {
-    display: 'flex',
-    flexDirection: 'column',
-    alignItems: 'center',
-    justifyContent: 'flex-start',
-    minHeight: isWeb ? '100dvh' : 'auto',
-    paddingTop: isWeb ? 140 : 80,
-    paddingBottom: 80,
-    paddingHorizontal: 24,
-    boxSizing: 'border-box',
-    gap: 12,
-    overflow: 'hidden',
-    position: 'relative',
-  } as any,
-  heroParallaxBg: {
-    position: 'absolute',
-    top: -100,
-    left: -100,
-    right: -100,
-    bottom: -100,
-    backgroundImage: isWeb ? 'radial-gradient(ellipse at 50% 40%, rgba(251,191,36,0.06) 0%, transparent 60%)' : undefined,
-    pointerEvents: 'none',
-  } as any,
-  chronotypeBadge: {
-    backgroundColor: '#7c6fff',
-    borderRadius: 999,
-    paddingHorizontal: 12,
-    paddingVertical: 4,
-    alignSelf: 'center',
-    marginBottom: 0,
-    position: 'static',
-    margin: 0,
-    transform: 'none',
-  } as any,
-  chronotypeBadgeText: {
-    fontSize: 13,
-    fontWeight: '700',
-    color: '#ffffff',
-  },
-  heroBadge: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 6,
-    backgroundColor: 'rgba(251,191,36,0.15)',
-    borderRadius: 20,
-    paddingHorizontal: 14,
-    paddingVertical: 6,
-    marginBottom: 0,
-    borderWidth: 1,
-    borderColor: 'rgba(251,191,36,0.3)',
-    position: 'static',
-    margin: 0,
-    transform: 'none',
-  } as any,
-  heroBadgeText: { fontSize: 13, fontWeight: '600', color: '#fbbf24' },
-  heroTitle: {
-    fontSize: isWeb ? 52 : 34,
-    fontWeight: '800',
-    color: '#ffffff',
-    textAlign: 'center',
-    lineHeight: isWeb ? 64 : 42,
-    marginBottom: 0,
-    letterSpacing: -0.5,
-    maxWidth: 800,
-    position: 'static',
-    margin: 0,
-    transform: 'none',
-    display: 'block',
-  } as any,
-  heroTitleSub: {
-    fontSize: isWeb ? 20 : 15,
-    fontWeight: '400',
-    color: '#94a3b8',
-    textAlign: 'center',
-    lineHeight: isWeb ? 30 : 22,
-    marginBottom: 0,
-    fontStyle: 'italic',
-    maxWidth: isWeb ? 680 : undefined,
-    alignSelf: 'center',
-    position: 'static',
-    margin: 0,
-    transform: 'none',
-  } as any,
-  heroSubtitle: {
-    fontSize: isWeb ? 20 : 16,
-    color: '#8892a4',
-    textAlign: 'center',
-    lineHeight: isWeb ? 30 : 24,
-    maxWidth: 600,
-    marginBottom: 0,
-    position: 'static',
-    margin: 0,
-    transform: 'none',
-    display: 'block',
-  } as any,
-  heroActions: {
-    flexDirection: isWeb ? 'row' : 'column',
-    gap: 12,
-    marginBottom: 0,
-    alignItems: 'center',
-    flexWrap: 'wrap',
-    justifyContent: 'center',
-    width: '100%',
-    position: 'static',
-    margin: 0,
-    transform: 'none',
-  } as any,
-  heroBtn: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 8,
-    backgroundColor: '#fbbf24',
-    paddingHorizontal: 32,
-    paddingVertical: 18,
-    borderRadius: 14,
-    shadowColor: '#fbbf24',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.4,
-    shadowRadius: 12,
-    elevation: 6,
-    transition: isWeb ? 'transform 0.3s ease, box-shadow 0.3s ease' : undefined,
-    width: '100%',
-    position: 'static',
-    margin: 0,
-    transform: 'none',
-  } as any,
-  heroBtnText: { fontSize: 18, fontWeight: '800', color: '#1e293b' },
-  heroBtnSecondary: {
-    paddingHorizontal: 32,
-    paddingVertical: 18,
-    borderRadius: 14,
-    borderWidth: 1.5,
-    borderColor: 'rgba(255,255,255,0.3)',
-    transition: isWeb ? 'border-color 0.3s ease' : undefined,
-    width: '100%',
-    position: 'static',
-    margin: 0,
-    transform: 'none',
-  } as any,
-  heroBtnSecondaryText: { fontSize: 16, fontWeight: '600', color: '#ffffff' },
-  heroStats: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 32,
-    backgroundColor: 'rgba(255,255,255,0.06)',
-    borderRadius: 16,
-    paddingHorizontal: 40,
-    paddingVertical: 20,
-    borderWidth: 1,
-    borderColor: 'rgba(255,255,255,0.1)',
-    flexWrap: 'wrap',
-    justifyContent: 'center',
-    position: 'static',
-    margin: 0,
-    transform: 'none',
-  } as any,
-  heroStat: { alignItems: 'center' },
-  heroStatNum: { fontSize: 32, fontWeight: '800', color: '#fbbf24' },
-  heroStatLabel: { fontSize: 13, color: '#8892a4', fontWeight: '500' },
-  heroStatDivider: { width: 1, height: 40, backgroundColor: 'rgba(255,255,255,0.1)' },
-  heroChevron: { marginTop: 0, opacity: 0.5, position: 'static', margin: 0, transform: 'none' },
 
   container: { maxWidth: 1100, alignSelf: 'center', width: '100%', paddingHorizontal: 24 },
 

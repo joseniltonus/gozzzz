@@ -2,6 +2,7 @@ import { View, Text, StyleSheet } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import type { LocaleChronotypeBlock } from '@/data/chronotypesExperience';
 import type { ShareImageVariant } from '@/lib/chronotypeMultiShare';
+import { SHARE_BRAND_URL_TEXT } from '@/lib/shareBranding';
 import { STORY_HEIGHT, STORY_WIDTH } from '@/lib/chronotypeStoryShare';
 
 function themeFor(color: LocaleChronotypeBlock['color']) {
@@ -29,12 +30,13 @@ export default function ChronotypeShareTemplates({ variant, block, locale }: Pro
   const th = themeFor(block.color);
 
   if (variant === 'whatsapp') {
+    /** Status 9:16: emoji + nome + frase + marca. */
     return (
       <LinearGradient colors={[...th.colors]} style={styles.root} start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }}>
         <Text style={styles.wEmoji}>{block.emoji}</Text>
         <Text style={[styles.wName, { color: th.accent }]}>{block.name}</Text>
         <Text style={[styles.wShort, { color: th.muted }]}>{block.story.short}</Text>
-        <Text style={styles.footer}>gozzzz.app</Text>
+        <Text style={[styles.footer, { color: th.accent }]}>{SHARE_BRAND_URL_TEXT}</Text>
       </LinearGradient>
     );
   }
@@ -45,17 +47,20 @@ export default function ChronotypeShareTemplates({ variant, block, locale }: Pro
       <LinearGradient colors={[...th.colors]} style={styles.root} start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }}>
         <Text style={[styles.igHead, { color: '#f8fafc' }]}>{head}</Text>
         <Text style={[styles.igBody, { color: th.muted }]}>{block.story.short}</Text>
-        <Text style={styles.footer}>gozzzz.app</Text>
+        <Text style={[styles.footer, { color: th.accent }]}>{SHARE_BRAND_URL_TEXT}</Text>
       </LinearGradient>
     );
   }
 
-  const cta = locale === 'pt' ? 'Descubra o seu → gozzzz.app' : 'Find yours → gozzzz.app';
+  const cta =
+    locale === 'pt'
+      ? `Descubra o seu → ${SHARE_BRAND_URL_TEXT}`
+      : `Find yours → ${SHARE_BRAND_URL_TEXT}`;
   return (
     <LinearGradient colors={[...th.colors]} style={styles.root} start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }}>
       <Text style={[styles.igBody, { color: th.muted, marginTop: 120 }]}>{block.story.curiosity}</Text>
       <Text style={[styles.igCta, { color: th.accent }]}>{cta}</Text>
-      <Text style={styles.footer}>gozzzz.app</Text>
+      <Text style={[styles.footer, { color: th.accent }]}>{SHARE_BRAND_URL_TEXT}</Text>
     </LinearGradient>
   );
 }
@@ -70,20 +75,21 @@ const styles = StyleSheet.create({
   wEmoji: {
     fontSize: 120,
     textAlign: 'center',
-    marginBottom: 24,
+    marginBottom: 16,
   },
   wName: {
-    fontSize: 44,
+    fontSize: 34,
     fontWeight: '800',
     textAlign: 'center',
-    marginBottom: 32,
-    letterSpacing: -0.5,
+    marginBottom: 20,
+    letterSpacing: -0.4,
   },
   wShort: {
-    fontSize: 38,
-    fontWeight: '500',
+    fontSize: 40,
+    fontWeight: '600',
     textAlign: 'center',
-    lineHeight: 52,
+    lineHeight: 54,
+    paddingHorizontal: 8,
   },
   igHead: {
     fontSize: 48,
@@ -106,10 +112,11 @@ const styles = StyleSheet.create({
     position: 'absolute',
     left: 0,
     right: 0,
-    bottom: 100,
+    bottom: 96,
     textAlign: 'center',
-    fontSize: 32,
+    fontSize: 26,
     fontWeight: '600',
     opacity: 0.7,
+    letterSpacing: 0.3,
   },
 });

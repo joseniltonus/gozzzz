@@ -1,4 +1,4 @@
-import { View, Text, StyleSheet } from 'react-native';
+import { View, Text, StyleSheet, Platform, useWindowDimensions } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import Animated, { FadeIn, FadeInDown, ZoomIn } from 'react-native-reanimated';
 import type { LocaleChronotypeBlock } from '@/data/chronotypesExperience';
@@ -28,13 +28,15 @@ const STAGGER_MS = 150;
 
 export default function ChronotypeIdentityScreen({ block, onNext }: Props) {
   const accent = accentFor(block.color);
+  const { width: winW } = useWindowDimensions();
+  const maxWrap = Math.min(390, winW);
 
   return (
-    <View style={styles.wrap}>
+    <View style={[styles.wrap, { maxWidth: maxWrap }]}>
       <View style={styles.hero}>
         <Animated.View
           entering={ZoomIn.springify().damping(14).stiffness(180)}
-          style={styles.emojiWrap}
+          style={[styles.emojiHalo, { shadowColor: accent }]}
         >
           <Text style={styles.emoji}>{block.emoji}</Text>
         </Animated.View>
@@ -82,18 +84,31 @@ export default function ChronotypeIdentityScreen({ block, onNext }: Props) {
 
 const styles = StyleSheet.create({
   wrap: {
-    paddingHorizontal: 20,
+    paddingHorizontal: 24,
     paddingBottom: 28,
-    maxWidth: 520,
     width: '100%',
     alignSelf: 'center',
   },
   hero: {
     alignItems: 'center',
-    marginBottom: 24,
+    marginBottom: 28,
   },
-  emojiWrap: {
-    marginBottom: 8,
+  emojiHalo: {
+    marginBottom: 10,
+    paddingHorizontal: 4,
+    paddingVertical: 4,
+    borderRadius: 20,
+    backgroundColor: 'transparent',
+    borderWidth: 0,
+    ...(Platform.OS === 'ios'
+      ? {
+          shadowOffset: { width: 0, height: 8 },
+          shadowOpacity: 0.2,
+          shadowRadius: 16,
+        }
+      : Platform.OS === 'android'
+        ? { elevation: 4 }
+        : {}),
   },
   emoji: {
     fontSize: 72,
@@ -126,17 +141,17 @@ const styles = StyleSheet.create({
     marginBottom: 20,
   },
   traitCard: {
-    borderRadius: 16,
+    borderRadius: 22,
     overflow: 'hidden',
     borderWidth: 1,
-    borderColor: 'rgba(255,255,255,0.07)',
+    borderColor: 'rgba(255,255,255,0.1)',
   },
   traitInner: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: 14,
-    paddingVertical: 14,
-    paddingHorizontal: 16,
+    paddingVertical: 16,
+    paddingHorizontal: 18,
   },
   traitTitle: {
     flex: 1,
@@ -146,10 +161,10 @@ const styles = StyleSheet.create({
   },
   insightBox: {
     marginBottom: 24,
-    borderRadius: 16,
+    borderRadius: 22,
     overflow: 'hidden',
     borderWidth: 1,
-    borderColor: 'rgba(255,255,255,0.08)',
+    borderColor: 'rgba(255,255,255,0.1)',
   },
   insightInner: {
     padding: 16,

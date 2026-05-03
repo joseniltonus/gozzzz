@@ -6,6 +6,7 @@
 import { Platform, Share, Alert } from 'react-native';
 import type { ChronotypeColor } from '@/data/chronotypesExperience';
 import type { LocaleChronotypeBlock } from '@/data/chronotypesExperience';
+import { drawShareBrandFooterCanvas, SHARE_BRAND_URL_TEXT } from '@/lib/shareBranding';
 import { STORY_HEIGHT, STORY_WIDTH } from '@/lib/chronotypeStoryShare';
 
 export type ShareImageVariant = 'whatsapp' | 'instagram1' | 'instagram2';
@@ -87,17 +88,6 @@ function fillGradient(ctx: CanvasRenderingContext2D, t: CanvasTheme) {
   ctx.fillRect(0, 0, STORY_WIDTH, STORY_HEIGHT);
 }
 
-function drawFooter(ctx: CanvasRenderingContext2D, t: CanvasTheme, y = STORY_HEIGHT - 100) {
-  ctx.save();
-  ctx.globalAlpha = 0.7;
-  ctx.fillStyle = t.accent;
-  ctx.font = '500 34px system-ui, -apple-system, sans-serif';
-  const label = 'gozzzz.app';
-  const w = ctx.measureText(label).width;
-  ctx.fillText(label, (STORY_WIDTH - w) / 2, y);
-  ctx.restore();
-}
-
 function canvasToObjectUrl(canvas: HTMLCanvasElement): Promise<string | null> {
   return new Promise((resolve) => {
     canvas.toBlob(
@@ -140,22 +130,26 @@ export async function generateShareImageWeb(
     ctx.textAlign = 'center';
     ctx.fillText(block.emoji, STORY_WIDTH / 2, y);
     y += 100;
-    ctx.font = '700 44px system-ui, -apple-system, sans-serif';
+    ctx.fillStyle = t.accent;
+    ctx.font = '700 36px system-ui, -apple-system, sans-serif';
     for (const ln of wrapCanvasText(ctx, block.name, maxW)) {
       ctx.fillText(ln, STORY_WIDTH / 2, y);
-      y += 52;
+      y += 46;
     }
-    y += 40;
+    y += 16;
     ctx.fillStyle = t.muted;
-    ctx.font = '500 40px system-ui, -apple-system, sans-serif';
-    for (const ln of wrapCanvasText(ctx, block.story.short, maxW)) {
-      for (const line of wrapCanvasText(ctx, ln, maxW)) {
-        ctx.fillText(line, STORY_WIDTH / 2, y);
-        y += 48;
-      }
+    ctx.font = '500 34px system-ui, -apple-system, sans-serif';
+    for (const line of wrapCanvasText(ctx, block.story.short, maxW)) {
+      ctx.fillText(line, STORY_WIDTH / 2, y);
+      y += 48;
     }
     ctx.textAlign = 'left';
-    drawFooter(ctx, t);
+    drawShareBrandFooterCanvas(ctx, {
+      canvasWidth: STORY_WIDTH,
+      canvasHeight: STORY_HEIGHT,
+      accentColor: t.accent,
+      align: 'center',
+    });
     return canvasToObjectUrl(canvas);
   }
 
@@ -174,7 +168,12 @@ export async function generateShareImageWeb(
       ctx.fillText(ln, pad, y);
       y += 50;
     }
-    drawFooter(ctx, t);
+    drawShareBrandFooterCanvas(ctx, {
+      canvasWidth: STORY_WIDTH,
+      canvasHeight: STORY_HEIGHT,
+      accentColor: t.accent,
+      align: 'center',
+    });
     return canvasToObjectUrl(canvas);
   }
 
@@ -189,12 +188,20 @@ export async function generateShareImageWeb(
   ctx.fillStyle = t.accent;
   ctx.font = '600 36px system-ui, -apple-system, sans-serif';
   const cta =
-    locale === 'pt' ? 'Descubra o seu → gozzzz.app' : 'Find yours → gozzzz.app';
+    locale === 'pt'
+      ? `Descubra o seu → ${SHARE_BRAND_URL_TEXT}`
+      : `Find yours → ${SHARE_BRAND_URL_TEXT}`;
   for (const ln of wrapCanvasText(ctx, cta, maxW)) {
     ctx.fillText(ln, pad, y);
     y += 48;
   }
-  drawFooter(ctx, t, STORY_HEIGHT - 90);
+  drawShareBrandFooterCanvas(ctx, {
+    canvasWidth: STORY_WIDTH,
+    canvasHeight: STORY_HEIGHT,
+    accentColor: t.accent,
+    bottomPx: STORY_HEIGHT - 90,
+    align: 'center',
+  });
   return canvasToObjectUrl(canvas);
 }
 
