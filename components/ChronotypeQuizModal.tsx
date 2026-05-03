@@ -21,6 +21,7 @@ import { savePreRegistrationQuizDone } from '@/lib/quizDevicePersistence';
 import { ShareableCard } from './ShareableCard';
 import * as SecureStore from 'expo-secure-store';
 import ProgressBar from '@/src/components/ProgressBar';
+import Reanimated, { SlideInRight } from 'react-native-reanimated';
 
 type Chronotype = 'dolphin' | 'lion' | 'bear' | 'wolf';
 
@@ -386,10 +387,11 @@ export default function ChronotypeQuizModal({
           >
             {showProgressBar !== false && (
               <View style={styles.progressHeader}>
-                <ProgressBar current={screen + 1} total={4} />
+                <ProgressBar current={screen + 1} total={4} animated />
               </View>
             )}
 
+            <Reanimated.View key={screen} entering={SlideInRight.duration(320)}>
             <Text style={styles.question}>
               {lang === 'pt' ? currentScreen.q_pt : currentScreen.q_en}
             </Text>
@@ -428,6 +430,7 @@ export default function ChronotypeQuizModal({
                 );
               })}
             </View>
+            </Reanimated.View>
 
             <TouchableOpacity
               style={[styles.nextButton, !hasAnswer && styles.nextButtonDisabled]}

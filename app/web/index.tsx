@@ -12,7 +12,6 @@ import { useRouter } from 'expo-router';
 import Head from 'expo-router/head';
 import { LinearGradient } from 'expo-linear-gradient';
 import {
-  Moon,
   Brain,
   Sun,
   Coffee,
@@ -28,9 +27,11 @@ import {
   Lock,
   BadgeCheck,
   Calendar,
+  Bed,
 } from 'lucide-react-native';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useUserProfile } from '@/hooks/useUserProfile';
+import GozzzzWordmark from '@/components/branding/GozzzzWordmark';
 
 const isWeb = Platform.OS === 'web';
 
@@ -55,10 +56,7 @@ function WebNav() {
     <View style={[styles.nav, scrolled && styles.navScrolled]}>
       <View style={styles.navInner}>
         <TouchableOpacity onPress={() => router.push('/web')} style={styles.navBrand}>
-          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: 24, height: 24 }}>
-            <Moon size={24} color="#fbbf24" strokeWidth={2} />
-          </div>
-          <Text style={styles.navBrandText}>GoZzzz</Text>
+          <GozzzzWordmark size="md" />
         </TouchableOpacity>
 
         {showLinks ? (
@@ -69,6 +67,9 @@ function WebNav() {
             <TouchableOpacity onPress={() => router.push('/web/coach')}>
               <Text style={styles.navLink}>{t('web.nav.coach')}</Text>
             </TouchableOpacity>
+            <TouchableOpacity onPress={() => router.push('/web/cronotipo')}>
+              <Text style={styles.navLink}>{t('web.nav.chronotype')}</Text>
+            </TouchableOpacity>
             <TouchableOpacity onPress={() => router.push('/web/sobre')}>
               <Text style={styles.navLink}>{t('web.nav.about')}</Text>
             </TouchableOpacity>
@@ -77,9 +78,14 @@ function WebNav() {
             </TouchableOpacity>
           </View>
         ) : (
-          <TouchableOpacity onPress={() => router.push('/web/assinar')} style={styles.navCta}>
-            <Text style={styles.navCtaText}>{t('web.nav.subscribe')}</Text>
-          </TouchableOpacity>
+          <View style={styles.navMobileRight}>
+            <TouchableOpacity onPress={() => router.push('/web/cronotipo')}>
+              <Text style={styles.navLink}>{t('web.nav.chronotype')}</Text>
+            </TouchableOpacity>
+            <TouchableOpacity onPress={() => router.push('/web/assinar')} style={styles.navCta}>
+              <Text style={styles.navCtaText}>{t('web.nav.subscribe')}</Text>
+            </TouchableOpacity>
+          </View>
         )}
       </View>
     </View>
@@ -159,13 +165,13 @@ export default function WebLandingPage() {
     ? [
         { icon: Brain, title: 'Arquitetura do Sono', desc: 'Baseado em pesquisas revisadas por pares sobre estágios do sono, biologia circadiana e consolidação da memória' },
         { icon: Sun, title: 'Ciência Circadiana', desc: 'Fundamentado em estudos publicados sobre exposição à luz, regulação da melatonina e otimização do relógio biológico' },
-        { icon: Moon, title: 'Distúrbios do Sono', desc: 'Informado por pesquisas clínicas sobre insônia, privação de sono e medicina comportamental do sono' },
+        { icon: Bed, title: 'Distúrbios do Sono', desc: 'Informado por pesquisas clínicas sobre insônia, privação de sono e medicina comportamental do sono' },
         { icon: Heart, title: 'Protocolos de Estilo de Vida', desc: 'Sintetiza evidências de ciência nutricional, fisiologia do exercício e literatura de gerenciamento do estresse' },
       ]
     : [
         { icon: Brain, title: 'Sleep Architecture', desc: 'Built on peer-reviewed research covering sleep stages, circadian biology, and memory consolidation' },
         { icon: Sun, title: 'Circadian Science', desc: 'Grounded in published studies on light exposure, melatonin regulation, and body-clock optimization' },
-        { icon: Moon, title: 'Sleep Disorders', desc: 'Informed by clinical research on insomnia, sleep deprivation, and behavioral sleep medicine' },
+        { icon: Bed, title: 'Sleep Disorders', desc: 'Informed by clinical research on insomnia, sleep deprivation, and behavioral sleep medicine' },
         { icon: Heart, title: 'Lifestyle Protocols', desc: 'Synthesizes evidence from nutrition science, exercise physiology, and stress management literature' },
       ];
 
@@ -587,6 +593,9 @@ export default function WebLandingPage() {
             <TouchableOpacity onPress={() => router.push('/web/coach')}>
               <Text style={styles.footerLink}>{t('web.nav.coach')}</Text>
             </TouchableOpacity>
+            <TouchableOpacity onPress={() => router.push('/web/cronotipo')}>
+              <Text style={styles.footerLink}>{t('web.nav.chronotype')}</Text>
+            </TouchableOpacity>
             <TouchableOpacity onPress={() => router.push('/web/sobre')}>
               <Text style={styles.footerLink}>{t('web.nav.about')}</Text>
             </TouchableOpacity>
@@ -641,7 +650,6 @@ const styles = StyleSheet.create({
     width: '100%',
   },
   navBrand: { flexDirection: 'row', alignItems: 'center', gap: 8 },
-  navBrandText: { fontSize: 22, fontWeight: '800', color: '#ffffff', letterSpacing: 1 },
   navLinks: { flexDirection: 'row', alignItems: 'center', gap: 32 },
   navLink: {
     fontSize: 15,
@@ -649,6 +657,11 @@ const styles = StyleSheet.create({
     color: 'rgba(255,255,255,0.85)',
     transition: isWeb ? 'color 0.3s ease' : undefined,
   } as any,
+  navMobileRight: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 14,
+  },
   navCta: {
     backgroundColor: '#fbbf24',
     paddingHorizontal: 20,

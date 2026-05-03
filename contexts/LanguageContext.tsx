@@ -266,6 +266,7 @@ const translations = {
     // Web pages
     'web.nav.program': 'Programa',
     'web.nav.coach': 'Concierge',
+    'web.nav.chronotype': 'Cronótipo',
     'web.nav.about': 'Sobre',
     'web.nav.subscribe': 'Assinar',
     'web.nav.back': 'Voltar',
@@ -1317,6 +1318,7 @@ const translations = {
     // Web pages
     'web.nav.program': 'Program',
     'web.nav.coach': 'Concierge',
+    'web.nav.chronotype': 'Chronotype',
     'web.nav.about': 'About',
     'web.nav.subscribe': 'Subscribe',
     'web.nav.back': 'Back',

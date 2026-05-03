@@ -1,29 +1,54 @@
-import { useCallback, useState } from 'react';
+import { useCallback, useState, useRef, useEffect } from 'react';
 import { View, StyleSheet } from 'react-native';
 import { useRouter } from 'expo-router';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import ChronotypeQuizModal from '@/components/ChronotypeQuizModal';
 import ProgressBar from '@/src/components/ProgressBar';
+import QuizAnalyzingOverlay from '@/components/chronotype/QuizAnalyzingOverlay';
+import { useLanguage } from '@/contexts/LanguageContext';
+
+const ANALYZE_MS = 2000;
 
 /**
- * Quiz de cronótipo em ecrã completo; barra de progresso no topo (reutilizável).
+ * Quiz de cronótipo em ecrã completo; barra de progresso no topo; revelação com overlay de análise.
  */
 export default function QuizScreen() {
   const router = useRouter();
   const insets = useSafeAreaInsets();
+  const { language } = useLanguage();
+  const locale = language === 'pt' ? 'pt' : 'en';
   const [questionIndex, setQuestionIndex] = useState(1);
+  const [analyzing, setAnalyzing] = useState(false);
+  const pendingChrono = useRef<string | null>(null);
+  const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  useEffect(() => {
+    if (!analyzing || !pendingChrono.current) return;
+    timerRef.current = setTimeout(() => {
+      const c = pendingChrono.current;
+      pendingChrono.current = null;
+      setAnalyzing(false);
+      if (c) {
+        router.push({ pathname: '/(auth)/result', params: { chronotype: c } });
+      }
+    }, ANALYZE_MS);
+    return () => {
+      if (timerRef.current) clearTimeout(timerRef.current);
+    };
+  }, [analyzing, router]);
 
   const onComplete = useCallback(
     (chronotype: string) => {
-      router.push({ pathname: '/(auth)/result', params: { chronotype } });
+      pendingChrono.current = chronotype;
+      setAnalyzing(true);
     },
-    [router],
+    [],
   );
 
   return (
     <View style={styles.root}>
       <View style={[styles.progressPad, { paddingTop: Math.max(insets.top, 12) }]}>
-        <ProgressBar current={questionIndex} total={4} />
+        <ProgressBar current={questionIndex} total={4} animated />
       </View>
       <View style={styles.quizBody}>
         <ChronotypeQuizModal
@@ -34,6 +59,7 @@ export default function QuizScreen() {
           onQuestionIndexChange={(i) => setQuestionIndex(i + 1)}
         />
       </View>
+      <QuizAnalyzingOverlay visible={analyzing} locale={locale} />
     </View>
   );
 }
