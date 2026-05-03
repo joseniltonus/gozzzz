@@ -7,15 +7,31 @@ import {
   Animated,
   Easing,
   Platform,
+  TouchableOpacity,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { StatusBar } from 'expo-status-bar';
 import { useRouter } from 'expo-router';
-import PrimaryButton from '@/src/components/PrimaryButton';
+import MaskedView from '@react-native-masked-view/masked-view';
+import { LinearGradient } from 'expo-linear-gradient';
+import Reanimated, {
+  useSharedValue,
+  useAnimatedStyle,
+  withRepeat,
+  withSequence,
+  withTiming,
+} from 'react-native-reanimated';
 import GhostButton from '@/src/components/GhostButton';
 import ChronotypModal from '@/src/screens/ChronotypModal';
 
 const BG = '#0c0e1a';
+
+const SCI_ROWS = [
+  { initials: 'MB', name: 'Dr. Breus', inst: 'Sleep Medicine', color: 'rgba(124,111,255,0.25)', textColor: '#c8c0ff' },
+  { initials: 'MW', name: 'Dr. Walker', inst: 'UC Berkeley', color: 'rgba(111,200,255,0.20)', textColor: '#a8d8ff' },
+  { initials: 'AH', name: 'Dr. Huberman', inst: 'Stanford', color: 'rgba(160,111,255,0.20)', textColor: '#c8a8ff' },
+  { initials: 'CC', name: 'Dr. Czeisler', inst: 'Harvard Medical', color: 'rgba(111,200,160,0.20)', textColor: '#a8ffd8' },
+] as const;
 
 function makeStarField() {
   const stars: { key: number; leftPct: number; top: number; size: number; opacity: number }[] = [];
@@ -76,6 +92,91 @@ function AnimatedStarField() {
   );
 }
 
+function LogoBlock() {
+  const useMask = Platform.OS !== 'web';
+
+  if (!useMask) {
+    return (
+      <View style={styles.logoWrap}>
+        <Text style={styles.logoTextFallback}>GoZzz</Text>
+        <Text style={styles.logoSub}>PROGRAMA DE SONO EM 21 PASSOS</Text>
+        <View style={styles.logoLine} />
+      </View>
+    );
+  }
+
+  return (
+    <View style={styles.logoWrap}>
+      <MaskedView
+        style={styles.maskedLogo}
+        maskElement={
+          <View style={styles.maskInner}>
+            <Text style={styles.logoText}>GoZzz</Text>
+          </View>
+        }
+      >
+        <LinearGradient colors={['#ffffff', '#c8c0ff']} start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }}>
+          <Text style={[styles.logoText, styles.logoTextHidden]}>GoZzz</Text>
+        </LinearGradient>
+      </MaskedView>
+      <Text style={styles.logoSub}>PROGRAMA DE SONO EM 21 PASSOS</Text>
+      <View style={styles.logoLine} />
+    </View>
+  );
+}
+
+function ResearcherGrid() {
+  return (
+    <View style={styles.sciWrap}>
+      <Text style={styles.sciLabel}>Fundamentado em</Text>
+      <View style={styles.sciGrid}>
+        {SCI_ROWS.map((r) => (
+          <View key={r.initials} style={styles.sciPill}>
+            <View style={[styles.sciAv, { backgroundColor: r.color }]}>
+              <Text style={[styles.sciAvText, { color: r.textColor }]}>{r.initials}</Text>
+            </View>
+            <View>
+              <Text style={styles.sciName}>{r.name}</Text>
+              <Text style={styles.sciInst}>{r.inst}</Text>
+            </View>
+          </View>
+        ))}
+      </View>
+    </View>
+  );
+}
+
+function CtaButton({ onPress }: { onPress: () => void }) {
+  const shimmer = useSharedValue(-1);
+
+  useEffect(() => {
+    shimmer.value = withRepeat(
+      withSequence(withTiming(1, { duration: 1200 }), withTiming(-1, { duration: 1 })),
+      -1,
+      false,
+    );
+  }, [shimmer]);
+
+  const shimmerStyle = useAnimatedStyle(() => ({
+    transform: [{ translateX: shimmer.value * 300 }],
+  }));
+
+  return (
+    <TouchableOpacity onPress={onPress} activeOpacity={0.9}>
+      <LinearGradient
+        colors={['#8b7fff', '#6a5fff', '#5a8fff']}
+        start={{ x: 0, y: 0 }}
+        end={{ x: 1, y: 1 }}
+        style={styles.ctaGradient}
+      >
+        <View style={styles.ctaTopLine} />
+        <Reanimated.View style={[styles.ctaShimmer, shimmerStyle]} />
+        <Text style={styles.ctaText}>→ Fazer o teste</Text>
+      </LinearGradient>
+    </TouchableOpacity>
+  );
+}
+
 export default function EntryScreen() {
   const router = useRouter();
   const [showModal, setShowModal] = useState(false);
@@ -103,12 +204,9 @@ export default function EntryScreen() {
           <View style={styles.inner}>
             <View style={styles.notch} />
 
-            <Text style={styles.logoLine}>
-              <Text style={styles.logoGo}>Go</Text>
-              <Text style={styles.logoZzz}>Zzz</Text>
-            </Text>
-            <Text style={styles.logoSub}>PROGRAMA DE SONO EM 21 PASSOS</Text>
-            <View style={styles.logoRule} />
+            <LogoBlock />
+
+            <ResearcherGrid />
 
             <View style={styles.moonOuter}>
               <View style={styles.moonMid}>
@@ -125,7 +223,7 @@ export default function EntryScreen() {
               Descubra em 60 segundos qual é o{'\n'}seu tipo biológico de sono.
             </Text>
 
-            <PrimaryButton label="→ Fazer o teste" onPress={goQuiz} />
+            <CtaButton onPress={goQuiz} />
             <GhostButton label="Saiba mais" onPress={() => setShowModal(true)} style={styles.ghostAfterPrimary} />
 
             <Text style={styles.meta}>Gratuito · 60 segundos · Sem cadastro</Text>
@@ -203,32 +301,95 @@ const styles = StyleSheet.create({
     alignSelf: 'center',
     marginBottom: 28,
   },
-  logoLine: {
-    textAlign: 'center',
-    fontSize: 34,
-    fontWeight: '500',
+  logoWrap: {
+    alignItems: 'center',
+    marginBottom: 22,
   },
-  logoGo: {
-    color: '#ffffff',
+  maskedLogo: {
+    alignSelf: 'center',
   },
-  logoZzz: {
-    color: '#a99fff',
+  maskInner: {
+    backgroundColor: 'transparent',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  logoText: {
+    fontSize: 40,
+    fontWeight: '300',
+    letterSpacing: -1.5,
+    color: '#fff',
+  },
+  logoTextHidden: {
+    opacity: 0,
+  },
+  logoTextFallback: {
+    fontSize: 40,
+    fontWeight: '300',
+    letterSpacing: -1.5,
+    color: '#e8e4ff',
   },
   logoSub: {
-    marginTop: 6,
     fontSize: 10,
-    color: '#4a5275',
-    letterSpacing: 1.5,
+    color: '#3a4060',
+    letterSpacing: 2.4,
     textTransform: 'uppercase',
-    textAlign: 'center',
+    marginTop: 6,
   },
-  logoRule: {
+  logoLine: {
     width: 32,
     height: 1,
-    backgroundColor: 'rgba(255,255,255,0.08)',
-    alignSelf: 'center',
-    marginTop: 16,
-    marginBottom: 24,
+    backgroundColor: 'rgba(255,255,255,0.07)',
+    marginTop: 14,
+  },
+  sciWrap: {
+    width: '100%',
+    marginBottom: 22,
+  },
+  sciLabel: {
+    fontSize: 9,
+    color: '#3a4060',
+    letterSpacing: 1.4,
+    textTransform: 'uppercase',
+    textAlign: 'center',
+    marginBottom: 10,
+    fontWeight: '500',
+  },
+  sciGrid: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: 6,
+  },
+  sciPill: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+    backgroundColor: 'rgba(255,255,255,0.04)',
+    borderWidth: 1,
+    borderColor: 'rgba(255,255,255,0.08)',
+    borderRadius: 12,
+    padding: 9,
+    width: '48%',
+  },
+  sciAv: {
+    width: 28,
+    height: 28,
+    borderRadius: 14,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  sciAvText: {
+    fontSize: 9,
+    fontWeight: '600',
+  },
+  sciName: {
+    fontSize: 10,
+    color: '#c0c5e0',
+    fontWeight: '500',
+  },
+  sciInst: {
+    fontSize: 8,
+    color: '#40465a',
+    marginTop: 1,
   },
   moonOuter: {
     width: 80,
@@ -277,6 +438,41 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     lineHeight: 22,
     marginBottom: 36,
+  },
+  ctaGradient: {
+    width: '100%',
+    borderRadius: 16,
+    paddingVertical: 18,
+    alignItems: 'center',
+    marginBottom: 10,
+    shadowColor: '#7c6fff',
+    shadowOffset: { width: 0, height: 8 },
+    shadowOpacity: 0.45,
+    shadowRadius: 20,
+    elevation: 12,
+    overflow: 'hidden',
+  },
+  ctaTopLine: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    height: 1,
+    backgroundColor: 'rgba(255,255,255,0.3)',
+  },
+  ctaShimmer: {
+    position: 'absolute',
+    top: 0,
+    bottom: 0,
+    width: 80,
+    backgroundColor: 'rgba(255,255,255,0.10)',
+    transform: [{ skewX: '-20deg' }],
+  },
+  ctaText: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: '#fff',
+    letterSpacing: 0.3,
   },
   ghostAfterPrimary: {
     marginTop: 8,
