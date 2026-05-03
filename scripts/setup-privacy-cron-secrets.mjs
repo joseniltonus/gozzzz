@@ -8,6 +8,7 @@
  * Uso: npm run privacy:setup-cron
  */
 import crypto from 'node:crypto';
+import { execFileSync } from 'node:child_process';
 import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -51,6 +52,19 @@ function refFromSupabaseUrl(urlStr) {
 
 loadDotEnv(envPath);
 
+function githubRepoFromGit() {
+  try {
+    const u = execFileSync('git', ['-C', root, 'remote', 'get-url', 'origin'], {
+      encoding: 'utf8',
+    }).trim();
+    const m = u.match(/github\.com[/:]([\w.-]+)\/([\w.-]+?)(?:\.git)?$/i);
+    if (m) return `${m[1]}/${m[2]}`;
+  } catch {
+    /* ignore */
+  }
+  return 'joseniltonus/gozzzz';
+}
+
 const url = process.env.EXPO_PUBLIC_SUPABASE_URL?.trim();
 const projectRef = refFromSupabaseUrl(url);
 
@@ -63,7 +77,14 @@ if (!projectRef) {
 
 const privacySecret = crypto.randomBytes(32).toString('hex');
 
-console.log('\n=== Valores para GitHub Actions (Repository secrets) ===\n');
+console.log('\n=== Ligações úteis (abre no browser) ===\n');
+console.log(
+  `Supabase — segredos das Edge Functions (cola o segredo aqui):\n  https://supabase.com/dashboard/project/${projectRef}/functions/secrets\n`,
+);
+const ghRepo = githubRepoFromGit();
+console.log(`GitHub — secrets do repositório:\n  https://github.com/${ghRepo}/settings/secrets/actions\n`);
+
+console.log('=== Valores para GitHub Actions (Repository secrets) ===\n');
 console.log('Nome: SUPABASE_PROJECT_REF');
 console.log('Valor:');
 console.log(projectRef);
