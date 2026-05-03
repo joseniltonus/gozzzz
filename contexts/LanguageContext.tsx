@@ -1345,7 +1345,7 @@ const translations = {
     'web.chronoPremium.heroHeadline': 'You wake up tired even after 8 hours of sleep?',
     'web.chronoPremium.heroSub': 'Discover your biological chronotype in 60 seconds',
     'web.chronoPremium.ctaQuiz': 'Take the free test',
-    'web.chronoPremium.trustLine': 'Free • 60 seconds • No signup on device',
+    'web.chronoPremium.trustLine': 'Free • 60 seconds • No signup required',
     'web.chronoPremium.scienceTitle': 'Grounded in sleep science',
     'web.chronoPremium.scienceBullets': 'Chronobiology • Circadian rhythm • Sleep architecture',
     'web.chronoPremium.scienceFoot':

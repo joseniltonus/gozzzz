@@ -1,12 +1,11 @@
-import { View, ActivityIndicator, StyleSheet, Platform } from 'react-native';
+import { View, ActivityIndicator, StyleSheet } from 'react-native';
 import { Redirect } from 'expo-router';
 import { useAuth } from '@/contexts/AuthContext';
-import EntryScreen from '@/src/screens/EntryScreen';
 import WebMarketingLanding from '@/components/web/WebMarketingLanding';
 
 /**
- * Mobile (guest): EntryScreen (quiz / entrada nativa).
- * Web (guest): mesma landing que `/web` (funil cronótipo na primeira página de gozzzz.app).
+ * Visitante (web + nativo): mesma landing marketing + funil cronótipo (`WebMarketingLanding`).
+ * O antigo `EntryScreen` só era usado no nativo e por isso o Expo parecia “preso” no visual antigo.
  * Autenticados: home nas tabs.
  */
 export default function Index() {
@@ -24,11 +23,7 @@ export default function Index() {
     return <Redirect href="/(tabs)/home" />;
   }
 
-  if (Platform.OS === 'web') {
-    return <WebMarketingLanding />;
-  }
-
-  return <EntryScreen />;
+  return <WebMarketingLanding />;
 }
 
 const styles = StyleSheet.create({
