@@ -1,10 +1,19 @@
 name: Deploy App (Web + OTA)
 
+# Automatic: every push to `main` runs validation, then Vercel (web) + EAS OTA (iOS/Android)
+# in parallel. No extra manual deploy step — only merge or push to `main`.
+# Optional: run manually from Actions → "Run workflow".
 on:
   push:
     branches:
       - main
   workflow_dispatch: {}
+
+# If several commits land on `main` quickly, cancel older in-flight runs so production
+# always matches the latest commit (saves CI time and avoids stale deploys).
+concurrency:
+  group: deploy-app-web-ota-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
 
 jobs:
   validate-science:
