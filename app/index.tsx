@@ -2,7 +2,7 @@ import { View, ActivityIndicator, StyleSheet, Platform } from 'react-native';
 import { Redirect } from 'expo-router';
 import { useAuth } from '@/contexts/AuthContext';
 import EntryScreen from '@/src/screens/EntryScreen';
-import WebLandingPage from './web/index';
+import WebMarketingLanding from '@/components/web/WebMarketingLanding';
 
 /**
  * Mobile (guest): EntryScreen (quiz / entrada nativa).
@@ -25,7 +25,7 @@ export default function Index() {
   }
 
   if (Platform.OS === 'web') {
-    return <WebLandingPage />;
+    return <WebMarketingLanding />;
   }
 
   return <EntryScreen />;
