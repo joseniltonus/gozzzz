@@ -7,7 +7,7 @@ import {
   Platform,
   useWindowDimensions,
 } from 'react-native';
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useMemo } from 'react';
 import { useRouter } from 'expo-router';
 import Head from 'expo-router/head';
 import { LinearGradient } from 'expo-linear-gradient';
@@ -37,19 +37,12 @@ const isWeb = Platform.OS === 'web';
 const GOLD = '#d4a96a';
 const GOLD_LIGHT = '#e8c99a';
 
-function WebNav() {
+function WebNav({ scrollY }: { scrollY: number }) {
   const router = useRouter();
   const { t } = useLanguage();
   const { width } = useWindowDimensions();
-  const [scrolled, setScrolled] = useState(false);
   const showLinks = width >= 768;
-
-  useEffect(() => {
-    if (!isWeb) return;
-    const handleScroll = () => setScrolled(window.scrollY > 40);
-    window.addEventListener('scroll', handleScroll);
-    return () => window.removeEventListener('scroll', handleScroll);
-  }, []);
+  const scrolled = scrollY > 40;
 
   return (
     <View style={[styles.nav, scrolled && styles.navScrolled]}>
@@ -94,14 +87,10 @@ export default function WebMarketingLanding() {
   const isDesktop = windowWidth >= 1024;
   const isTablet = windowWidth >= 768 && windowWidth < 1024;
 
-  useEffect(() => {
-    if (!isWeb) return;
-    const handleScroll = () => setScrollY(window.scrollY);
-    window.addEventListener('scroll', handleScroll);
-    return () => {
-      window.removeEventListener('scroll', handleScroll);
-    };
-  }, []);
+  /** RN Web: o scroll é no `ScrollView`, não em `window` — `window.scrollY` ficava sempre 0. */
+  const onPageScroll = (e: { nativeEvent: { contentOffset: { y: number } } }) => {
+    setScrollY(e.nativeEvent.contentOffset.y);
+  };
 
   const testimonials = [
     {
@@ -235,8 +224,13 @@ export default function WebMarketingLanding() {
           "numberOfCredits": "21"
         })}</script>
       </Head>
-      <ScrollView style={styles.page} showsVerticalScrollIndicator={false}>
-        <WebNav />
+      <ScrollView
+        style={styles.page}
+        showsVerticalScrollIndicator={false}
+        onScroll={onPageScroll}
+        scrollEventThrottle={16}
+      >
+        <WebNav scrollY={scrollY} />
 
       <ChronotypePremiumWebFunnel scrollY={scrollY} />
 

@@ -57,7 +57,6 @@ export default function ChronotypePremiumWebFunnel({ scrollY }: Props) {
   const [ctaHover, setCtaHover] = useState(false);
   const [ctaPressed, setCtaPressed] = useState(false);
   const ctaScale = ctaPressed ? 0.97 : ctaHover && isWeb ? 1.05 : 1;
-  const [scienceVisible, setScienceVisible] = useState(false);
   const glow = useSharedValue(0.35);
 
   useEffect(() => {
@@ -81,10 +80,6 @@ export default function ChronotypePremiumWebFunnel({ scrollY }: Props) {
     }),
     [scrollY],
   );
-
-  useEffect(() => {
-    if (scrollY > 32) setScienceVisible(true);
-  }, [scrollY]);
 
   const goQuiz = () => router.push('/(auth)/signup');
   const goProgram = () => router.push('/web/programa');
@@ -183,20 +178,16 @@ export default function ChronotypePremiumWebFunnel({ scrollY }: Props) {
             <View style={styles.dividerLine} />
           </View>
 
-          {scienceVisible ? (
-            <Animated.View entering={FadeIn.duration(480)} style={styles.scienceBlock}>
-              <View style={styles.scienceBrainWrap}>
-                <Brain size={20} color="rgba(255,255,255,0.42)" strokeWidth={1.5} />
-              </View>
-              <Text style={[styles.scienceTitle, webFont]}>{t('web.chronoPremium.scienceTitle')}</Text>
-              <Text style={[styles.scienceBullets, webFont]}>{t('web.chronoPremium.scienceBullets')}</Text>
-              <Text style={[styles.scienceLead, webFont]}>{t('web.chronoPremium.scienceResearchersLead')}</Text>
-              <Text style={[styles.scienceNames, webFont]}>{t('web.chronoPremium.scienceResearchersNames')}</Text>
-              <Text style={[styles.heroPrivacy, webFont]}>{t('web.chronoPremium.heroPrivacyLine')}</Text>
-            </Animated.View>
-          ) : (
-            <View style={styles.sciencePlaceholder} />
-          )}
+          <Animated.View entering={FadeIn.duration(520).delay(120)} style={styles.scienceBlock}>
+            <View style={styles.scienceBrainWrap}>
+              <Brain size={20} color="rgba(255,255,255,0.42)" strokeWidth={1.5} />
+            </View>
+            <Text style={[styles.scienceTitle, webFont]}>{t('web.chronoPremium.scienceTitle')}</Text>
+            <Text style={[styles.scienceBullets, webFont]}>{t('web.chronoPremium.scienceBullets')}</Text>
+            <Text style={[styles.scienceLead, webFont]}>{t('web.chronoPremium.scienceResearchersLead')}</Text>
+            <Text style={[styles.scienceNames, webFont]}>{t('web.chronoPremium.scienceResearchersNames')}</Text>
+            <Text style={[styles.heroPrivacy, webFont]}>{t('web.chronoPremium.heroPrivacyLine')}</Text>
+          </Animated.View>
         </View>
 
         <Text style={[styles.gridLabel, webFont]}>{t('web.chronoPremium.gridLabel')}</Text>
@@ -396,10 +387,6 @@ const styles = StyleSheet.create({
     fontSize: 9,
     color: 'rgba(255,255,255,0.28)',
     letterSpacing: 0,
-  },
-  sciencePlaceholder: {
-    height: 120,
-    marginBottom: 8,
   },
   scienceBlock: {
     width: '100%',
