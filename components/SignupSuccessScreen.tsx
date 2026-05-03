@@ -6,14 +6,23 @@ import { useLanguage } from '@/contexts/LanguageContext';
 
 interface SignupSuccessScreenProps {
   email: string;
+  /** Cronótipo (chave dolphin|lion|bear|wolf) para levar ao ecrã de passos após confirmação. */
+  chronotypeKey?: string;
 }
 
-export default function SignupSuccessScreen({ email }: SignupSuccessScreenProps) {
+export default function SignupSuccessScreen({ email, chronotypeKey }: SignupSuccessScreenProps) {
   const router = useRouter();
   const { t } = useLanguage();
 
   const handleLogin = () => {
     router.replace('/(auth)/login');
+  };
+
+  const handleContinueToPlan = () => {
+    router.replace({
+      pathname: '/(auth)/steps',
+      params: { chronotype: chronotypeKey ?? '' },
+    });
   };
 
   return (
@@ -37,9 +46,15 @@ export default function SignupSuccessScreen({ email }: SignupSuccessScreenProps)
               <Text style={styles.emailText}>{email}</Text>
             </View>
 
-            <TouchableOpacity style={styles.button} onPress={handleLogin}>
-              <Text style={styles.buttonText}>{t('auth.success.button')}</Text>
+            <Text style={styles.confirmHint}>{t('auth.success.confirmHint')}</Text>
+
+            <TouchableOpacity style={styles.button} onPress={handleContinueToPlan} activeOpacity={0.85}>
+              <Text style={styles.buttonText}>{t('auth.success.continuePlan')}</Text>
               <ArrowRight size={20} color="#0d0d16" />
+            </TouchableOpacity>
+
+            <TouchableOpacity style={styles.secondaryButton} onPress={handleLogin} activeOpacity={0.85}>
+              <Text style={styles.secondaryButtonText}>{t('auth.success.button')}</Text>
             </TouchableOpacity>
           </View>
         </LinearGradient>
@@ -101,6 +116,15 @@ const styles = StyleSheet.create({
     color: '#d4a96a',
     textAlign: 'center',
   },
+  confirmHint: {
+    width: '100%',
+    fontSize: 14,
+    color: '#8892a4',
+    textAlign: 'center',
+    lineHeight: 22,
+    marginBottom: 24,
+    paddingHorizontal: 4,
+  },
   button: {
     width: '100%',
     flexDirection: 'row',
@@ -120,5 +144,21 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontWeight: '700',
     color: '#0d0d16',
+  },
+  secondaryButton: {
+    width: '100%',
+    marginTop: 12,
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingVertical: 16,
+    borderRadius: 12,
+    borderWidth: 1,
+    borderColor: 'rgba(212, 169, 106, 0.35)',
+    backgroundColor: 'rgba(255,255,255,0.04)',
+  },
+  secondaryButtonText: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: '#d4a96a',
   },
 });

@@ -720,6 +720,9 @@ const translations = {
     'auth.success.message': 'Sua conta foi criada com sucesso.',
     'auth.success.accessWith': 'Acesse com o e-mail:',
     'auth.success.button': 'Fazer Login',
+    'auth.success.confirmHint':
+      'Enviamos um link de confirmação para o seu email. Abra a mensagem e toque no link para ativar a conta — depois pode entrar com o seu email e senha.',
+    'auth.success.continuePlan': 'Continuar para o plano de 21 passos →',
 
     // Cookie consent
     'cookie.title': 'Usamos cookies essenciais',
@@ -1691,6 +1694,9 @@ const translations = {
     'auth.success.message': 'Your account was created successfully.',
     'auth.success.accessWith': 'Access with the email:',
     'auth.success.button': 'Sign In',
+    'auth.success.confirmHint':
+      'We sent a confirmation link to your email. Open the message and tap the link to activate your account — then you can sign in with your email and password.',
+    'auth.success.continuePlan': 'Continue to your 21-step plan →',
 
     // Cookie consent
     'cookie.title': 'We use essential cookies',

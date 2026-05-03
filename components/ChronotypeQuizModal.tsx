@@ -20,6 +20,7 @@ import { syncQuizCompletionFromServer } from '@/lib/syncQuizCompletion';
 import { savePreRegistrationQuizDone } from '@/lib/quizDevicePersistence';
 import { ShareableCard } from './ShareableCard';
 import * as SecureStore from 'expo-secure-store';
+import ProgressBar from '@/src/components/ProgressBar';
 
 type Chronotype = 'dolphin' | 'lion' | 'bear' | 'wolf';
 
@@ -131,6 +132,10 @@ interface Props {
   onComplete: (chronotype: string) => void;
   /** Use on a Stack screen (/quiz): no RN Modal wrapper (avoids double sheet / web glitches). */
   presentation?: 'modal' | 'fullscreen';
+  /** When false, parent (e.g. QuizScreen) renders the progress bar. Default true. */
+  showProgressBar?: boolean;
+  /** Fires with 0–3 while answering questions (fullscreen sync with external bar). */
+  onQuestionIndexChange?: (questionIndex: number) => void;
 }
 
 async function persistLatestChronotype(chronotype: Chronotype, userId?: string) {
@@ -228,6 +233,8 @@ export default function ChronotypeQuizModal({
   visible,
   onComplete,
   presentation = 'modal',
+  showProgressBar = true,
+  onQuestionIndexChange,
 }: Props) {
   const { user } = useAuth();
   const { language } = useLanguage();
@@ -264,15 +271,37 @@ export default function ChronotypeQuizModal({
     });
   }, [screen]);
 
-  const goNext = useCallback(() => {
+  const goNext = useCallback(async () => {
     if (screen === 3) {
       const chronotype = calcChronotype(answers);
+      if (presentation === 'fullscreen') {
+        try {
+          await persistLatestChronotype(chronotype, user?.id);
+          if (!user) {
+            await savePreRegistrationQuizDone();
+          }
+          if (user) {
+            await persistQuizResultRemotely({
+              userId: user.id,
+              chronotype,
+              language: lang,
+            });
+          }
+        } catch {
+          // still leave quiz — navigation must not block on persistence errors
+        }
+        setScreen(0);
+        setAnswers([[], [], [], []]);
+        setResult(null);
+        onComplete(chronotype);
+        return;
+      }
       setResult(chronotype);
       setScreen(4);
     } else {
-      setScreen(s => s + 1);
+      setScreen((s) => s + 1);
     }
-  }, [screen, answers]);
+  }, [screen, answers, presentation, user, lang, onComplete]);
 
   const goBack = useCallback(() => {
     setScreen((s) => Math.max(0, s - 1));
@@ -308,6 +337,13 @@ export default function ChronotypeQuizModal({
 
   const chronoInfo = result ? CHRONOTYPE_DATA[result] : null;
   const scienceNote = result ? SCIENCE_NOTES[result] : null;
+
+  useEffect(() => {
+    if (!onQuestionIndexChange) return;
+    if (screen >= 0 && screen <= 3) {
+      onQuestionIndexChange(screen);
+    }
+  }, [screen, onQuestionIndexChange]);
 
   useEffect(() => {
     const glowLoop = Animated.loop(
@@ -348,11 +384,11 @@ export default function ChronotypeQuizModal({
             scrollEventThrottle={16}
             showsVerticalScrollIndicator={false}
           >
-            <View style={styles.progressHeader}>
-              <View style={styles.progressBar}>
-                <View style={[styles.progressFill, { width: `${((screen + 1) / 4) * 100}%` as any }]} />
+            {showProgressBar !== false && (
+              <View style={styles.progressHeader}>
+                <ProgressBar current={screen + 1} total={4} />
               </View>
-            </View>
+            )}
 
             <Text style={styles.question}>
               {lang === 'pt' ? currentScreen.q_pt : currentScreen.q_en}
@@ -525,18 +561,6 @@ const styles = StyleSheet.create({
   progressHeader: {
     marginBottom: 24,
     width: '100%',
-  },
-  progressBar: {
-    height: 3,
-    backgroundColor: 'rgba(255,255,255,0.08)',
-    borderRadius: 2,
-    overflow: 'hidden',
-    width: '100%',
-  },
-  progressFill: {
-    height: 3,
-    backgroundColor: '#7c6fff',
-    borderRadius: 2,
   },
   question: {
     fontSize: 28,

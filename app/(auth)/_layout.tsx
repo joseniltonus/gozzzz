@@ -1,14 +1,3 @@
-import { Stack } from 'expo-router';
+import AppNavigator from '@/src/navigation/AppNavigator';
 
-export default function AuthLayout() {
-  return (
-    <Stack screenOptions={{ headerShown: false }}>
-      <Stack.Screen name="onboarding" />
-      <Stack.Screen name="quiz" />
-      <Stack.Screen name="result" />
-      <Stack.Screen name="login" />
-      <Stack.Screen name="signup" />
-      <Stack.Screen name="forgot-password" />
-    </Stack>
-  );
-}
+export default AppNavigator;

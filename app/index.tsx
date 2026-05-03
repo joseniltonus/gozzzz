@@ -1,7 +1,7 @@
 import { View, ActivityIndicator, StyleSheet } from 'react-native';
 import { Redirect } from 'expo-router';
 import { useAuth } from '@/contexts/AuthContext';
-import EntryScreen from '@/screens/EntryScreen';
+import EntryScreen from '@/src/screens/EntryScreen';
 
 /**
  * Entrada unificada (web + mobile): mesmo ecrã premium; utilizadores autenticados vão para a home.
