@@ -12,12 +12,18 @@ jobs:
     steps:
       - name: Trigger privacy processor
         env:
+          GITHUB_EVENT_NAME: ${{ github.event_name }}
           SUPABASE_PROJECT_REF: ${{ secrets.SUPABASE_PROJECT_REF }}
           PRIVACY_PROCESSOR_SECRET: ${{ secrets.PRIVACY_PROCESSOR_SECRET }}
         run: |
           if [ -z "$SUPABASE_PROJECT_REF" ] || [ -z "$PRIVACY_PROCESSOR_SECRET" ]; then
-            echo "Missing required secrets: SUPABASE_PROJECT_REF or PRIVACY_PROCESSOR_SECRET"
-            exit 1
+            MSG="Configure GitHub Actions secrets: SUPABASE_PROJECT_REF (ex.: abcdef do URL abcdef.supabase.co) e PRIVACY_PROCESSOR_SECRET (mesmo valor usado na Edge Function process-privacy-requests)."
+            if [ "$GITHUB_EVENT_NAME" = "workflow_dispatch" ]; then
+              echo "::error::${MSG}"
+              exit 1
+            fi
+            echo "::notice::Privacy cron skipped — ${MSG}"
+            exit 0
           fi
 
           ATTEMPTS=3
