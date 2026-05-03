@@ -35,26 +35,10 @@ function validateSourceFields(file, content) {
   return errors;
 }
 
-function validatePubMedLinks(file, content) {
-  const errors = [];
-  // Ensure science-rendering components expose PubMed action.
-  if (file.includes('Lesson1InteractiveCard') || file.includes('SleepLessonCard')) {
-    if (!content.includes('pubmed.ncbi.nlm.nih.gov')) {
-      errors.push(`${file}: missing PubMed lookup link`);
-    }
-    if (!content.includes('Open reference on PubMed') && !content.includes('Abrir referência no PubMed')) {
-      errors.push(`${file}: missing user-facing PubMed link label`);
-    }
-  }
-  return errors;
-}
-
 let allErrors = [];
 for (const file of targetFiles) {
   const content = read(file);
-  allErrors = allErrors
-    .concat(validateSourceFields(file, content))
-    .concat(validatePubMedLinks(file, content));
+  allErrors = allErrors.concat(validateSourceFields(file, content));
 }
 
 if (allErrors.length > 0) {

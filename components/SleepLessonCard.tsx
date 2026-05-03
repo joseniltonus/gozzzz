@@ -5,7 +5,6 @@ import {
   StyleSheet,
   ScrollView,
   TouchableOpacity,
-  Linking,
 } from 'react-native';
 import { useLanguage } from '@/contexts/LanguageContext';
 import {
@@ -19,11 +18,6 @@ interface Props {
 }
 
 const STEPS = ['hook', 'insight', 'mechanism', 'application', 'commit'];
-
-function buildPubMedSearchUrl(source: string, citation: string) {
-  const query = `${source} ${citation}`.trim();
-  return `https://pubmed.ncbi.nlm.nih.gov/?term=${encodeURIComponent(query)}`;
-}
 
 type SourceKind = 'peer' | 'secondary';
 
@@ -243,15 +237,6 @@ export function SleepLessonCard({ lessonId, onComplete }: Props) {
                     </View>
                     <Text style={s.citationText}>{c.citation}</Text>
                     <Text style={s.citationSource}>{c.source}</Text>
-                    <TouchableOpacity
-                      onPress={() => void Linking.openURL(buildPubMedSearchUrl(c.source, c.citation))}
-                      style={s.referenceLinkBtn}
-                      activeOpacity={0.8}
-                    >
-                      <Text style={s.referenceLinkText}>
-                        {isPt ? 'Abrir referência no PubMed' : 'Open reference on PubMed'}
-                      </Text>
-                    </TouchableOpacity>
                   </View>
                     );
                   })}
@@ -533,16 +518,6 @@ const s = StyleSheet.create({
   citationSource: {
     fontSize: 11,
     color: '#4a5568',
-    fontWeight: '600',
-  },
-  referenceLinkBtn: {
-    marginTop: 6,
-    alignSelf: 'flex-start',
-  },
-  referenceLinkText: {
-    fontSize: 11,
-    color: '#5fb4df',
-    textDecorationLine: 'underline',
     fontWeight: '600',
   },
   credibilityBadge: {

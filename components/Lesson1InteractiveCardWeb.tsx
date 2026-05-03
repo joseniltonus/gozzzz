@@ -6,7 +6,6 @@ import {
   TouchableOpacity,
   TextInput,
   Platform,
-  Linking,
 } from 'react-native';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { ArrowRight, Moon, Check, ChevronDown, ChevronUp, FlaskConical } from 'lucide-react-native';
@@ -274,11 +273,6 @@ const STAGES_EN = [
   { label: 'REM', sublabel: 'Memory & emotion', color: '#fbbf24', depth: 2 },
 ];
 
-function buildPubMedSearchUrl(source: string, citation: string) {
-  const query = `${source} ${citation}`.trim();
-  return `https://pubmed.ncbi.nlm.nih.gov/?term=${encodeURIComponent(query)}`;
-}
-
 type SourceKind = 'peer' | 'secondary';
 
 function classifySource(source: string): SourceKind {
@@ -542,15 +536,6 @@ function ScienceExpander({
               </View>
               <Text style={sci.citation}>{entry.citation}</Text>
               <Text style={sci.entrySource}>{isPt ? 'Fonte' : 'Source'}: {entry.source}</Text>
-              <TouchableOpacity
-                onPress={() => void Linking.openURL(buildPubMedSearchUrl(entry.source, entry.citation))}
-                style={sci.linkBtn}
-                activeOpacity={0.8}
-              >
-                <Text style={sci.linkText}>
-                  {isPt ? 'Abrir referência no PubMed' : 'Open reference on PubMed'}
-                </Text>
-              </TouchableOpacity>
             </View>
               );
             })}
@@ -1030,16 +1015,6 @@ const sci = StyleSheet.create({
     color: '#7aa6bf',
     lineHeight: 18,
     marginBottom: 2,
-  },
-  linkBtn: {
-    marginTop: 2,
-    alignSelf: 'flex-start',
-  },
-  linkText: {
-    fontSize: 12,
-    color: '#5fb4df',
-    textDecorationLine: 'underline',
-    fontWeight: '600',
   },
   credibilityBadge: {
     alignSelf: 'flex-start',
