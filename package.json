@@ -5,6 +5,7 @@
   "private": true,
   "scripts": {
     "dev": "EXPO_NO_TELEMETRY=1 expo start",
+    "dev:with-sha": "EXPO_NO_TELEMETRY=1 EXPO_PUBLIC_GIT_SHA=$(git rev-parse HEAD 2>/dev/null) expo start",
     "ios": "bash scripts/start-ios-simple.sh",
     "ios:clear": "bash scripts/start-ios-simple.sh --clear",
     "android": "bash scripts/start-android-with-emulator.sh",

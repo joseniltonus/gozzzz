@@ -82,6 +82,7 @@ jobs:
 
       - name: Build web bundle
         env:
+          EXPO_PUBLIC_GIT_SHA: ${{ github.sha }}
           EXPO_PUBLIC_SUPABASE_URL: ${{ secrets.EXPO_PUBLIC_SUPABASE_URL }}
           EXPO_PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.EXPO_PUBLIC_SUPABASE_ANON_KEY }}
           EXPO_PUBLIC_STRIPE_PUBLISHABLE_KEY: ${{ secrets.EXPO_PUBLIC_STRIPE_PUBLISHABLE_KEY }}
@@ -129,6 +130,7 @@ jobs:
 
       - name: Publish production OTA
         env:
+          EXPO_PUBLIC_GIT_SHA: ${{ github.sha }}
           EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
         run: |
           if [ -z "$EXPO_TOKEN" ]; then
