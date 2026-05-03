@@ -1,13 +1,18 @@
 name: Deploy App (Web + OTA)
 
 # Automatic: every push to `main` runs validation, then Vercel (web) + EAS OTA (iOS/Android)
-# in parallel. No extra manual deploy step — only merge or push to `main`.
-# Optional: run manually from Actions → "Run workflow".
+# in parallel. This does NOT submit to App Store or Google Play — OTA only updates existing installs.
+# Optional: run manually from Actions → "Run workflow" (use "Web only" to skip OTA).
 on:
   push:
     branches:
       - main
-  workflow_dispatch: {}
+  workflow_dispatch:
+    inputs:
+      web_only:
+        description: 'Deploy only the web app to Vercel (skip Expo OTA)'
+        type: boolean
+        default: false
 
 # If several commits land on `main` quickly, cancel older in-flight runs so production
 # always matches the latest commit (saves CI time and avoids stale deploys).
@@ -95,6 +100,9 @@ jobs:
   publish-ota:
     name: Publish OTA update (iOS + Android)
     needs: validate-science
+    if: >-
+      github.event_name == 'push' ||
+      (github.event_name == 'workflow_dispatch' && github.event.inputs.web_only != 'true')
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
