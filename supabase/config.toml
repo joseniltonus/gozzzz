@@ -1,0 +1,5 @@
+# https://supabase.com/docs/guides/functions/function-configuration
+# O cron do GitHub chama esta função com Authorization: Bearer <PRIVACY_PROCESSOR_SECRET>,
+# não com JWT de utilizador — verify_jwt tem de estar desligado.
+[functions.process-privacy-requests]
+verify_jwt = false
