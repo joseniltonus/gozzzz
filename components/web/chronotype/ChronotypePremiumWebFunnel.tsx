@@ -21,6 +21,7 @@ import Animated, {
   withSequence,
   withTiming,
 } from 'react-native-reanimated';
+import type { TextStyle } from 'react-native';
 import { Brain } from 'lucide-react-native';
 import { useLanguage } from '@/contexts/LanguageContext';
 import GozzzzWordmark from '@/components/branding/GozzzzWordmark';
@@ -48,6 +49,14 @@ const webFont =
   Platform.OS === 'web'
     ? ({ fontFamily: 'Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif' } as const)
     : {};
+
+/** Na web, MaskedView + Reanimated `entering` falham em vários browsers — gradiente via CSS + View estável. */
+const headlineHighlightWeb = {
+  color: 'transparent',
+  backgroundImage: 'linear-gradient(90deg, #a855f7 0%, #6366f1 52%, #38bdf8 100%)',
+  WebkitBackgroundClip: 'text',
+  backgroundClip: 'text',
+} as unknown as TextStyle;
 
 export default function ChronotypePremiumWebFunnel({ scrollY }: Props) {
   const { t, language } = useLanguage();
@@ -114,31 +123,45 @@ export default function ChronotypePremiumWebFunnel({ scrollY }: Props) {
         ))}
       </Animated.View>
 
-      <View style={styles.pageInner}>
+      <View style={styles.pageInner} {...(isWeb ? ({ nativeID: 'chronotype-hero-root' } as object) : {})}>
         <View style={styles.heroColumn}>
           <View style={styles.logoBlock}>
             <GozzzzWordmark preset="funnelHero" />
           </View>
 
-          <Animated.View entering={FadeInDown.duration(600).delay(40)} style={styles.headlineBlock}>
-            <View style={styles.headlineRow}>
-              <Text style={[styles.headlinePlain, webFont]}>{hlPre}</Text>
-              <MaskedView style={styles.hlMaskHost} maskElement={
-                <View style={styles.hlMaskBox}>
-                  <Text style={[styles.hlMaskText, webFont]}>{hlHi}</Text>
-                </View>
-              }>
-                <LinearGradient
-                  colors={['#a855f7', '#6366f1', '#38bdf8']}
-                  start={{ x: 0, y: 0 }}
-                  end={{ x: 1, y: 0 }}
-                  style={StyleSheet.absoluteFill}
-                />
-              </MaskedView>
-              <Text style={[styles.headlinePlain, webFont]}>{hlSuf}</Text>
+          {isWeb ? (
+            <View style={styles.headlineBlock} testID="chronotype-hero-headline">
+              <Text style={[styles.headlineWebWrap, webFont]}>
+                <Text style={[styles.headlinePlain, webFont]}>{hlPre}</Text>
+                <Text style={[styles.headlinePlain, headlineHighlightWeb, webFont]}>{hlHi}</Text>
+                <Text style={[styles.headlinePlain, webFont]}>{hlSuf}</Text>
+              </Text>
+              <Text style={[styles.subhead, webFont]}>{t('web.chronoPremium.heroSub')}</Text>
             </View>
-            <Text style={[styles.subhead, webFont]}>{t('web.chronoPremium.heroSub')}</Text>
-          </Animated.View>
+          ) : (
+            <Animated.View entering={FadeInDown.duration(600).delay(40)} style={styles.headlineBlock}>
+              <View style={styles.headlineRow}>
+                <Text style={[styles.headlinePlain, webFont]}>{hlPre}</Text>
+                <MaskedView
+                  style={styles.hlMaskHost}
+                  maskElement={
+                    <View style={styles.hlMaskBox}>
+                      <Text style={[styles.hlMaskText, webFont]}>{hlHi}</Text>
+                    </View>
+                  }
+                >
+                  <LinearGradient
+                    colors={['#a855f7', '#6366f1', '#38bdf8']}
+                    start={{ x: 0, y: 0 }}
+                    end={{ x: 1, y: 0 }}
+                    style={StyleSheet.absoluteFill}
+                  />
+                </MaskedView>
+                <Text style={[styles.headlinePlain, webFont]}>{hlSuf}</Text>
+              </View>
+              <Text style={[styles.subhead, webFont]}>{t('web.chronoPremium.heroSub')}</Text>
+            </Animated.View>
+          )}
 
           <View style={styles.ctaBlock}>
             <Pressable
@@ -178,16 +201,29 @@ export default function ChronotypePremiumWebFunnel({ scrollY }: Props) {
             <View style={styles.dividerLine} />
           </View>
 
-          <Animated.View entering={FadeIn.duration(520).delay(120)} style={styles.scienceBlock}>
-            <View style={styles.scienceBrainWrap}>
-              <Brain size={20} color="rgba(255,255,255,0.42)" strokeWidth={1.5} />
+          {isWeb ? (
+            <View style={styles.scienceBlock} testID="chronotype-hero-science">
+              <View style={styles.scienceBrainWrap}>
+                <Brain size={20} color="rgba(255,255,255,0.42)" strokeWidth={1.5} />
+              </View>
+              <Text style={[styles.scienceTitle, webFont]}>{t('web.chronoPremium.scienceTitle')}</Text>
+              <Text style={[styles.scienceBullets, webFont]}>{t('web.chronoPremium.scienceBullets')}</Text>
+              <Text style={[styles.scienceLead, webFont]}>{t('web.chronoPremium.scienceResearchersLead')}</Text>
+              <Text style={[styles.scienceNames, webFont]}>{t('web.chronoPremium.scienceResearchersNames')}</Text>
+              <Text style={[styles.heroPrivacy, webFont]}>{t('web.chronoPremium.heroPrivacyLine')}</Text>
             </View>
-            <Text style={[styles.scienceTitle, webFont]}>{t('web.chronoPremium.scienceTitle')}</Text>
-            <Text style={[styles.scienceBullets, webFont]}>{t('web.chronoPremium.scienceBullets')}</Text>
-            <Text style={[styles.scienceLead, webFont]}>{t('web.chronoPremium.scienceResearchersLead')}</Text>
-            <Text style={[styles.scienceNames, webFont]}>{t('web.chronoPremium.scienceResearchersNames')}</Text>
-            <Text style={[styles.heroPrivacy, webFont]}>{t('web.chronoPremium.heroPrivacyLine')}</Text>
-          </Animated.View>
+          ) : (
+            <Animated.View entering={FadeIn.duration(520).delay(120)} style={styles.scienceBlock}>
+              <View style={styles.scienceBrainWrap}>
+                <Brain size={20} color="rgba(255,255,255,0.42)" strokeWidth={1.5} />
+              </View>
+              <Text style={[styles.scienceTitle, webFont]}>{t('web.chronoPremium.scienceTitle')}</Text>
+              <Text style={[styles.scienceBullets, webFont]}>{t('web.chronoPremium.scienceBullets')}</Text>
+              <Text style={[styles.scienceLead, webFont]}>{t('web.chronoPremium.scienceResearchersLead')}</Text>
+              <Text style={[styles.scienceNames, webFont]}>{t('web.chronoPremium.scienceResearchersNames')}</Text>
+              <Text style={[styles.heroPrivacy, webFont]}>{t('web.chronoPremium.heroPrivacyLine')}</Text>
+            </Animated.View>
+          )}
         </View>
 
         <Text style={[styles.gridLabel, webFont]}>{t('web.chronoPremium.gridLabel')}</Text>
@@ -268,6 +304,12 @@ const styles = StyleSheet.create({
     width: '100%',
     marginBottom: 16,
     alignItems: 'center',
+  },
+  headlineWebWrap: {
+    width: '100%',
+    textAlign: 'center',
+    marginBottom: 16,
+    flexWrap: 'wrap',
   },
   headlineRow: {
     flexDirection: 'row',
