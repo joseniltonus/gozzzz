@@ -4,7 +4,7 @@
  *
  * @see https://docs.expo.dev/eas/environment-variables/faq/
  *
- * Env: EXPO_TOKEN (required)
+ * Env: EXPO_TOKEN (required) — também pode vir do `.env` na raiz (não commitado).
  */
 import { execFileSync } from 'node:child_process';
 import fs from 'node:fs';
@@ -13,6 +13,30 @@ import { fileURLToPath } from 'node:url';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const root = path.join(__dirname, '..');
+const envPath = path.join(root, '.env');
+
+function loadDotEnv(filePath) {
+  if (!fs.existsSync(filePath)) return;
+  const text = fs.readFileSync(filePath, 'utf8');
+  for (const line of text.split('\n')) {
+    const trimmed = line.trim();
+    if (!trimmed || trimmed.startsWith('#')) continue;
+    const eq = trimmed.indexOf('=');
+    if (eq <= 0) continue;
+    const key = trimmed.slice(0, eq).trim();
+    let val = trimmed.slice(eq + 1).trim();
+    if (
+      (val.startsWith('"') && val.endsWith('"')) ||
+      (val.startsWith("'") && val.endsWith("'"))
+    ) {
+      val = val.slice(1, -1);
+    }
+    if (process.env[key] === undefined) process.env[key] = val;
+  }
+}
+
+loadDotEnv(envPath);
+loadDotEnv(path.join(root, '.env.local'));
 
 const REQUIRED = ['EXPO_PUBLIC_SUPABASE_URL', 'EXPO_PUBLIC_SUPABASE_ANON_KEY'];
 const STRIPE = 'EXPO_PUBLIC_STRIPE_PUBLISHABLE_KEY';
@@ -46,7 +70,16 @@ function easEnvGet(variableName) {
 }
 
 if (!process.env.EXPO_TOKEN?.trim()) {
-  console.error('[verify:eas-env] Defina EXPO_TOKEN (token em https://expo.dev/settings/access-tokens ).');
+  console.error(
+    [
+      '[verify:eas-env] Falta EXPO_TOKEN.',
+      '  1) Cria um token: https://expo.dev/settings/access-tokens',
+      '  2) Cola no .env na raiz do projeto (ficheiro não vai para o Git):',
+      '       EXPO_TOKEN=xxxxxxxx',
+      '     ou exporta na sessão: export EXPO_TOKEN=xxxxxxxx',
+      '  3) Volta a correr: npm run verify:eas-env',
+    ].join('\n'),
+  );
   process.exit(1);
 }
 
