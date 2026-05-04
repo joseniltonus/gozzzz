@@ -13,7 +13,6 @@ import MaskedView from '@react-native-masked-view/masked-view';
 import { useRouter } from 'expo-router';
 import Animated, {
   FadeInDown,
-  FadeIn,
   Easing,
   useAnimatedStyle,
   useSharedValue,
@@ -22,7 +21,7 @@ import Animated, {
   withTiming,
 } from 'react-native-reanimated';
 import type { TextStyle } from 'react-native';
-import { Brain } from 'lucide-react-native';
+import { Activity, Brain, Check, Clock, Dna, Lock, Shield, Zap } from 'lucide-react-native';
 import { useLanguage } from '@/contexts/LanguageContext';
 import GozzzzWordmark from '@/components/branding/GozzzzWordmark';
 import { CHRONOTYPE_EXP_KEYS, getChronotypeExperience, type ChronotypeExpKey } from '@/data/chronotypesExperience';
@@ -102,8 +101,12 @@ export default function ChronotypePremiumWebFunnel({ scrollY }: Props) {
   const hlHi = t('web.chronoPremium.heroHeadlineHighlight');
   const hlSuf = t('web.chronoPremium.heroHeadlineSuffix');
 
+  const subPre = t('web.chronoPremium.heroSubPrefix');
+  const subHi = t('web.chronoPremium.heroSubHighlight');
+  const subSuf = t('web.chronoPremium.heroSubSuffix');
+
   return (
-    <LinearGradient colors={['#050816', '#0b0f2a']} style={[styles.shell, shellExtra]}>
+    <LinearGradient colors={['#050508', '#0c0c12']} style={[styles.shell, shellExtra]}>
       <Animated.View style={[styles.starsWrap, parallaxStars]} pointerEvents="none">
         {STARFIELD.map(([x, y, o, s], i) => (
           <View
@@ -134,16 +137,20 @@ export default function ChronotypePremiumWebFunnel({ scrollY }: Props) {
               <Text style={[styles.headlineWebWrap, webFont]}>
                 <Text style={[styles.headlinePlain, webFont]}>{hlPre}</Text>
                 <Text style={[styles.headlinePlain, headlineHighlightWeb, webFont]}>{hlHi}</Text>
-                <Text style={[styles.headlinePlain, webFont]}>{hlSuf}</Text>
+                {hlSuf ? <Text style={[styles.headlinePlain, webFont]}>{hlSuf}</Text> : null}
               </Text>
-              <Text style={[styles.subhead, webFont]}>{t('web.chronoPremium.heroSub')}</Text>
+              <Text style={[styles.subheadWrap, webFont]}>
+                <Text style={[styles.subheadMuted, webFont]}>{subPre}</Text>
+                <Text style={[styles.subheadAccent, webFont]}>{subHi}</Text>
+                <Text style={[styles.subheadMuted, webFont]}>{subSuf}</Text>
+              </Text>
             </View>
           ) : (
             <Animated.View entering={FadeInDown.duration(600).delay(40)} style={styles.headlineBlock}>
               <View style={styles.headlineRow}>
                 <Text style={[styles.headlinePlain, webFont]}>{hlPre}</Text>
                 <MaskedView
-                  style={styles.hlMaskHost}
+                  style={[styles.hlMaskHost, { minWidth: Math.min(HERO_MAX - 24, hlHi.length * 11) }]}
                   maskElement={
                     <View style={styles.hlMaskBox}>
                       <Text style={[styles.hlMaskText, webFont]}>{hlHi}</Text>
@@ -157,9 +164,13 @@ export default function ChronotypePremiumWebFunnel({ scrollY }: Props) {
                     style={StyleSheet.absoluteFill}
                   />
                 </MaskedView>
-                <Text style={[styles.headlinePlain, webFont]}>{hlSuf}</Text>
+                {hlSuf ? <Text style={[styles.headlinePlain, webFont]}>{hlSuf}</Text> : null}
               </View>
-              <Text style={[styles.subhead, webFont]}>{t('web.chronoPremium.heroSub')}</Text>
+              <Text style={[styles.subheadWrap, webFont]}>
+                <Text style={[styles.subheadMuted, webFont]}>{subPre}</Text>
+                <Text style={[styles.subheadAccent, webFont]}>{subHi}</Text>
+                <Text style={[styles.subheadMuted, webFont]}>{subSuf}</Text>
+              </Text>
             </Animated.View>
           )}
 
@@ -192,7 +203,22 @@ export default function ChronotypePremiumWebFunnel({ scrollY }: Props) {
                 </Text>
               </LinearGradient>
             </Pressable>
-            <Text style={[styles.trust, webFont]}>{t('web.chronoPremium.trustLine')}</Text>
+            <View style={styles.trustRow}>
+              <View style={styles.trustItem}>
+                <Check size={15} color="#c4b5fd" strokeWidth={2.2} />
+                <Text style={[styles.trustItemText, webFont]}>{t('web.chronoPremium.trustFree')}</Text>
+              </View>
+              <Text style={styles.trustSep}>·</Text>
+              <View style={styles.trustItem}>
+                <Zap size={15} color="#c4b5fd" strokeWidth={2.2} />
+                <Text style={[styles.trustItemText, webFont]}>{t('web.chronoPremium.trustFast')}</Text>
+              </View>
+              <Text style={styles.trustSep}>·</Text>
+              <View style={styles.trustItem}>
+                <Lock size={15} color="#c4b5fd" strokeWidth={2.2} />
+                <Text style={[styles.trustItemText, webFont]}>{t('web.chronoPremium.trustSignup')}</Text>
+              </View>
+            </View>
           </View>
 
           <View style={styles.dividerRow}>
@@ -201,29 +227,34 @@ export default function ChronotypePremiumWebFunnel({ scrollY }: Props) {
             <View style={styles.dividerLine} />
           </View>
 
-          {isWeb ? (
-            <View style={styles.scienceBlock} testID="chronotype-hero-science">
-              <View style={styles.scienceBrainWrap}>
-                <Brain size={20} color="rgba(255,255,255,0.42)" strokeWidth={1.5} />
-              </View>
-              <Text style={[styles.scienceTitle, webFont]}>{t('web.chronoPremium.scienceTitle')}</Text>
-              <Text style={[styles.scienceBullets, webFont]}>{t('web.chronoPremium.scienceBullets')}</Text>
-              <Text style={[styles.scienceLead, webFont]}>{t('web.chronoPremium.scienceResearchersLead')}</Text>
-              <Text style={[styles.scienceNames, webFont]}>{t('web.chronoPremium.scienceResearchersNames')}</Text>
-              <Text style={[styles.heroPrivacy, webFont]}>{t('web.chronoPremium.heroPrivacyLine')}</Text>
+          <View style={styles.scienceBlock} testID="chronotype-hero-science">
+            <View style={styles.brainRing}>
+              <Brain size={18} color="rgba(255,255,255,0.55)" strokeWidth={1.6} />
             </View>
-          ) : (
-            <Animated.View entering={FadeIn.duration(520).delay(120)} style={styles.scienceBlock}>
-              <View style={styles.scienceBrainWrap}>
-                <Brain size={20} color="rgba(255,255,255,0.42)" strokeWidth={1.5} />
+            <Text style={[styles.scienceTitle, webFont]}>{t('web.chronoPremium.scienceTitle')}</Text>
+            <View style={styles.pillarRow}>
+              <View style={styles.pillarItem}>
+                <Dna size={13} color="#c4b5fd" strokeWidth={2} />
+                <Text style={[styles.pillarText, webFont]}>{t('web.chronoPremium.sciencePillar1')}</Text>
               </View>
-              <Text style={[styles.scienceTitle, webFont]}>{t('web.chronoPremium.scienceTitle')}</Text>
-              <Text style={[styles.scienceBullets, webFont]}>{t('web.chronoPremium.scienceBullets')}</Text>
-              <Text style={[styles.scienceLead, webFont]}>{t('web.chronoPremium.scienceResearchersLead')}</Text>
-              <Text style={[styles.scienceNames, webFont]}>{t('web.chronoPremium.scienceResearchersNames')}</Text>
-              <Text style={[styles.heroPrivacy, webFont]}>{t('web.chronoPremium.heroPrivacyLine')}</Text>
-            </Animated.View>
-          )}
+              <Text style={[styles.pillarPipe, webFont]}>|</Text>
+              <View style={styles.pillarItem}>
+                <Clock size={13} color="#c4b5fd" strokeWidth={2} />
+                <Text style={[styles.pillarText, webFont]}>{t('web.chronoPremium.sciencePillar2')}</Text>
+              </View>
+              <Text style={[styles.pillarPipe, webFont]}>|</Text>
+              <View style={styles.pillarItem}>
+                <Activity size={13} color="#c4b5fd" strokeWidth={2} />
+                <Text style={[styles.pillarText, webFont]}>{t('web.chronoPremium.sciencePillar3')}</Text>
+              </View>
+            </View>
+            <Text style={[styles.scienceLead, webFont]}>{t('web.chronoPremium.scienceResearchersLead')}</Text>
+            <Text style={[styles.scienceNames, webFont]}>{t('web.chronoPremium.scienceResearchersNames')}</Text>
+            <View style={styles.privacyPill}>
+              <Shield size={13} color="rgba(255,255,255,0.45)" strokeWidth={2} />
+              <Text style={[styles.privacyPillText, webFont]}>{t('web.chronoPremium.heroPrivacyLine')}</Text>
+            </View>
+          </View>
         </View>
 
         <Text style={[styles.gridLabel, webFont]}>{t('web.chronoPremium.gridLabel')}</Text>
@@ -307,6 +338,8 @@ const styles = StyleSheet.create({
   },
   headlineWebWrap: {
     width: '100%',
+    maxWidth: 352,
+    alignSelf: 'center',
     textAlign: 'center',
     marginBottom: 16,
     flexWrap: 'wrap',
@@ -328,9 +361,11 @@ const styles = StyleSheet.create({
     letterSpacing: -0.4,
   },
   hlMaskHost: {
-    height: 42,
+    minHeight: 44,
+    maxHeight: 120,
     justifyContent: 'center',
     marginHorizontal: 0,
+    alignSelf: 'center',
   },
   hlMaskBox: {
     flex: 1,
@@ -347,14 +382,24 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     letterSpacing: -0.4,
   },
-  subhead: {
+  subheadWrap: {
+    width: '100%',
+    textAlign: 'center',
+    marginBottom: 28,
+    paddingHorizontal: 4,
+    flexWrap: 'wrap',
+  },
+  subheadMuted: {
     fontSize: 16,
     lineHeight: 24,
     fontWeight: '400',
-    color: 'rgba(255,255,255,0.8)',
-    textAlign: 'center',
-    marginBottom: 32,
-    paddingHorizontal: 4,
+    color: 'rgba(226,232,240,0.78)',
+  },
+  subheadAccent: {
+    fontSize: 16,
+    lineHeight: 24,
+    fontWeight: '600',
+    color: '#d8b4fe',
   },
   ctaBlock: {
     width: '100%',
@@ -404,12 +449,29 @@ const styles = StyleSheet.create({
     color: '#ffffff',
     letterSpacing: 0.2,
   },
-  trust: {
-    fontSize: 14,
-    fontWeight: '400',
-    color: 'rgba(255,255,255,0.6)',
-    textAlign: 'center',
-    marginBottom: 32,
+  trustRow: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 8,
+    marginBottom: 28,
+    paddingHorizontal: 4,
+  },
+  trustItem: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 5,
+  },
+  trustItemText: {
+    fontSize: 13,
+    fontWeight: '500',
+    color: 'rgba(196,181,253,0.92)',
+  },
+  trustSep: {
+    fontSize: 13,
+    color: 'rgba(148,163,184,0.45)',
+    marginHorizontal: 2,
   },
   dividerRow: {
     flexDirection: 'row',
@@ -436,47 +498,85 @@ const styles = StyleSheet.create({
     marginBottom: 36,
     paddingHorizontal: 4,
   },
-  scienceBrainWrap: {
-    marginBottom: 10,
+  brainRing: {
+    width: 46,
+    height: 46,
+    borderRadius: 23,
+    borderWidth: 1,
+    borderColor: 'rgba(255,255,255,0.14)',
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginBottom: 12,
+    backgroundColor: 'rgba(255,255,255,0.03)',
   },
   scienceTitle: {
-    fontSize: 14,
-    lineHeight: 20,
-    fontWeight: '500',
-    color: 'rgba(255,255,255,0.8)',
+    fontSize: 15,
+    lineHeight: 22,
+    fontWeight: '600',
+    color: 'rgba(255,255,255,0.92)',
     textAlign: 'center',
-    marginBottom: 10,
+    marginBottom: 12,
   },
-  scienceBullets: {
-    fontSize: 12,
-    lineHeight: 18,
-    fontWeight: '400',
-    color: 'rgba(255,255,255,0.6)',
-    textAlign: 'center',
-    marginBottom: 16,
+  pillarRow: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 6,
+    marginBottom: 18,
+    maxWidth: HERO_MAX,
+  },
+  pillarItem: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 5,
+  },
+  pillarText: {
+    fontSize: 11,
+    fontWeight: '500',
+    color: 'rgba(196,181,253,0.95)',
+    letterSpacing: 0.2,
+  },
+  pillarPipe: {
+    fontSize: 11,
+    color: 'rgba(148,163,184,0.35)',
+    marginHorizontal: 2,
   },
   scienceLead: {
-    fontSize: 12,
-    lineHeight: 17,
-    fontWeight: '400',
-    color: 'rgba(255,255,255,0.6)',
-    textAlign: 'center',
-    marginBottom: 4,
-  },
-  scienceNames: {
-    fontSize: 12,
-    lineHeight: 17,
-    fontWeight: '400',
-    color: 'rgba(255,255,255,0.6)',
-    textAlign: 'center',
-    marginBottom: 16,
-  },
-  heroPrivacy: {
     fontSize: 11,
     lineHeight: 16,
     fontWeight: '400',
-    color: 'rgba(255,255,255,0.5)',
+    color: 'rgba(148,163,184,0.85)',
     textAlign: 'center',
+    marginBottom: 6,
+  },
+  scienceNames: {
+    fontSize: 12,
+    lineHeight: 18,
+    fontWeight: '500',
+    color: 'rgba(216,180,254,0.95)',
+    textAlign: 'center',
+    marginBottom: 18,
+  },
+  privacyPill: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+    paddingVertical: 10,
+    paddingHorizontal: 14,
+    borderRadius: 999,
+    borderWidth: 1,
+    borderColor: 'rgba(255,255,255,0.12)',
+    backgroundColor: 'rgba(255,255,255,0.03)',
+    maxWidth: HERO_MAX,
+  },
+  privacyPillText: {
+    flexShrink: 1,
+    fontSize: 11,
+    lineHeight: 15,
+    fontWeight: '400',
+    color: 'rgba(148,163,184,0.88)',
+    textAlign: 'left',
   },
   gridLabel: {
     fontSize: 11,
