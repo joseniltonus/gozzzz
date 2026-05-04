@@ -23,6 +23,7 @@
     "privacy:setup-cron": "node scripts/setup-privacy-cron-secrets.mjs",
     "sync:remote": "node scripts/sync-remote-from-env.mjs",
     "deploy:vercel": "node scripts/sync-dotenv-to-vercel.mjs",
+    "vercel:prepare-dist": "node scripts/prepare-vercel-dist-deploy.mjs",
     "eas:build:ios": "npx eas-cli build --profile production --platform ios",
     "eas:build:android": "npx eas-cli build --profile production --platform android",
     "eas:build:all": "npx eas-cli build --profile production --platform all",

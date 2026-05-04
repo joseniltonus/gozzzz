@@ -82,6 +82,15 @@ jobs:
           EXPO_PUBLIC_STRIPE_PUBLISHABLE_KEY: ${{ secrets.EXPO_PUBLIC_STRIPE_PUBLISHABLE_KEY }}
         run: npm run build:web
 
+      # `dist/` está no .gitignore — o Vercel CLI não envia essa pasta. Um `vercel deploy`
+      # na raiz força rebuild na nuvem (sem as EXPO_PUBLIC_* do GitHub) → produção desatualizada.
+      # Preparamos `dist/` com .vercel/project.json e fazemos deploy a partir daí (bundle do CI).
+      - name: Prepare static deploy (dist + Vercel project link)
+        env:
+          VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
+          VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
+        run: node scripts/prepare-vercel-dist-deploy.mjs
+
       - name: Deploy to Vercel (production)
         env:
           VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
@@ -90,6 +99,7 @@ jobs:
             echo "Missing required Vercel secret: VERCEL_TOKEN"
             exit 1
           fi
+          cd dist
           npx vercel deploy --prod --yes --token "$VERCEL_TOKEN"
 
   publish-ota:
