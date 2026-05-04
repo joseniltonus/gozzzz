@@ -16,7 +16,6 @@ import {
   type ChronotypeKey,
   type ChronotypeIntel,
 } from '@/data/chronotypesIntelligence';
-import { SHARE_BRAND_URL_TEXT } from '@/lib/shareBranding';
 import { generateStoryImage, handleShare, STORY_HEIGHT, STORY_WIDTH } from '@/lib/chronotypeStoryShare';
 
 const COPY = {
@@ -90,7 +89,7 @@ function StoryCaptureFrame({ intel }: { intel: ChronotypeIntel }) {
       <Text style={storyFrame.title}>{story.title}</Text>
       <Text style={storyFrame.line}>{story.line1}</Text>
       <Text style={storyFrame.line}>{story.line2}</Text>
-      <Text style={[storyFrame.footer, { color: accent }]}>{SHARE_BRAND_URL_TEXT}</Text>
+      <Text style={[storyFrame.footer, { color: accent }]}>gozzzz.app</Text>
     </LinearGradient>
   );
 }
@@ -456,13 +455,9 @@ const storyFrame = StyleSheet.create({
   },
   footer: {
     position: 'absolute',
-    left: 0,
-    right: 0,
-    bottom: 100,
-    textAlign: 'center',
-    fontSize: 26,
-    fontWeight: '600',
-    opacity: 0.7,
-    letterSpacing: 0.3,
+    left: 72,
+    bottom: 120,
+    fontSize: 36,
+    fontWeight: '700',
   },
 });

@@ -5,7 +5,6 @@
  */
 
 import { Platform, Share, Alert } from 'react-native';
-import { drawShareBrandFooterCanvas } from '@/lib/shareBranding';
 import type { RefObject } from 'react';
 import type { View } from 'react-native';
 import type { ChronotypeIntel, ChronotypeKey } from '@/data/chronotypesIntelligence';
@@ -130,13 +129,9 @@ export async function generateStoryImageWeb(intel: ChronotypeIntel): Promise<str
     y += 52;
   }
 
-  drawShareBrandFooterCanvas(ctx, {
-    canvasWidth: STORY_WIDTH,
-    canvasHeight: STORY_HEIGHT,
-    accentColor: t.accent,
-    bottomPx: STORY_HEIGHT - 100,
-    align: 'center',
-  });
+  ctx.fillStyle = t.accent;
+  ctx.font = '700 36px system-ui, -apple-system, sans-serif';
+  ctx.fillText('gozzzz.app', 72, STORY_HEIGHT - 120);
 
   return new Promise((resolve) => {
     canvas.toBlob(

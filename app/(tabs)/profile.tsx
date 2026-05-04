@@ -1,4 +1,4 @@
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Switch, TextInput, Platform } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Switch, TextInput } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useState } from 'react';
 import { LinearGradient } from 'expo-linear-gradient';
@@ -12,7 +12,6 @@ import { useToast } from '@/contexts/ToastContext';
 import { useUserProfile } from '@/hooks/useUserProfile';
 
 import { ErrorBoundary } from '@/components/ErrorBoundary';
-import { BUILD_STAMP_LABEL } from '@/lib/buildStamp';
 
 function ProfileContent() {
   const router = useRouter();
@@ -378,13 +377,6 @@ function ProfileContent() {
 
         <View style={styles.footer}>
           <Text style={[styles.footerText, { color: tc.footerText }]}>{t('app.version')}</Text>
-          {BUILD_STAMP_LABEL ? (
-            <Text style={[styles.footerBuildStamp, { color: tc.footerSubtext }]}>{BUILD_STAMP_LABEL}</Text>
-          ) : __DEV__ ? (
-            <Text style={[styles.footerBuildStamp, { color: tc.footerSubtext }]}>
-              {Platform.OS === 'web' ? 'dev (bundle web local)' : 'dev (Metro — código neste computador)'}
-            </Text>
-          ) : null}
           <Text style={[styles.footerSubtext, { color: tc.footerSubtext }]}>
             {t('profile.footerSubtext')}
           </Text>
@@ -808,11 +800,6 @@ const styles = StyleSheet.create({
   footer: {
     alignItems: 'center',
     paddingVertical: 20,
-  },
-  footerBuildStamp: {
-    fontSize: 11,
-    marginTop: 4,
-    letterSpacing: 0.3,
   },
   footerText: {
     fontSize: 13,

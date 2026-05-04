@@ -11,6 +11,7 @@ import { hasPremiumProgramAccess } from '@/lib/subscriptionAccess';
 import { useState, useEffect } from 'react';
 
 import { ErrorBoundary } from '@/components/ErrorBoundary';
+import { getAppVersion } from '@/lib/appVersion';
 
 function AboutContent() {
   const router = useRouter();
@@ -203,10 +204,12 @@ function AboutContent() {
 
         <View style={[styles.footer, { backgroundColor: tc.footerBg }]}>
           <Text style={styles.footerBrand}>GoZzzz</Text>
+          <Text style={[styles.footerVersion, { color: tc.textPrimary }]}>
+            {t('about.version')} {getAppVersion()}
+          </Text>
           <Text style={styles.footerCompany}>MORFEU SAUDE E TECNOLOGIA LTDA</Text>
           <Text style={styles.footerCnpj}>CNPJ: 66.059.212/0001-52</Text>
           <Text style={styles.footerText}>{t('about.contact')}</Text>
-          <Text style={styles.footerText}>{t('about.version')} 1.0.0</Text>
         </View>
       </View>
     </ScrollView>
@@ -515,6 +518,12 @@ const styles = StyleSheet.create({
     color: '#d4a96a',
     letterSpacing: 1.2,
     marginBottom: 4,
+  },
+  footerVersion: {
+    fontSize: 17,
+    fontWeight: '800',
+    marginBottom: 8,
+    letterSpacing: 0.3,
   },
   footerCompany: {
     fontSize: 13,

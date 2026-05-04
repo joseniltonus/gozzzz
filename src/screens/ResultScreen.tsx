@@ -2,27 +2,28 @@ import { StyleSheet } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { useLanguage } from '@/contexts/LanguageContext';
-import ChronotypeResultFlow from '@/components/chronotype/ChronotypeResultFlow';
-import { normalizeChronotypeExpKey, type ChronotypeExpKey } from '@/data/chronotypesExperience';
+import ChronotypeIntelligenceProfile from '@/components/chronotype/ChronotypeIntelligenceProfile';
+import { normalizeChronotypeKey, type ChronotypeKey } from '@/data/chronotypesIntelligence';
 
 export default function ResultScreen() {
   const router = useRouter();
   const { language } = useLanguage();
   const isPt = language === 'pt';
   const { chronotype: raw } = useLocalSearchParams<{ chronotype?: string | string[] }>();
-  const key: ChronotypeExpKey = normalizeChronotypeExpKey(raw) ?? 'bear';
+  const key: ChronotypeKey = normalizeChronotypeKey(raw) ?? 'bear';
 
   return (
     <SafeAreaView style={styles.safe} edges={['top', 'left', 'right', 'bottom']}>
-      <ChronotypeResultFlow
+      <ChronotypeIntelligenceProfile
         chronotypeKey={key}
         locale={isPt ? 'pt' : 'en'}
-        onDay1={() =>
+        onContinuePlan={() =>
           router.push({
             pathname: '/(auth)/signup',
             params: { chronotype: key },
           })
         }
+        continuePlanLabel={isPt ? 'Ver meu plano de 21 passos →' : 'See my 21-step plan →'}
       />
     </SafeAreaView>
   );

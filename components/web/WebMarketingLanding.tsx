@@ -7,7 +7,7 @@ import {
   Platform,
   useWindowDimensions,
 } from 'react-native';
-import { useState, useMemo } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { useRouter } from 'expo-router';
 import Head from 'expo-router/head';
 import { LinearGradient } from 'expo-linear-gradient';
@@ -37,17 +37,24 @@ const isWeb = Platform.OS === 'web';
 const GOLD = '#d4a96a';
 const GOLD_LIGHT = '#e8c99a';
 
-function WebNav({ scrollY }: { scrollY: number }) {
+function WebNav() {
   const router = useRouter();
   const { t } = useLanguage();
   const { width } = useWindowDimensions();
+  const [scrolled, setScrolled] = useState(false);
   const showLinks = width >= 768;
-  const scrolled = scrollY > 40;
+
+  useEffect(() => {
+    if (!isWeb) return;
+    const handleScroll = () => setScrolled(window.scrollY > 40);
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
 
   return (
     <View style={[styles.nav, scrolled && styles.navScrolled]}>
       <View style={styles.navInner}>
-        <TouchableOpacity onPress={() => router.push('/')} style={styles.navBrand}>
+        <TouchableOpacity onPress={() => router.push('/web')} style={styles.navBrand}>
           <GozzzzWordmark size="md" />
         </TouchableOpacity>
 
@@ -76,7 +83,7 @@ function WebNav({ scrollY }: { scrollY: number }) {
   );
 }
 
-export default function WebMarketingLanding() {
+export default function WebLandingPage() {
   const router = useRouter();
   const { t, language } = useLanguage();
   const { width: windowWidth } = useWindowDimensions();
@@ -87,10 +94,14 @@ export default function WebMarketingLanding() {
   const isDesktop = windowWidth >= 1024;
   const isTablet = windowWidth >= 768 && windowWidth < 1024;
 
-  /** RN Web: o scroll é no `ScrollView`, não em `window` — `window.scrollY` ficava sempre 0. */
-  const onPageScroll = (e: { nativeEvent: { contentOffset: { y: number } } }) => {
-    setScrollY(e.nativeEvent.contentOffset.y);
-  };
+  useEffect(() => {
+    if (!isWeb) return;
+    const handleScroll = () => setScrollY(window.scrollY);
+    window.addEventListener('scroll', handleScroll);
+    return () => {
+      window.removeEventListener('scroll', handleScroll);
+    };
+  }, []);
 
   const testimonials = [
     {
@@ -224,13 +235,8 @@ export default function WebMarketingLanding() {
           "numberOfCredits": "21"
         })}</script>
       </Head>
-      <ScrollView
-        style={styles.page}
-        showsVerticalScrollIndicator={false}
-        onScroll={onPageScroll}
-        scrollEventThrottle={16}
-      >
-        <WebNav scrollY={scrollY} />
+      <ScrollView style={styles.page} showsVerticalScrollIndicator={false}>
+        <WebNav />
 
       <ChronotypePremiumWebFunnel scrollY={scrollY} />
 

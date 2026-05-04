@@ -2,6 +2,9 @@
 node_modules/
 
 # expo
+expo-qr.png
+expo-qr-ios.png
+expo-qr-android.png
 .expo/
 dist/
 web-build/

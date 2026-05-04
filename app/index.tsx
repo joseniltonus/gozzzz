@@ -1,12 +1,10 @@
 import { View, ActivityIndicator, StyleSheet } from 'react-native';
 import { Redirect } from 'expo-router';
 import { useAuth } from '@/contexts/AuthContext';
-import WebMarketingLanding from '@/components/web/WebMarketingLanding';
+import EntryScreen from '@/src/screens/EntryScreen';
 
 /**
- * Visitante (web + nativo): mesma landing marketing + funil cronótipo (`WebMarketingLanding`).
- * O antigo `EntryScreen` só era usado no nativo e por isso o Expo parecia “preso” no visual antigo.
- * Autenticados: home nas tabs.
+ * Entrada unificada (web + mobile): mesmo ecrã premium; utilizadores autenticados vão para a home.
  */
 export default function Index() {
   const { user, loading } = useAuth();
@@ -23,7 +21,7 @@ export default function Index() {
     return <Redirect href="/(tabs)/home" />;
   }
 
-  return <WebMarketingLanding />;
+  return <EntryScreen />;
 }
 
 const styles = StyleSheet.create({
