@@ -1,1 +1,2 @@
-export { default } from './coach/concierge';
+/** Tab Concierge: mesmo conteúdo que `coach/index` (incl. valores consultoria individual). */
+export { default } from './coach/index';

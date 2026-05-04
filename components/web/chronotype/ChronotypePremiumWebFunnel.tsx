@@ -9,10 +9,8 @@ import {
   Pressable,
 } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
-import MaskedView from '@react-native-masked-view/masked-view';
 import { useRouter } from 'expo-router';
 import Animated, {
-  FadeInDown,
   Easing,
   useAnimatedStyle,
   useSharedValue,
@@ -24,11 +22,19 @@ import type { TextStyle } from 'react-native';
 import { Activity, Brain, Check, Clock, Dna, Lock, Shield, Zap } from 'lucide-react-native';
 import { useLanguage } from '@/contexts/LanguageContext';
 import GozzzzWordmark from '@/components/branding/GozzzzWordmark';
+import ChronotypePremiumNativeHero from '@/components/chronotype/ChronotypePremiumNativeHero';
+import {
+  CHRONOTYPE_HERO_MAX,
+  CHRONOTYPE_HEADLINE_FS,
+  CHRONOTYPE_HEADLINE_LH,
+  CHRONOTYPE_HEADLINE_MAX_W,
+  CHRONOTYPE_HEADLINE_TRACKING,
+} from '@/components/chronotype/chronotypePremiumHeroConstants';
 import { CHRONOTYPE_EXP_KEYS, getChronotypeExperience, type ChronotypeExpKey } from '@/data/chronotypesExperience';
 
 const isWeb = Platform.OS === 'web';
 
-const HERO_MAX = 420;
+const HERO_MAX = CHRONOTYPE_HERO_MAX;
 
 /** Estrelas discretas, baixa opacidade (spec: sparse, subtle). */
 const STARFIELD = [
@@ -68,6 +74,7 @@ export default function ChronotypePremiumWebFunnel({ scrollY }: Props) {
   const glow = useSharedValue(0.35);
 
   useEffect(() => {
+    if (!isWeb) return;
     glow.value = withRepeat(
       withSequence(
         withTiming(0.52, { duration: 2200, easing: Easing.inOut(Easing.quad) }),
@@ -84,7 +91,7 @@ export default function ChronotypePremiumWebFunnel({ scrollY }: Props) {
 
   const parallaxStars = useMemo(
     () => ({
-      transform: [{ translateY: isWeb ? scrollY * 0.06 : 0 }],
+      transform: [{ translateY: scrollY * (isWeb ? 0.06 : 0.05) }],
     }),
     [scrollY],
   );
@@ -97,6 +104,13 @@ export default function ChronotypePremiumWebFunnel({ scrollY }: Props) {
 
   const shellExtra = isWeb ? ({ minHeight: '88vh' } as object) : { minHeight: 560 };
 
+  const shellGradient = isWeb
+    ? ({ colors: ['#050508', '#0c0c12'] as const } as const)
+    : ({
+        colors: ['#050816', '#0a1028', '#0b0f2a'] as const,
+        locations: [0, 0.52, 1] as const,
+      } as const);
+
   const hlPre = t('web.chronoPremium.heroHeadlinePrefix');
   const hlHi = t('web.chronoPremium.heroHeadlineHighlight');
   const hlSuf = t('web.chronoPremium.heroHeadlineSuffix');
@@ -106,7 +120,7 @@ export default function ChronotypePremiumWebFunnel({ scrollY }: Props) {
   const subSuf = t('web.chronoPremium.heroSubSuffix');
 
   return (
-    <LinearGradient colors={['#050508', '#0c0c12']} style={[styles.shell, shellExtra]}>
+    <LinearGradient {...shellGradient} style={[styles.shell, shellExtra]}>
       <Animated.View style={[styles.starsWrap, parallaxStars]} pointerEvents="none">
         {STARFIELD.map(([x, y, o, s], i) => (
           <View
@@ -128,133 +142,109 @@ export default function ChronotypePremiumWebFunnel({ scrollY }: Props) {
 
       <View style={styles.pageInner} {...(isWeb ? ({ nativeID: 'chronotype-hero-root' } as object) : {})}>
         <View style={styles.heroColumn}>
-          <View style={styles.logoBlock}>
-            <GozzzzWordmark preset="funnelHero" />
-          </View>
-
           {isWeb ? (
-            <View style={styles.headlineBlock} testID="chronotype-hero-headline">
-              <Text style={[styles.headlineWebWrap, webFont]}>
-                <Text style={[styles.headlinePlain, webFont]}>{hlPre}</Text>
-                <Text style={[styles.headlinePlain, headlineHighlightWeb, webFont]}>{hlHi}</Text>
-                {hlSuf ? <Text style={[styles.headlinePlain, webFont]}>{hlSuf}</Text> : null}
-              </Text>
-              <Text style={[styles.subheadWrap, webFont]}>
-                <Text style={[styles.subheadMuted, webFont]}>{subPre}</Text>
-                <Text style={[styles.subheadAccent, webFont]}>{subHi}</Text>
-                <Text style={[styles.subheadMuted, webFont]}>{subSuf}</Text>
-              </Text>
-            </View>
-          ) : (
-            <Animated.View entering={FadeInDown.duration(600).delay(40)} style={styles.headlineBlock}>
-              <View style={styles.headlineRow}>
-                <Text style={[styles.headlinePlain, webFont]}>{hlPre}</Text>
-                <MaskedView
-                  style={[styles.hlMaskHost, { minWidth: Math.min(HERO_MAX - 24, hlHi.length * 11) }]}
-                  maskElement={
-                    <View style={styles.hlMaskBox}>
-                      <Text style={[styles.hlMaskText, webFont]}>{hlHi}</Text>
-                    </View>
-                  }
-                >
-                  <LinearGradient
-                    colors={['#a855f7', '#6366f1', '#38bdf8']}
-                    start={{ x: 0, y: 0 }}
-                    end={{ x: 1, y: 0 }}
-                    style={StyleSheet.absoluteFill}
-                  />
-                </MaskedView>
-                {hlSuf ? <Text style={[styles.headlinePlain, webFont]}>{hlSuf}</Text> : null}
+            <>
+              <View style={styles.logoBlock}>
+                <GozzzzWordmark preset="funnelHero" />
               </View>
-              <Text style={[styles.subheadWrap, webFont]}>
-                <Text style={[styles.subheadMuted, webFont]}>{subPre}</Text>
-                <Text style={[styles.subheadAccent, webFont]}>{subHi}</Text>
-                <Text style={[styles.subheadMuted, webFont]}>{subSuf}</Text>
-              </Text>
-            </Animated.View>
-          )}
 
-          <View style={styles.ctaBlock}>
-            <Pressable
-              onPress={goQuiz}
-              onPressIn={() => setCtaPressed(true)}
-              onPressOut={() => setCtaPressed(false)}
-              {...(isWeb
-                ? ({
+              <View style={styles.headlineBlock} testID="chronotype-hero-headline">
+                <Text style={[styles.headlineWebWrap, webFont]}>
+                  <Text style={[styles.headlinePlain, webFont]}>{hlPre}</Text>
+                  <Text style={[styles.headlinePlain, headlineHighlightWeb, webFont]}>{hlHi}</Text>
+                  {hlSuf ? <Text style={[styles.headlinePlain, webFont]}>{hlSuf}</Text> : null}
+                </Text>
+                <Text style={[styles.subheadWrap, webFont]}>
+                  <Text style={[styles.subheadMuted, webFont]}>{subPre}</Text>
+                  <Text style={[styles.subheadAccent, webFont]}>{subHi}</Text>
+                  <Text style={[styles.subheadMuted, webFont]}>{subSuf}</Text>
+                </Text>
+              </View>
+
+              <View style={styles.ctaBlock}>
+                <Pressable
+                  onPress={goQuiz}
+                  onPressIn={() => setCtaPressed(true)}
+                  onPressOut={() => setCtaPressed(false)}
+                  {...({
                     onMouseEnter: () => setCtaHover(true),
                     onMouseLeave: () => {
                       setCtaHover(false);
                       setCtaPressed(false);
                     },
-                  } as object)
-                : {})}
-              style={[styles.ctaOuter, { transform: [{ scale: ctaScale }] }]}
-            >
-              <Animated.View style={[styles.ctaGlow, glowStyle]} />
-              <LinearGradient
-                colors={['#9333ea', '#6366f1', '#0ea5e9']}
-                start={{ x: 0, y: 0 }}
-                end={{ x: 1, y: 0 }}
-                style={styles.ctaGrad}
-              >
-                <Text style={[styles.ctaText, webFont]}>
-                  {'\u2192 '}
-                  {t('web.chronoPremium.ctaQuiz')}
-                </Text>
-              </LinearGradient>
-            </Pressable>
-            <View style={styles.trustRow}>
-              <View style={styles.trustItem}>
-                <Check size={15} color="#c4b5fd" strokeWidth={2.2} />
-                <Text style={[styles.trustItemText, webFont]}>{t('web.chronoPremium.trustFree')}</Text>
+                  } as object)}
+                  style={[styles.ctaOuter, { transform: [{ scale: ctaScale }] }]}
+                >
+                  <Animated.View style={[styles.ctaGlow, glowStyle]} />
+                  <LinearGradient
+                    colors={['#9333ea', '#6366f1', '#0ea5e9']}
+                    locations={[0, 0.52, 1]}
+                    start={{ x: 0, y: 0 }}
+                    end={{ x: 1, y: 0 }}
+                    style={styles.ctaGrad}
+                  >
+                    <Text style={[styles.ctaText, webFont]}>
+                      {'\u2192 '}
+                      {t('web.chronoPremium.ctaQuiz')}
+                    </Text>
+                  </LinearGradient>
+                </Pressable>
+                <View style={styles.trustRow}>
+                  <View style={styles.trustItem}>
+                    <Check size={15} color="#c4b5fd" strokeWidth={2.2} />
+                    <Text style={[styles.trustItemText, webFont]}>{t('web.chronoPremium.trustFree')}</Text>
+                  </View>
+                  <Text style={styles.trustSep}>·</Text>
+                  <View style={styles.trustItem}>
+                    <Zap size={15} color="#c4b5fd" strokeWidth={2.2} />
+                    <Text style={[styles.trustItemText, webFont]}>{t('web.chronoPremium.trustFast')}</Text>
+                  </View>
+                  <Text style={styles.trustSep}>·</Text>
+                  <View style={styles.trustItem}>
+                    <Lock size={15} color="#c4b5fd" strokeWidth={2.2} />
+                    <Text style={[styles.trustItemText, webFont]}>{t('web.chronoPremium.trustSignup')}</Text>
+                  </View>
+                </View>
               </View>
-              <Text style={styles.trustSep}>·</Text>
-              <View style={styles.trustItem}>
-                <Zap size={15} color="#c4b5fd" strokeWidth={2.2} />
-                <Text style={[styles.trustItemText, webFont]}>{t('web.chronoPremium.trustFast')}</Text>
-              </View>
-              <Text style={styles.trustSep}>·</Text>
-              <View style={styles.trustItem}>
-                <Lock size={15} color="#c4b5fd" strokeWidth={2.2} />
-                <Text style={[styles.trustItemText, webFont]}>{t('web.chronoPremium.trustSignup')}</Text>
-              </View>
-            </View>
-          </View>
 
-          <View style={styles.dividerRow}>
-            <View style={styles.dividerLine} />
-            <Text style={styles.dividerStar}>✦</Text>
-            <View style={styles.dividerLine} />
-          </View>
+              <View style={styles.dividerRow}>
+                <View style={styles.dividerLine} />
+                <Text style={styles.dividerStar}>✦</Text>
+                <View style={styles.dividerLine} />
+              </View>
 
-          <View style={styles.scienceBlock} testID="chronotype-hero-science">
-            <View style={styles.brainRing}>
-              <Brain size={18} color="rgba(255,255,255,0.55)" strokeWidth={1.6} />
-            </View>
-            <Text style={[styles.scienceTitle, webFont]}>{t('web.chronoPremium.scienceTitle')}</Text>
-            <View style={styles.pillarRow}>
-              <View style={styles.pillarItem}>
-                <Dna size={13} color="#c4b5fd" strokeWidth={2} />
-                <Text style={[styles.pillarText, webFont]}>{t('web.chronoPremium.sciencePillar1')}</Text>
+              <View style={styles.scienceBlock} testID="chronotype-hero-science">
+                <View style={styles.brainRing}>
+                  <Brain size={18} color="rgba(255,255,255,0.55)" strokeWidth={1.6} />
+                </View>
+                <Text style={[styles.scienceTitle, webFont]}>{t('web.chronoPremium.scienceTitle')}</Text>
+                <View style={styles.pillarRow}>
+                  <View style={styles.pillarItem}>
+                    <Dna size={13} color="#c4b5fd" strokeWidth={2} />
+                    <Text style={[styles.pillarText, webFont]}>{t('web.chronoPremium.sciencePillar1')}</Text>
+                  </View>
+                  <Text style={[styles.pillarPipe, webFont]}>|</Text>
+                  <View style={styles.pillarItem}>
+                    <Clock size={13} color="#c4b5fd" strokeWidth={2} />
+                    <Text style={[styles.pillarText, webFont]}>{t('web.chronoPremium.sciencePillar2')}</Text>
+                  </View>
+                  <Text style={[styles.pillarPipe, webFont]}>|</Text>
+                  <View style={styles.pillarItem}>
+                    <Activity size={13} color="#c4b5fd" strokeWidth={2} />
+                    <Text style={[styles.pillarText, webFont]}>{t('web.chronoPremium.sciencePillar3')}</Text>
+                  </View>
+                </View>
+                <Text style={[styles.scienceLead, webFont]}>{t('web.chronoPremium.scienceResearchersLead')}</Text>
+                <Text style={[styles.scienceNames, webFont]}>{t('web.chronoPremium.scienceResearchersNames')}</Text>
+                <View style={styles.privacyPill}>
+                  <Shield size={13} color="rgba(255,255,255,0.45)" strokeWidth={2} />
+                  <Text style={[styles.privacyPillText, webFont]}>{t('web.chronoPremium.heroPrivacyLine')}</Text>
+                </View>
               </View>
-              <Text style={[styles.pillarPipe, webFont]}>|</Text>
-              <View style={styles.pillarItem}>
-                <Clock size={13} color="#c4b5fd" strokeWidth={2} />
-                <Text style={[styles.pillarText, webFont]}>{t('web.chronoPremium.sciencePillar2')}</Text>
-              </View>
-              <Text style={[styles.pillarPipe, webFont]}>|</Text>
-              <View style={styles.pillarItem}>
-                <Activity size={13} color="#c4b5fd" strokeWidth={2} />
-                <Text style={[styles.pillarText, webFont]}>{t('web.chronoPremium.sciencePillar3')}</Text>
-              </View>
-            </View>
-            <Text style={[styles.scienceLead, webFont]}>{t('web.chronoPremium.scienceResearchersLead')}</Text>
-            <Text style={[styles.scienceNames, webFont]}>{t('web.chronoPremium.scienceResearchersNames')}</Text>
-            <View style={styles.privacyPill}>
-              <Shield size={13} color="rgba(255,255,255,0.45)" strokeWidth={2} />
-              <Text style={[styles.privacyPillText, webFont]}>{t('web.chronoPremium.heroPrivacyLine')}</Text>
-            </View>
-          </View>
+            </>
+          ) : (
+            <ChronotypePremiumNativeHero onPressCta={goQuiz} />
+          )}
         </View>
 
         <Text style={[styles.gridLabel, webFont]}>{t('web.chronoPremium.gridLabel')}</Text>
@@ -327,8 +317,6 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   logoBlock: {
-    marginTop: 48,
-    marginBottom: 40,
     alignItems: 'center',
   },
   headlineBlock: {
@@ -338,7 +326,7 @@ const styles = StyleSheet.create({
   },
   headlineWebWrap: {
     width: '100%',
-    maxWidth: 352,
+    maxWidth: CHRONOTYPE_HEADLINE_MAX_W,
     alignSelf: 'center',
     textAlign: 'center',
     marginBottom: 16,
@@ -353,34 +341,12 @@ const styles = StyleSheet.create({
     marginBottom: 16,
   },
   headlinePlain: {
-    fontSize: 35,
-    lineHeight: 40,
+    fontSize: CHRONOTYPE_HEADLINE_FS,
+    lineHeight: CHRONOTYPE_HEADLINE_LH,
     fontWeight: '700',
     color: '#ffffff',
     textAlign: 'center',
-    letterSpacing: -0.4,
-  },
-  hlMaskHost: {
-    minHeight: 44,
-    maxHeight: 120,
-    justifyContent: 'center',
-    marginHorizontal: 0,
-    alignSelf: 'center',
-  },
-  hlMaskBox: {
-    flex: 1,
-    backgroundColor: '#000000',
-    justifyContent: 'center',
-    alignItems: 'center',
-    paddingHorizontal: 2,
-  },
-  hlMaskText: {
-    fontSize: 35,
-    lineHeight: 40,
-    fontWeight: '700',
-    color: '#ffffff',
-    textAlign: 'center',
-    letterSpacing: -0.4,
+    letterSpacing: CHRONOTYPE_HEADLINE_TRACKING,
   },
   subheadWrap: {
     width: '100%',

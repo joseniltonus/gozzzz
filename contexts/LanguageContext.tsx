@@ -549,10 +549,42 @@ const translations = {
 
     // Web footer
     'web.footer.copyright': '© 2026 GoZzzz · MORFEU SAUDE E TECNOLOGIA LTDA · CNPJ: 66.059.212/0001-52',
+
+    // Cronótipo premium (funil web + hero nativo)
+    'web.chronoPremium.heroHeadlinePrefix': 'Você acorda cansado mesmo dormindo ',
+    'web.chronoPremium.heroHeadlineHighlight': '8 horas',
+    'web.chronoPremium.heroHeadlineSuffix': '?',
+    'web.chronoPremium.nativeHeroHeadlineHighlight': '8 horas',
+    'web.chronoPremium.nativeHeroHeadlineSuffix': '?',
+    'web.chronoPremium.heroSubPrefix': 'Descubra em ',
+    'web.chronoPremium.heroSubHighlight': '60 segundos',
+    'web.chronoPremium.heroSubSuffix': ' seu cronótipo biológico',
+    'web.chronoPremium.heroSub': 'Descubra em 60 segundos seu cronótipo biológico',
+    'web.chronoPremium.ctaQuiz': 'Fazer o teste grátis',
+    'web.chronoPremium.trustFree': 'Gratuito',
+    'web.chronoPremium.trustFast': '60 segundos',
+    'web.chronoPremium.trustSignup': 'Sem cadastro',
+    'web.chronoPremium.trustLine': 'Gratuito • 60 segundos • Sem cadastro',
+    'web.chronoPremium.scienceTitle': 'Baseado em ciência do sono',
+    'web.chronoPremium.sciencePillar1': 'Cronobiologia',
+    'web.chronoPremium.sciencePillar2': 'Ritmo circadiano',
+    'web.chronoPremium.sciencePillar3': 'Arquitetura do sono',
+    'web.chronoPremium.scienceBullets': 'Cronobiologia • Ritmo circadiano • Arquitetura do sono',
+    'web.chronoPremium.scienceResearchersLead': 'Inspirado em pesquisas de',
+    'web.chronoPremium.scienceResearchersNames': 'Matthew Walker • Michael Breus • Andrew Huberman',
+    'web.chronoPremium.heroPrivacyLine': 'Privacidade 100% segura • Seus dados não são armazenados',
+    'web.chronoPremium.gridLabel': 'Seu tipo de energia',
+    'web.chronoPremium.valueTitle': 'Pronto para dormir melhor?',
+    'web.chronoPremium.ctaStartFree': 'Começar grátis',
+    'web.chronoPremium.linkProgram': 'Ver programa completo',
+
     'web.sobre.disclaimer2': 'Antes de iniciar qualquer programa de mudança de hábitos relacionados ao sono, consulte um médico ou profissional de saúde qualificado, especialmente se você apresentar condições como apneia do sono, insônia crônica, transtornos do humor, uso de medicamentos ou outras condições médicas.',
     'web.sobre.disclaimer3': 'Os resultados descritos são experiências individuais e podem variar de pessoa para pessoa. O GoZzzz não garante resultados específicos. Em caso de sintomas persistentes ou agravamento de qualquer condição, procure atendimento médico imediatamente. Este aplicativo não substitui o cuidado médico profissional.',
     'web.sobre.footerContact': 'Contato: suporte@gozzzz.app · Versão 1.0.0',
     'web.sobre.footerCopy': '© 2025 GoZzzz. Todos os direitos reservados.',
+
+    // App entry (primeiro ecrã)
+    'entry.learnMore': 'Saiba mais',
 
     // Auth screens
     'auth.tagline': 'A ciência do sono aplicada ao seu cotidiano',
@@ -1528,6 +1560,9 @@ const translations = {
     'web.sobre.footerContact': 'Contact: support@gozzzz.app · Version 1.0.0',
     'web.sobre.footerCopy': '© 2025 GoZzzz. All rights reserved.',
 
+    // App entry (first screen)
+    'entry.learnMore': 'Learn more',
+
     // Auth screens
     'auth.tagline': 'Sleep science applied to your daily life',
     'auth.login.title': 'Welcome back',
@@ -2115,6 +2150,34 @@ const translations = {
 
     // Web footer
     'web.footer.copyright': '© 2026 GoZzzz · MORFEU SAUDE E TECNOLOGIA LTDA · CNPJ: 66.059.212/0001-52',
+
+    // Chronotype premium funnel / native hero
+    'web.chronoPremium.heroHeadlinePrefix': 'You wake up tired even after sleeping ',
+    'web.chronoPremium.heroHeadlineHighlight': '8 hours',
+    'web.chronoPremium.heroHeadlineSuffix': '?',
+    'web.chronoPremium.nativeHeroHeadlineHighlight': '8 hours',
+    'web.chronoPremium.nativeHeroHeadlineSuffix': ' of sleep?',
+    'web.chronoPremium.heroSubPrefix': 'Discover in ',
+    'web.chronoPremium.heroSubHighlight': '60 seconds',
+    'web.chronoPremium.heroSubSuffix': ' your biological chronotype',
+    'web.chronoPremium.heroSub': 'Discover in 60 seconds your biological chronotype',
+    'web.chronoPremium.ctaQuiz': 'Take the free test',
+    'web.chronoPremium.trustFree': 'Free',
+    'web.chronoPremium.trustFast': '60 seconds',
+    'web.chronoPremium.trustSignup': 'No sign-up',
+    'web.chronoPremium.trustLine': 'Free • 60 seconds • No sign-up',
+    'web.chronoPremium.scienceTitle': 'Based on sleep science',
+    'web.chronoPremium.sciencePillar1': 'Chronobiology',
+    'web.chronoPremium.sciencePillar2': 'Circadian rhythm',
+    'web.chronoPremium.sciencePillar3': 'Sleep architecture',
+    'web.chronoPremium.scienceBullets': 'Chronobiology • Circadian rhythm • Sleep architecture',
+    'web.chronoPremium.scienceResearchersLead': 'Inspired by research from',
+    'web.chronoPremium.scienceResearchersNames': 'Matthew Walker • Michael Breus • Andrew Huberman',
+    'web.chronoPremium.heroPrivacyLine': '100% secure privacy • Your data is not stored',
+    'web.chronoPremium.gridLabel': 'Your energy type',
+    'web.chronoPremium.valueTitle': 'Ready to sleep better?',
+    'web.chronoPremium.ctaStartFree': 'Start free',
+    'web.chronoPremium.linkProgram': 'View full program',
   },
 };
 const STORAGE_KEY = 'gozzzz_language';

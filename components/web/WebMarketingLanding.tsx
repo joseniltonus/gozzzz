@@ -94,15 +94,6 @@ export default function WebLandingPage() {
   const isDesktop = windowWidth >= 1024;
   const isTablet = windowWidth >= 768 && windowWidth < 1024;
 
-  useEffect(() => {
-    if (!isWeb) return;
-    const handleScroll = () => setScrollY(window.scrollY);
-    window.addEventListener('scroll', handleScroll);
-    return () => {
-      window.removeEventListener('scroll', handleScroll);
-    };
-  }, []);
-
   const testimonials = [
     {
       name: 'Ana Paula M.',
@@ -235,7 +226,12 @@ export default function WebLandingPage() {
           "numberOfCredits": "21"
         })}</script>
       </Head>
-      <ScrollView style={styles.page} showsVerticalScrollIndicator={false}>
+      <ScrollView
+        style={styles.page}
+        showsVerticalScrollIndicator={false}
+        onScroll={(e) => setScrollY(e.nativeEvent.contentOffset.y)}
+        scrollEventThrottle={16}
+      >
         <WebNav />
 
       <ChronotypePremiumWebFunnel scrollY={scrollY} />
