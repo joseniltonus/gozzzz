@@ -29,7 +29,7 @@ const Q2_OPTIONS = [
   'Tudo junto',
 ] as const;
 const Q3_OPTIONS = [
-  'Mais conteúdo em vídeo',
+  'Mais conteúdo aprofundado em texto',
   'Lembretes mais frequentes',
   'Mais personalização',
   'Nada, gostei assim',

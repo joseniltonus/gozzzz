@@ -1,4 +1,4 @@
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Image, Platform } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Image, Platform, ActivityIndicator } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { LinearGradient } from 'expo-linear-gradient';
@@ -16,6 +16,7 @@ import { SleepLessonCard } from '@/components/SleepLessonCard';
 import { SLEEP_LESSON_CONTENT } from '@/data/sleepLessonContent';
 import { getChronotypeOneLiner } from '@/data/chronotypeOneLiner';
 import { useUserProfile } from '@/hooks/useUserProfile';
+import { useEffectiveChronotype } from '@/hooks/useEffectiveChronotype';
 import { hasPremiumProgramAccess } from '@/lib/subscriptionAccess';
 import { ShareableCard } from '@/components/ShareableCard';
 import { useProgress } from '@/contexts/ProgressContext';
@@ -29,14 +30,12 @@ export default function LessonDetailScreen() {
   const { isDark } = useTheme();
   const insets = useSafeAreaInsets();
   const { profile, loading: profileLoading } = useUserProfile();
+  const chronotype = useEffectiveChronotype();
   const { refreshProgress } = useProgress();
   const [hasPremiumAccess, setHasPremiumAccess] = useState(false);
   const [accessChecked, setAccessChecked] = useState(false);
   const [completingLesson, setCompletingLesson] = useState(false);
   const [sleepLessonComplete, setSleepLessonComplete] = useState(false);
-
-  // Always use profile as single source of truth — no localStorage fallback needed
-  const chronotype = profile?.chronotype || null;
 
   const tc = {
     bg: isDark ? '#0d0d16' : '#f0f4f8',
@@ -114,7 +113,7 @@ export default function LessonDetailScreen() {
     const nextLesson = LESSONS_DATA.find((l) => l.step_number === lesson.step_number + 1);
     console.log("PRÓXIMA LIÇÃO pressed, current:", lesson.step_number, "next:", nextLesson?.step_number);
     if (nextLesson) {
-      if (nextLesson.step_number > 3 && !hasPremiumAccess) {
+      if (nextLesson.step_number > 3 && accessChecked && !hasPremiumAccess) {
         router.push('/(tabs)/program');
         return;
       }
@@ -184,7 +183,24 @@ export default function LessonDetailScreen() {
     );
   }
 
-  const isLocked = lesson.step_number > 3 && (!accessChecked || !hasPremiumAccess);
+  const isPremiumStep = lesson.step_number > 3;
+  const accessPending = Boolean(user && isPremiumStep && !accessChecked);
+  const isLocked = isPremiumStep && (!user || (accessChecked && !hasPremiumAccess));
+
+  if (accessPending) {
+    return (
+      <View style={[styles.container, { backgroundColor: tc.bg }]}>
+        <LinearGradient colors={tc.gradientColors} style={[styles.header, { paddingTop: insets.top + 24 }]}>
+          <TouchableOpacity style={styles.backButton} onPress={navigateToPrevLesson}>
+            <ArrowLeft size={24} color="#ffffff" />
+          </TouchableOpacity>
+        </LinearGradient>
+        <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+          <ActivityIndicator size="large" color="#d4a96a" />
+        </View>
+      </View>
+    );
+  }
 
   const getTitle = () => language === 'pt' ? lesson.title_pt : lesson.title_en;
   const getDescription = () => language === 'pt' ? lesson.description_pt : lesson.description_en;

@@ -6,83 +6,44 @@ import { useLanguage } from '@/contexts/LanguageContext';
 import { useUserProfile } from '@/hooks/useUserProfile';
 import { useProgress } from '@/contexts/ProgressContext';
 import { getChronotypeInfo } from '@/data/chronotypes';
+import { LESSONS_DATA } from '@/data/lessons';
 import { ErrorBoundary } from '@/components/ErrorBoundary';
 import ChronotypeQuizModal from '@/components/ChronotypeQuizModal';
-import * as SecureStore from 'expo-secure-store';
 import {
   saveQuizDoneLocal,
   readQuizDoneLocal,
   readPreRegistrationQuizDone,
   clearPreRegistrationQuizDone,
+  readQuizChronotypeFromDevice,
+  saveQuizChronotypeToDevice,
+  readQuizChronotypeVerifiedFromDevice,
+  isValidChronotypeString,
 } from '@/lib/quizDevicePersistence';
 import { supabase } from '@/lib/supabase';
 
 type Chronotype = 'lion' | 'bear' | 'wolf' | 'dolphin';
 type Lang = 'pt' | 'en';
 
+/** Hora local do dispositivo: manhã / tarde / noite (PT) e equivalente em EN. */
+function getTimeOfDayGreeting(language: Lang): string {
+  const hour = new Date().getHours();
+  if (language === 'pt') {
+    if (hour >= 5 && hour < 12) return 'Bom dia';
+    if (hour >= 12 && hour < 18) return 'Boa tarde';
+    return 'Boa noite';
+  }
+  if (hour >= 5 && hour < 12) return 'Good morning';
+  if (hour >= 12 && hour < 18) return 'Good afternoon';
+  if (hour >= 18 && hour < 22) return 'Good evening';
+  return 'Good night';
+}
+
 const PURPLE = '#7c6fff';
 const BG = '#0f0e1a';
 const CARD_BG = '#1a1830';
 const GOLD = '#d4a96a';
 
-const saveQuizChronotype = async (userId: string, chronotype: string) => {
-  try {
-    const key = `quiz_chronotype_${userId}`;
-    const latestKey = 'quiz_latest_chronotype';
-    const verifiedKey = `quiz_chronotype_verified_${userId}`;
-    if (Platform.OS === 'web') {
-      localStorage.setItem(key, chronotype);
-      localStorage.setItem(latestKey, chronotype);
-      localStorage.setItem(verifiedKey, 'true');
-    } else {
-      await Promise.all([
-        SecureStore.setItemAsync(key, chronotype),
-        SecureStore.setItemAsync(latestKey, chronotype),
-        SecureStore.setItemAsync(verifiedKey, 'true'),
-      ]);
-    }
-  } catch (err) {
-    console.error('Local chronotype save error:', err);
-  }
-};
-
-const readChronotypeVerified = async (userId: string): Promise<boolean> => {
-  try {
-    const key = `quiz_chronotype_verified_${userId}`;
-    const value = Platform.OS === 'web' ? localStorage.getItem(key) : await SecureStore.getItemAsync(key);
-    return value === 'true';
-  } catch {
-    return false;
-  }
-};
-
-const readQuizChronotype = async (userId: string): Promise<Chronotype | null> => {
-  try {
-    const key = `quiz_chronotype_${userId}`;
-    const latestKey = 'quiz_latest_chronotype';
-    const [userValue, latestValue] = Platform.OS === 'web'
-      ? [localStorage.getItem(key), localStorage.getItem(latestKey)]
-      : [await SecureStore.getItemAsync(key), await SecureStore.getItemAsync(latestKey)];
-
-    const isValid = (v: string | null): v is Chronotype =>
-      v === 'lion' || v === 'bear' || v === 'wolf' || v === 'dolphin';
-
-    // Prefer latest quiz result if available.
-    if (isValid(latestValue)) {
-      return latestValue;
-    }
-    if (isValid(userValue)) {
-      return userValue;
-    }
-    return null;
-  } catch (err) {
-    console.error('Local chronotype read error:', err);
-    return null;
-  }
-};
-
-const isChronotype = (value: string | null | undefined): value is Chronotype =>
-  value === 'lion' || value === 'bear' || value === 'wolf' || value === 'dolphin';
+const isChronotype = isValidChronotypeString;
 
 // ─── DASHBOARD ─────────────────────────────────────────────────
 function ReturningUserScreen({ profile, lang, progress }: { profile: any; lang: Lang; progress: any }) {
@@ -90,10 +51,31 @@ function ReturningUserScreen({ profile, lang, progress }: { profile: any; lang: 
   const { width } = useWindowDimensions();
   const isNarrowScreen = width < 380;
   const info = getChronotypeInfo(profile.chronotype, lang);
-  const progressPercent = Math.round(((progress.completedCount ?? 0) / 21) * 100);
+  const progressPercent = Math.min(100, Math.round(((progress.completedCount ?? 0) / 21) * 100));
   const emojiMap: Record<string, string> = { lion: '🦁', bear: '🐻', wolf: '🐺', dolphin: '🐬' };
+  const rawNext = progress?.nextStep ?? 1;
+  const nextStepNum = Math.min(Math.max(rawNext, 1), 22);
+  const nextLesson = nextStepNum <= 21 ? LESSONS_DATA.find((l) => l.step_number === nextStepNum) : null;
+  const nextLessonTitle = nextLesson
+    ? lang === 'pt'
+      ? nextLesson.title_pt
+      : nextLesson.title_en
+    : lang === 'pt'
+      ? 'Programa de 21 dias concluído'
+      : '21-day program complete';
+  const chronotypeInsight =
+    info?.education?.[lang]?.[0] ??
+    (lang === 'pt'
+      ? 'Horários regulares e luz natural pela manhã sustentam o ritmo circadiano.'
+      : 'Regular timing and morning natural light support your circadian rhythm.');
   const moonPulse = useRef(new Animated.Value(0)).current;
   const starsTwinkle = useRef(new Animated.Value(0)).current;
+  const [, setGreetingTick] = useState(0);
+
+  useEffect(() => {
+    const id = setInterval(() => setGreetingTick((n) => n + 1), 60_000);
+    return () => clearInterval(id);
+  }, []);
 
   useEffect(() => {
     const moonLoop = Animated.loop(
@@ -210,13 +192,32 @@ function ReturningUserScreen({ profile, lang, progress }: { profile: any; lang: 
           ✦
         </Animated.Text>
       </View>
-      <Text style={styles.greeting}>{lang === 'pt' ? 'Bom dia' : 'Good morning'}, {profile.full_name || 'User'}</Text>
-      <Text style={styles.greetingSubtitle}>Sono profundo. De forma consistente.</Text>
+      <View style={styles.greetingBlock}>
+        <Text style={styles.greetingLead}>{getTimeOfDayGreeting(lang)}</Text>
+        <Text
+          style={[styles.greetingName, isNarrowScreen && styles.greetingNameNarrow]}
+          numberOfLines={2}
+          maxFontSizeMultiplier={1.35}
+        >
+          {profile.full_name?.trim() || (lang === 'pt' ? 'Bem-vindo' : 'Welcome')}
+        </Text>
+      </View>
+      <Text style={styles.greetingSubtitle}>
+        {lang === 'pt' ? 'Sono profundo. De forma consistente.' : 'Deep sleep. Consistently.'}
+      </Text>
 
       <View style={styles.progressCard}>
         <Text style={styles.progressLabel}>{lang === 'pt' ? 'Seu progresso' : 'Your progress'}</Text>
         <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
-          <Text style={styles.progressStep}>{lang === 'pt' ? `Passo ${progress.nextStep ?? 1} de 21` : `Step ${progress.nextStep ?? 1} of 21`}</Text>
+          <Text style={styles.progressStep}>
+            {rawNext > 21
+              ? lang === 'pt'
+                ? 'Programa de 21 dias concluído'
+                : '21-day program finished'
+              : lang === 'pt'
+                ? `Passo ${rawNext} de 21`
+                : `Step ${rawNext} of 21`}
+          </Text>
           <Text style={styles.progressPercent}>{progressPercent}%</Text>
         </View>
         <View style={styles.progressBarSmall}>
@@ -228,7 +229,9 @@ function ReturningUserScreen({ profile, lang, progress }: { profile: any; lang: 
         <View style={styles.statCard}>
           <Text style={styles.statLabel}>{lang === 'pt' ? 'Pico de energia' : 'Energy peak'}</Text>
           <Text style={styles.statValue}>{info?.peakHours?.[lang] ?? '–'}</Text>
-          <Text style={styles.statSub}>{emojiMap[profile.chronotype]} {info?.name?.[lang] ?? ''}</Text>
+          <Text style={styles.statSub}>
+            {emojiMap[profile.chronotype] ?? '🌙'} {info?.name?.[lang] ?? ''}
+          </Text>
         </View>
         <View style={styles.statCard}>
           <Text style={styles.statLabel}>{lang === 'pt' ? 'Janela ideal de sono' : 'Ideal sleep window'}</Text>
@@ -237,13 +240,43 @@ function ReturningUserScreen({ profile, lang, progress }: { profile: any; lang: 
         </View>
       </View>
 
+      <Text style={styles.disclaimerText}>
+        {lang === 'pt'
+          ? 'Horários orientativos (modelo Breus) — ajuste à sua rotina e ao que o corpo confirma.'
+          : 'Guidance ranges (Breus-style model) — tune to your schedule and what your body confirms.'}
+      </Text>
+
+      <View style={styles.insightCard}>
+        <Text style={styles.insightLabel}>{lang === 'pt' ? 'Destaque para o seu tipo' : 'Spotlight for your type'}</Text>
+        <Text style={styles.insightBody}>{chronotypeInsight}</Text>
+      </View>
+
       <TouchableOpacity
         style={styles.primaryButton}
         onPress={() => router.navigate('/(tabs)/program')}
         activeOpacity={0.8}
       >
         <Text style={styles.primaryButtonText}>
-          {lang === 'pt' ? `Continuar — Passo ${progress.nextStep ?? 1}` : `Continue — Step ${progress.nextStep ?? 1}`}
+          {rawNext > 21
+            ? lang === 'pt'
+              ? 'Abrir programa'
+              : 'Open program'
+            : lang === 'pt'
+              ? `Continuar — Passo ${rawNext}`
+              : `Continue — Step ${rawNext}`}
+        </Text>
+        <Text style={styles.primaryButtonSub} numberOfLines={2}>
+          {nextLessonTitle}
+        </Text>
+      </TouchableOpacity>
+
+      <TouchableOpacity
+        onPress={() => router.push('/(tabs)/lesson/2')}
+        activeOpacity={0.75}
+        style={styles.secondaryLinkWrap}
+      >
+        <Text style={styles.secondaryLink}>
+          {lang === 'pt' ? 'Como interpretamos estes horários →' : 'How we interpret these times →'}
         </Text>
       </TouchableOpacity>
     </ScrollView>
@@ -290,7 +323,7 @@ function HomeContent() {
       const metaDone = quizCompletedFromMeta;
       const [doneDisk, chronoDisk, preRegDone] = await Promise.all([
         readQuizDoneLocal(user.id),
-        readQuizChronotype(user.id),
+        readQuizChronotypeFromDevice(user.id),
         readPreRegistrationQuizDone(),
       ]);
 
@@ -300,7 +333,7 @@ function HomeContent() {
         if (isChronotype(chrono)) {
           await Promise.all([
             saveQuizDoneLocal(user.id),
-            saveQuizChronotype(user.id, chrono),
+            saveQuizChronotypeToDevice(user.id, chrono),
             clearPreRegistrationQuizDone(),
           ]);
           effectiveDone = true;
@@ -312,7 +345,7 @@ function HomeContent() {
       setLocalQuizDone(effectiveDone || metaDone);
       setLocalChronotype(chronoDisk ?? chronotypeFromAuthMeta ?? null);
 
-      const diskVerifiedFlag = await readChronotypeVerified(user.id);
+      const diskVerifiedFlag = await readQuizChronotypeVerifiedFromDevice(user.id);
       const verified =
         metaDone ||
         diskVerifiedFlag ||
@@ -375,7 +408,7 @@ function HomeContent() {
     if (user?.id) {
       void Promise.all([
         saveQuizDoneLocal(user.id),
-        saveQuizChronotype(user.id, chronotype),
+        saveQuizChronotypeToDevice(user.id, chronotype),
       ]).finally(() => {
         refetchProfile();
         refreshProgress();
@@ -404,7 +437,7 @@ function HomeContent() {
     if (!chronotypeToPersist) return;
 
     // Repair old/local missing verification in background without reopening quiz.
-    void saveQuizChronotype(user.id, chronotypeToPersist).then(() => {
+    void saveQuizChronotypeToDevice(user.id, chronotypeToPersist).then(() => {
       setLocalChronotypeVerified(true);
     });
   }, [user?.id, quizDone, localChronotypeVerified, localChronotype, effectiveProfile.chronotype]);
@@ -531,8 +564,39 @@ const styles = StyleSheet.create({
     top: 78,
     fontSize: 10,
   },
-  greeting: { fontSize: 14, color: '#98a1b3', marginBottom: 6, letterSpacing: 0.3 },
-  greetingSubtitle: { fontSize: 28, fontWeight: '700', color: '#f8f6f2', marginBottom: 30, lineHeight: 34, letterSpacing: 0.2 },
+  greetingBlock: {
+    marginBottom: 14,
+    maxWidth: '100%',
+  },
+  greetingLead: {
+    fontSize: 15,
+    fontWeight: '600',
+    color: 'rgba(152,161,179,0.95)',
+    letterSpacing: 0.4,
+    marginBottom: 6,
+  },
+  greetingName: {
+    fontSize: 30,
+    fontWeight: '800',
+    color: '#f5e7c9',
+    letterSpacing: 0.2,
+    lineHeight: 36,
+    textShadowColor: 'rgba(212,169,106,0.35)',
+    textShadowOffset: { width: 0, height: 0 },
+    textShadowRadius: 12,
+  },
+  greetingNameNarrow: {
+    fontSize: 26,
+    lineHeight: 32,
+  },
+  greetingSubtitle: {
+    fontSize: 18,
+    fontWeight: '600',
+    color: 'rgba(248,246,242,0.88)',
+    marginBottom: 28,
+    lineHeight: 26,
+    letterSpacing: 0.15,
+  },
   progressCard: {
     backgroundColor: CARD_BG,
     borderColor: 'rgba(212,169,106,0.18)',
@@ -551,7 +615,7 @@ const styles = StyleSheet.create({
   progressPercent: { fontSize: 18, fontWeight: '800', color: GOLD },
   progressBarSmall: { height: 5, backgroundColor: '#26233b', borderRadius: 999, overflow: 'hidden', marginTop: 12 },
   progressBarSmallFill: { height: '100%', backgroundColor: PURPLE },
-  statsRow: { flexDirection: 'row', gap: 12, marginBottom: 28 },
+  statsRow: { flexDirection: 'row', gap: 12, marginBottom: 12 },
   statsRowStacked: { flexDirection: 'column' },
   statCard: {
     flex: 1,
@@ -564,17 +628,61 @@ const styles = StyleSheet.create({
   statLabel: { fontSize: 11, color: '#aab3c2', fontWeight: '600', marginBottom: 8, letterSpacing: 0.8 },
   statValue: { fontSize: 19, fontWeight: '700', color: '#f8f6f2', marginBottom: 6 },
   statSub: { fontSize: 11, color: GOLD, fontWeight: '600' },
+  disclaimerText: {
+    fontSize: 11,
+    lineHeight: 16,
+    color: 'rgba(152,161,179,0.95)',
+    marginBottom: 14,
+    paddingHorizontal: 2,
+  },
+  insightCard: {
+    backgroundColor: 'rgba(124,111,255,0.08)',
+    borderRadius: 14,
+    borderLeftWidth: 3,
+    borderLeftColor: PURPLE,
+    paddingVertical: 14,
+    paddingHorizontal: 16,
+    marginBottom: 20,
+    borderWidth: 1,
+    borderColor: 'rgba(124,111,255,0.22)',
+  },
+  insightLabel: {
+    fontSize: 10,
+    fontWeight: '700',
+    color: '#b8b6ff',
+    letterSpacing: 0.85,
+    marginBottom: 8,
+    textTransform: 'uppercase',
+  },
+  insightBody: {
+    fontSize: 14,
+    lineHeight: 21,
+    color: '#e8e6f4',
+    fontWeight: '500',
+  },
   primaryButton: {
     backgroundColor: '#f8f6f2',
     borderRadius: 14,
     paddingVertical: 15,
     paddingHorizontal: 18,
     alignItems: 'center',
-    marginBottom: 16,
+    marginBottom: 12,
     width: '100%',
     borderWidth: 1,
     borderColor: 'rgba(212,169,106,0.4)',
   },
   primaryButtonText: { fontSize: 16, fontWeight: '700', color: '#191629', letterSpacing: 0.2 },
-  secondaryLink: { fontSize: 14, color: PURPLE, fontWeight: '500', textAlign: 'center' },
+  primaryButtonSub: {
+    fontSize: 13,
+    fontWeight: '600',
+    color: 'rgba(25,22,41,0.72)',
+    marginTop: 6,
+    textAlign: 'center',
+    lineHeight: 18,
+  },
+  secondaryLinkWrap: {
+    paddingVertical: 10,
+    alignItems: 'center',
+  },
+  secondaryLink: { fontSize: 14, color: PURPLE, fontWeight: '600', textAlign: 'center' },
 });

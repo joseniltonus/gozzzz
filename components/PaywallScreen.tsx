@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef, useMemo } from 'react';
 import {
   View,
   Text,
@@ -7,18 +7,12 @@ import {
   StyleSheet,
   Platform,
   ActivityIndicator,
+  Animated,
+  Easing,
 } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
-import { Moon, X, Check, Lock, Shield, BadgeCheck } from 'lucide-react-native';
-import { useTheme } from '@/contexts/ThemeContext';
+import { X } from 'lucide-react-native';
 import { supabase } from '@/lib/supabase';
-
-interface PaywallScreenProps {
-  onClose?: () => void;
-  onRestore?: () => void;
-  onCheckout?: (plan: 'annual') => Promise<void> | void;
-  language?: 'pt' | 'en';
-}
 
 function TrustBlock({ language = 'pt' }: { language: 'pt' | 'en' }) {
   const label = language === 'pt' ? 'Um programa construído sobre pesquisas de:' : 'A program built on research from:';
@@ -46,6 +40,13 @@ function TrustBlock({ language = 'pt' }: { language: 'pt' | 'en' }) {
       </View>
     </View>
   );
+}
+
+interface PaywallScreenProps {
+  onClose?: () => void;
+  onRestore?: () => void;
+  onCheckout?: (plan: 'annual') => Promise<void> | void;
+  language?: 'pt' | 'en';
 }
 
 const COPY = {
@@ -101,6 +102,8 @@ const COPY = {
   },
 };
 
+const STAR_COUNT = 30;
+
 export default function PaywallScreen({
   onClose,
   onRestore,
@@ -110,8 +113,72 @@ export default function PaywallScreen({
   const [selectedPlan] = useState<'annual'>('annual');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const { isDark } = useTheme();
   const [pricing, setPricing] = useState<{ annualPrice: string; annualEquiv: string; annualNote: string } | null>(null);
+
+  const starOpacities = useRef(
+    Array.from({ length: STAR_COUNT }, () => new Animated.Value(0.12 + Math.random() * 0.35)),
+  ).current;
+
+  const shimmerAnim = useRef(new Animated.Value(-200)).current;
+
+  const starsLayout = useMemo(
+    () =>
+      Array.from({ length: STAR_COUNT }, (_, i) => ({
+        key: i,
+        leftPct: Math.random() * 100,
+        top: Math.random() * 520,
+        size: 0.5 + Math.random() * 1.5,
+      })),
+    [],
+  );
+
+  useEffect(() => {
+    const loops = starOpacities.map((anim) => {
+      const initial = 0.1 + Math.random() * 0.42;
+      anim.setValue(initial);
+      const duration = 3000 + Math.random() * 4000;
+      return Animated.loop(
+        Animated.sequence([
+          Animated.timing(anim, {
+            toValue: 0.08,
+            duration,
+            easing: Easing.inOut(Easing.quad),
+            useNativeDriver: true,
+          }),
+          Animated.timing(anim, {
+            toValue: initial,
+            duration,
+            easing: Easing.inOut(Easing.quad),
+            useNativeDriver: true,
+          }),
+        ]),
+      );
+    });
+    loops.forEach((l) => l.start());
+    return () => {
+      loops.forEach((l) => l.stop());
+    };
+  }, [starOpacities]);
+
+  useEffect(() => {
+    const loop = Animated.loop(
+      Animated.sequence([
+        Animated.timing(shimmerAnim, {
+          toValue: 500,
+          duration: 3000,
+          easing: Easing.inOut(Easing.quad),
+          useNativeDriver: true,
+        }),
+        Animated.timing(shimmerAnim, {
+          toValue: -200,
+          duration: 0,
+          useNativeDriver: true,
+        }),
+      ]),
+    );
+    loop.start();
+    return () => loop.stop();
+  }, [shimmerAnim]);
 
   useEffect(() => {
     (async () => {
@@ -146,19 +213,6 @@ export default function PaywallScreen({
     annualNote: c.annualNote,
   };
 
-  const tc = {
-    bg: isDark ? '#0d0d16' : '#f0f4f8',
-    card: isDark ? '#12121e' : '#ffffff',
-    textPrimary: isDark ? '#e8d5b7' : '#1a202c',
-    textSecondary: isDark ? '#8892a4' : '#475569',
-    border: isDark ? 'rgba(212,169,106,0.08)' : 'rgba(0,0,0,0.08)',
-    gradientColors: (isDark ? ['#07070f', '#0f1a2e'] : ['#1a365d', '#2d5a8e']) as [string, string],
-    footerText: isDark ? '#4a5568' : '#64748b',
-  };
-
-  const BENEFITS = [c.b1, c.b2, c.b3, c.b4];
-  const CHECKLIST = [c.cl1, c.cl2, c.cl3, c.cl4];
-
   const handleCta = async () => {
     if (!onCheckout || loading) return;
     setLoading(true);
@@ -173,125 +227,260 @@ export default function PaywallScreen({
     }
   };
 
+  const priceStr = displayPricing.annualPrice;
+  const priceDigitIdx = priceStr.search(/\d/);
+  const priceCurrencySymbol = priceDigitIdx > 0 ? priceStr.slice(0, priceDigitIdx).trim() : '';
+  const priceNumericPart =
+    priceDigitIdx >= 0 ? priceStr.slice(priceDigitIdx).replace(/\s/g, '') : priceStr;
+
+  const isPt = language === 'pt';
+  const subHeadline = `${c.sub}\n${c.cl1}`;
+  const benefitRows = isPt
+    ? [
+        {
+          title: '21 passos completos desbloqueados',
+          desc: 'Acesso imediato a todo o programa — sem limitações',
+        },
+        {
+          title: 'Baseado em ciência real',
+          desc: 'Cada passo fundamentado em pesquisas de Walker, Breus, Huberman e Czeisler',
+        },
+        {
+          title: 'No seu ritmo, para sempre',
+          desc: 'Acesso vitalício — sem mensalidade, sem renovação automática',
+        },
+        {
+          title: 'iOS, Android e Web',
+          desc: 'Uma compra, todos os dispositivos',
+        },
+      ]
+    : [
+        {
+          title: 'All 21 steps unlocked',
+          desc: 'Immediate access to the full program — no limits',
+        },
+        {
+          title: 'Grounded in real science',
+          desc: 'Each step draws on research from Walker, Breus, Huberman, and Czeisler',
+        },
+        {
+          title: 'Your pace, forever',
+          desc: 'Lifetime access — no subscription, no auto-renewal',
+        },
+        {
+          title: 'iOS, Android & Web',
+          desc: 'One purchase, all your devices',
+        },
+      ];
+
+  const accessLabel = isPt ? 'ACESSO COMPLETO' : 'FULL ACCESS';
+  const headlineLine1 = isPt ? 'Você já descobriu seu cronotipo.\nAgora ' : "You've found your chronotype.\nNow ";
+  const headlineLine2 = isPt ? ' seu sono.' : ' your sleep.';
+  const transformWord = isPt ? 'transforme' : 'transform';
+  const lifetimeLabel = isPt ? 'ACESSO VITALÍCIO' : 'LIFETIME ACCESS';
+  const badgePayOnce = isPt ? 'Pagamento único' : 'One-time pay';
+  const anchorLine = isPt
+    ? 'Equivale a R$7 por passo — menos que um café'
+    : '~$1 per step — less than a coffee';
+  const pill1 = isPt ? 'Sem mensalidade' : 'No subscription';
+  const pill2 = isPt ? 'Sem renovação' : 'No renewal';
+  const pill3 = isPt ? 'Para sempre' : 'Forever';
+  const guaranteeTitle = isPt ? 'Garantia de 7 dias' : '7-day guarantee';
+  const guaranteeDesc = isPt
+    ? 'Se não gostar, devolvemos 100% do valor. Sem perguntas, sem burocracia.'
+    : "If you're not satisfied, we refund 100%. No questions, no hassle.";
+  const ctaSub = isPt
+    ? 'Pagamento seguro via Stripe · Acesso imediato'
+    : 'Secure payment via Stripe · Instant access';
+  const fundLabel = isPt ? 'FUNDAMENTADO EM' : 'ROOTED IN';
+  const disclaimer = isPt
+    ? 'Conceitos aplicados de forma independente.\nNão somos afiliados nem endossados por esses pesquisadores.'
+    : 'Concepts applied independently.\nWe are not affiliated with or endorsed by these researchers.';
+
+  const researcherPills = isPt
+    ? [
+        { initials: 'MB', label: 'Dr. Breus · Sleep Medicine', avatar: styles.pillAvatarMb, initial: styles.pillInitialMb },
+        { initials: 'MW', label: 'Dr. Walker · UC Berkeley', avatar: styles.pillAvatarMw, initial: styles.pillInitialMw },
+        { initials: 'AH', label: 'Dr. Huberman · Stanford', avatar: styles.pillAvatarAh, initial: styles.pillInitialAh },
+        { initials: 'CC', label: 'Dr. Czeisler · Harvard Medical', avatar: styles.pillAvatarCc, initial: styles.pillInitialCc },
+      ]
+    : [
+        { initials: 'MB', label: 'Dr. Breus · Sleep Medicine', avatar: styles.pillAvatarMb, initial: styles.pillInitialMb },
+        { initials: 'MW', label: 'Dr. Walker · UC Berkeley', avatar: styles.pillAvatarMw, initial: styles.pillInitialMw },
+        { initials: 'AH', label: 'Dr. Huberman · Stanford', avatar: styles.pillAvatarAh, initial: styles.pillInitialAh },
+        { initials: 'CC', label: 'Dr. Czeisler · Harvard Medical', avatar: styles.pillAvatarCc, initial: styles.pillInitialCc },
+      ];
+
   return (
-    <View style={[styles.root, { backgroundColor: tc.bg }]}>
+    <View style={styles.screenRoot}>
+      <View style={styles.bgGlow} pointerEvents="none" />
+      <View style={styles.starsLayer} pointerEvents="none">
+        {starsLayout.map((s, i) => (
+          <Animated.View
+            key={s.key}
+            style={[
+              styles.starDot,
+              {
+                left: `${s.leftPct}%`,
+                top: s.top,
+                width: s.size,
+                height: s.size,
+                borderRadius: s.size / 2,
+                opacity: starOpacities[i],
+              },
+            ]}
+          />
+        ))}
+      </View>
+
       <ScrollView
+        style={styles.scroll}
+        contentContainerStyle={styles.scrollContent}
         showsVerticalScrollIndicator={false}
         bounces={false}
       >
-        <LinearGradient colors={tc.gradientColors} style={styles.header}>
-          <View style={styles.topBar}>
-            <TouchableOpacity onPress={onClose} style={styles.topBarSide} activeOpacity={0.7}>
-              <X size={20} color="#ffffff" />
+        {onClose ? (
+          <View style={styles.closeRow}>
+            <TouchableOpacity onPress={onClose} style={styles.closeBtn} activeOpacity={0.7} hitSlop={12}>
+              <X size={22} color="#b8c0d8" />
             </TouchableOpacity>
-            <Text style={styles.topBarTitle}>GoZzzz</Text>
-            <View style={[styles.topBarSide, styles.topBarRight]} />
           </View>
+        ) : (
+          <View style={styles.closeRowSpacer} />
+        )}
 
-          <View style={styles.headerContent}>
-            <View style={styles.moonWrap}>
-              <Moon size={48} color="#ffffff" />
-            </View>
-            <Text style={styles.headline}>{c.headline}</Text>
-            <Text style={styles.sub}>{c.sub}</Text>
-          </View>
-        </LinearGradient>
-
-        <View style={styles.content}>
-          <View style={styles.chrono}>
-            <Text style={styles.chronoText}>{c.chrono}</Text>
-          </View>
-
-          <TrustBlock language={language} />
-
-          <View style={styles.benefits}>
-            {BENEFITS.map((b, i) => (
-              <View key={i} style={styles.benefitRow}>
-                <View style={[styles.checkCircle, { backgroundColor: isDark ? 'rgba(212,169,106,0.1)' : 'rgba(212,169,106,0.12)', borderColor: isDark ? 'rgba(212,169,106,0.25)' : 'rgba(212,169,106,0.35)' }]}>
-                  <Check size={12} color="#d4a96a" strokeWidth={3} />
-                </View>
-                <Text style={[styles.benefitText, { color: tc.textPrimary }]}>{b}</Text>
-              </View>
-            ))}
-          </View>
-
-          <View style={styles.section}>
-            <View
-              style={[
-                styles.planCard,
-                { backgroundColor: tc.card, borderColor: '#d4a96a' },
-                styles.planCardActive,
-              ]}
-            >
-              <View style={styles.planRow}>
-                <View style={styles.planInfo}>
-                  <Text style={[styles.planName, { color: tc.textPrimary }]}>
-                    {c.annual}
-                  </Text>
-                  <View style={styles.planPriceRow}>
-                    <Text style={[styles.planPrice, { color: '#d4a96a' }]}>
-                      {displayPricing.annualPrice}
-                    </Text>
-                  </View>
-                  <Text style={[styles.planNote, { color: tc.textSecondary }]}>{displayPricing.annualEquiv} • {displayPricing.annualNote}</Text>
-                </View>
-              </View>
-            </View>
-          </View>
-
-          <View style={styles.section}>
-            <Text style={[styles.sectionTitle, { color: tc.textPrimary }]}>{c.sectionIncluded}</Text>
-            <View style={[styles.checklistCard, { backgroundColor: tc.card, borderColor: tc.border }]}>
-              {CHECKLIST.map((item, i) => (
-                <View key={i} style={styles.clRow}>
-                  <View style={[styles.clCheck, { backgroundColor: isDark ? 'rgba(212,169,106,0.1)' : 'rgba(212,169,106,0.12)', borderColor: isDark ? 'rgba(212,169,106,0.25)' : 'rgba(212,169,106,0.35)' }]}>
-                    <Check size={12} color="#d4a96a" strokeWidth={2.5} />
-                  </View>
-                  <Text style={[styles.clText, { color: tc.textSecondary }]}>{item}</Text>
-                </View>
-              ))}
-            </View>
-          </View>
-
-          {error && (
-            <View style={styles.errorBox}>
-              <Text style={styles.errorText}>{error}</Text>
-            </View>
-          )}
-
-          <TouchableOpacity
-            style={[styles.cta, loading && styles.ctaDisabled]}
-            onPress={handleCta}
-            activeOpacity={0.85}
-            disabled={loading}
+        <View style={styles.iconTopOuter}>
+          <LinearGradient
+            colors={['rgba(255,190,50,0.20)', 'rgba(255,150,20,0.15)']}
+            start={{ x: 0, y: 0 }}
+            end={{ x: 1, y: 1 }}
+            style={styles.iconTopGradient}
           >
+            <Text style={styles.iconTopEmoji}>👑</Text>
+          </LinearGradient>
+        </View>
+
+        <Text style={styles.headlineEyebrow}>{accessLabel}</Text>
+
+        <Text style={styles.headlineMain}>
+          {headlineLine1}
+          <Text style={styles.headlineAccent}>{transformWord}</Text>
+          {headlineLine2}
+        </Text>
+
+        <Text style={styles.subtitle}>{subHeadline}</Text>
+
+        <View style={styles.benefitsWrap}>
+          {benefitRows.map((row) => (
+            <View key={row.title} style={styles.benefitRow}>
+              <View style={styles.benefitIcon}>
+                <Text style={styles.benefitCheck}>✓</Text>
+              </View>
+              <View style={styles.benefitTextCol}>
+                <Text style={styles.benefitTitle}>{row.title}</Text>
+                <Text style={styles.benefitDesc}>{row.desc}</Text>
+              </View>
+            </View>
+          ))}
+        </View>
+
+        <View style={styles.priceCard}>
+          <View style={styles.priceCardTopLight} />
+          <View style={styles.priceTopRow}>
+            <Text style={styles.priceLifetimeLabel}>{lifetimeLabel}</Text>
+            <View style={styles.badgeOnce}>
+              <Text style={styles.badgeOnceText}>{badgePayOnce}</Text>
+            </View>
+          </View>
+          <View style={styles.priceRow}>
+            <Text style={styles.priceCurrency}>{priceCurrencySymbol}</Text>
+            <Text style={styles.priceAmount}>{priceNumericPart}</Text>
+          </View>
+          <Text style={styles.priceAnchor}>{anchorLine}</Text>
+          <View style={styles.pillsRow}>
+            <View style={styles.pill}>
+              <Text style={styles.pillText}>{pill1}</Text>
+            </View>
+            <View style={styles.pill}>
+              <Text style={styles.pillText}>{pill2}</Text>
+            </View>
+            <View style={styles.pill}>
+              <Text style={styles.pillText}>{pill3}</Text>
+            </View>
+          </View>
+        </View>
+
+        <View style={styles.guaranteeCard}>
+          <Text style={styles.guaranteeEmoji}>🛡️</Text>
+          <View style={styles.guaranteeTextCol}>
+            <Text style={styles.guaranteeTitle}>{guaranteeTitle}</Text>
+            <Text style={styles.guaranteeDesc}>{guaranteeDesc}</Text>
+          </View>
+        </View>
+
+        {error ? (
+          <View style={styles.errorBox}>
+            <Text style={styles.errorText}>{error}</Text>
+          </View>
+        ) : null}
+
+        <TouchableOpacity
+          style={[styles.ctaOuter, loading && styles.ctaOuterDisabled]}
+          onPress={handleCta}
+          activeOpacity={0.88}
+          disabled={loading}
+        >
+          <LinearGradient
+            colors={['#ffd060', '#ffb020']}
+            start={{ x: 0, y: 0 }}
+            end={{ x: 1, y: 1 }}
+            style={styles.ctaGradient}
+          >
+            <View style={styles.ctaTopLight} />
+            <Animated.View
+              style={[
+                styles.ctaShimmer,
+                {
+                  transform: [{ skewX: '-20deg' }, { translateX: shimmerAnim }],
+                },
+              ]}
+            />
             {loading ? (
-              <ActivityIndicator size="small" color="#0d0d16" />
+              <ActivityIndicator size="small" color="#080a15" />
             ) : (
-              <Text style={styles.ctaText}>{c.cta}</Text>
+              <Text style={styles.ctaLabel}>{c.cta}</Text>
             )}
+          </LinearGradient>
+        </TouchableOpacity>
+
+        <Text style={styles.ctaSub}>{ctaSub}</Text>
+
+        <Text style={styles.fundTitle}>{fundLabel}</Text>
+        <View style={styles.researchersRow}>
+          {researcherPills.map((p) => (
+            <View key={p.initials} style={styles.researcherPill}>
+              <View style={[styles.pillAvatar, p.avatar]}>
+                <Text style={[styles.pillAvatarText, p.initial]}>{p.initials}</Text>
+              </View>
+              <Text style={styles.researcherPillLabel}>{p.label}</Text>
+            </View>
+          ))}
+        </View>
+
+        <Text style={styles.disclaimer}>{disclaimer}</Text>
+
+        <Text style={styles.termsSmall}>{c.terms}</Text>
+        <Text style={styles.footerSmall}>{c.footer}</Text>
+
+        {onRestore ? (
+          <TouchableOpacity onPress={onRestore} style={styles.restoreWrap} activeOpacity={0.75}>
+            <Text style={styles.restoreText}>{c.restore}</Text>
           </TouchableOpacity>
+        ) : null}
 
-          <Text style={[styles.guarantee, { color: '#555555' }]}>{c.guarantee}</Text>
-          <Text style={[styles.terms, { color: '#333333' }]}>{c.terms}</Text>
-
-          <View style={styles.securityRow}>
-            <Lock size={12} color="#d4a96a" />
-            <Text style={[styles.securityText, { color: tc.footerText }]}>{c.ssl}</Text>
-            <Text style={[styles.securityDot, { color: tc.footerText }]}>·</Text>
-            <Shield size={12} color="#d4a96a" />
-            <Text style={[styles.securityText, { color: tc.footerText }]}>{c.pci}</Text>
-            <Text style={[styles.securityDot, { color: tc.footerText }]}>·</Text>
-            <BadgeCheck size={12} color="#d4a96a" />
-            <Text style={[styles.securityText, { color: tc.footerText }]}>{c.secure}</Text>
-          </View>
-
-          <Text style={[styles.footer, { color: tc.textSecondary }]}>{c.footer}</Text>
-
-          <View style={styles.companyFooter}>
-            <Text style={[styles.companyText, { color: tc.textSecondary }]}>MORFEU SAUDE E TECNOLOGIA LTDA</Text>
-            <Text style={[styles.companyCnpj, { color: tc.footerText }]}>CNPJ: 66.059.212/0001-52</Text>
-          </View>
+        <View style={styles.companyFooter}>
+          <Text style={styles.companyText}>MORFEU SAUDE E TECNOLOGIA LTDA</Text>
+          <Text style={styles.companyCnpj}>CNPJ: 66.059.212/0001-52</Text>
         </View>
       </ScrollView>
     </View>
@@ -299,253 +488,261 @@ export default function PaywallScreen({
 }
 
 const styles = StyleSheet.create({
-  root: {
+  screenRoot: {
     flex: 1,
+    backgroundColor: '#080a15',
   },
-
-  header: {
-    paddingTop: Platform.OS === 'ios' ? 56 : 24,
-    paddingBottom: 40,
-    paddingHorizontal: 24,
+  bgGlow: {
+    position: 'absolute',
+    top: -80,
+    alignSelf: 'center',
+    width: 300,
+    height: 300,
+    borderRadius: 150,
+    backgroundColor: 'rgba(180,140,40,0.12)',
   },
-  topBar: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    marginBottom: 24,
-  },
-  topBarSide: {
-    minWidth: 72,
-    justifyContent: 'center',
-  },
-  topBarRight: {
-    alignItems: 'flex-end',
-  },
-  topBarTitle: {
-    fontSize: 17,
-    fontWeight: '700',
-    color: '#ffffff',
-    textAlign: 'center',
-    flex: 1,
-  },
-  topBarRestore: {
-    fontSize: 14,
-    color: '#d4a96a',
-    fontWeight: '600',
-  },
-
-  headerContent: {
-    alignItems: 'center',
-  },
-  moonWrap: {
-    width: 88,
-    height: 88,
-    borderRadius: 44,
-    backgroundColor: 'rgba(255,255,255,0.12)',
-    borderWidth: 1,
-    borderColor: 'rgba(255,255,255,0.2)',
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginBottom: 20,
-  },
-  headline: {
-    fontSize: 26,
-    fontWeight: '800',
-    color: '#ffffff',
-    textAlign: 'center',
-    lineHeight: 34,
-    marginBottom: 10,
-  },
-  sub: {
-    fontSize: 15,
-    color: 'rgba(255, 255, 255, 0.9)',
-    textAlign: 'center',
-    lineHeight: 22,
-  },
-
-  content: {
-    padding: 24,
-  },
-
-  chrono: {
-    marginBottom: 24,
-    alignItems: 'center',
-  },
-  chronoText: {
-    fontSize: 20,
-    fontWeight: '700',
-    color: '#FFFFFF',
-    textAlign: 'center',
-    lineHeight: 28,
-  },
-
-  statsRow: {
-    flexDirection: 'row',
-    borderRadius: 16,
-    borderWidth: 1,
-    marginBottom: 24,
+  starsLayer: {
+    ...StyleSheet.absoluteFillObject,
     overflow: 'hidden',
   },
-  statItem: {
+  starDot: {
+    position: 'absolute',
+    backgroundColor: '#ffffff',
+  },
+  scroll: {
     flex: 1,
-    paddingVertical: 16,
+    backgroundColor: 'transparent',
+  },
+  scrollContent: {
+    paddingHorizontal: 22,
+    paddingTop: Platform.OS === 'ios' ? 48 : 40,
+    paddingBottom: 40,
     alignItems: 'center',
   },
-  statValue: {
-    fontSize: 13,
-    fontWeight: '800',
-    textAlign: 'center',
-    lineHeight: 18,
+  closeRow: {
+    width: '100%',
+    flexDirection: 'row',
+    justifyContent: 'flex-end',
+    marginBottom: 8,
   },
-  statLabel: {
-    fontSize: 11,
-    textAlign: 'center',
-    marginTop: 3,
+  closeRowSpacer: {
+    height: 8,
+    width: '100%',
   },
-
-  benefits: {
-    gap: 12,
+  closeBtn: {
+    padding: 8,
+  },
+  iconTopOuter: {
+    width: 72,
+    height: 72,
+    borderRadius: 36,
+    marginBottom: 20,
+    backgroundColor: 'rgba(255,190,50,0.08)',
+    borderWidth: 1,
+    borderColor: 'rgba(255,190,50,0.20)',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  iconTopGradient: {
+    width: 48,
+    height: 48,
+    borderRadius: 24,
+    borderWidth: 1,
+    borderColor: 'rgba(255,190,50,0.30)',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  iconTopEmoji: {
+    fontSize: 20,
+  },
+  headlineEyebrow: {
+    fontSize: 10,
+    color: '#8a7040',
+    letterSpacing: 2.0,
+    textTransform: 'uppercase',
+    textAlign: 'center',
+    marginBottom: 10,
+  },
+  headlineMain: {
+    fontSize: 26,
+    fontWeight: '700',
+    color: '#ffffff',
+    textAlign: 'center',
+    lineHeight: 32,
+    letterSpacing: -0.5,
+    marginBottom: 8,
+  },
+  headlineAccent: {
+    color: '#ffc84a',
+  },
+  subtitle: {
+    fontSize: 14,
+    color: '#8090b0',
+    textAlign: 'center',
+    lineHeight: 22,
     marginBottom: 24,
+    maxWidth: 290,
+  },
+  benefitsWrap: {
+    width: '100%',
+    marginBottom: 22,
   },
   benefitRow: {
     flexDirection: 'row',
-    alignItems: 'center',
-    gap: 12,
+    alignItems: 'flex-start',
+    gap: 10,
+    marginBottom: 10,
   },
-  checkCircle: {
-    width: 24,
-    height: 24,
-    borderRadius: 12,
-    borderWidth: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    flexShrink: 0,
-  },
-  benefitText: {
-    fontSize: 15,
-    fontWeight: '500',
-  },
-
-  section: {
-    marginBottom: 24,
-  },
-  sectionTitle: {
-    fontSize: 18,
-    fontWeight: '700',
-    marginBottom: 12,
-  },
-  priceLabel: {
-    fontSize: 12,
-    textAlign: 'center',
-    marginBottom: 8,
-  },
-  priceAmount: {
-    fontSize: 32,
-    fontWeight: '700',
-    textAlign: 'center',
-    marginBottom: 12,
-  },
-
-  planCard: {
-    borderRadius: 16,
-    padding: 20,
-    marginBottom: 12,
-    borderWidth: 2,
-  },
-  planCardActive: {
-    shadowColor: '#d4a96a',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.15,
-    shadowRadius: 14,
-    elevation: 4,
-  },
-  planSavings: {
-    backgroundColor: 'rgba(212,169,106,0.15)',
-    paddingHorizontal: 10,
-    paddingVertical: 4,
-    borderRadius: 8,
-    alignSelf: 'flex-start',
-    marginBottom: 12,
-    borderWidth: 1,
-    borderColor: 'rgba(212,169,106,0.3)',
-  },
-  planSavingsText: {
-    fontSize: 11,
-    fontWeight: '800',
-    color: '#d4a96a',
-  },
-  planRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-  },
-  planInfo: {
-    flex: 1,
-  },
-  planName: {
-    fontSize: 17,
-    fontWeight: '700',
-    marginBottom: 6,
-  },
-  planPriceRow: {
-    flexDirection: 'row',
-    alignItems: 'baseline',
-    gap: 4,
-    marginBottom: 4,
-  },
-  planPrice: {
-    fontSize: 32,
-    fontWeight: '800',
-    letterSpacing: -1,
-  },
-  planNote: {
-    fontSize: 13,
-  },
-  radio: {
-    width: 24,
-    height: 24,
-    borderRadius: 12,
-    borderWidth: 2,
-    borderColor: 'rgba(212,169,106,0.2)',
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  radioActive: {
-    borderColor: '#d4a96a',
-  },
-  radioInner: {
-    width: 12,
-    height: 12,
-    borderRadius: 6,
-    backgroundColor: '#d4a96a',
-  },
-
-  checklistCard: {
-    borderRadius: 16,
-    padding: 20,
-    borderWidth: 1,
-    gap: 14,
-  },
-  clRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 12,
-  },
-  clCheck: {
+  benefitIcon: {
     width: 22,
     height: 22,
     borderRadius: 11,
+    backgroundColor: 'rgba(255,190,50,0.12)',
     borderWidth: 1,
-    justifyContent: 'center',
+    borderColor: 'rgba(255,190,50,0.25)',
     alignItems: 'center',
-    flexShrink: 0,
+    justifyContent: 'center',
   },
-  clText: {
-    fontSize: 14,
+  benefitCheck: {
+    fontSize: 10,
+    color: '#ffc84a',
+    fontWeight: '700',
+  },
+  benefitTextCol: {
     flex: 1,
   },
-
+  benefitTitle: {
+    fontSize: 13,
+    fontWeight: '600',
+    color: '#dde0f8',
+    marginBottom: 1,
+  },
+  benefitDesc: {
+    fontSize: 11,
+    color: '#6a7090',
+    lineHeight: 16,
+  },
+  priceCard: {
+    width: '100%',
+    marginBottom: 10,
+    backgroundColor: 'rgba(255,190,50,0.06)',
+    borderWidth: 1,
+    borderColor: 'rgba(255,190,50,0.20)',
+    borderRadius: 18,
+    paddingVertical: 18,
+    paddingHorizontal: 20,
+    overflow: 'hidden',
+  },
+  priceCardTopLight: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    height: 1,
+    backgroundColor: 'rgba(255,190,50,0.35)',
+  },
+  priceTopRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 8,
+  },
+  priceLifetimeLabel: {
+    fontSize: 10,
+    color: '#8a7040',
+    letterSpacing: 1.5,
+    textTransform: 'uppercase',
+    fontWeight: '600',
+  },
+  badgeOnce: {
+    backgroundColor: 'rgba(255,190,50,0.15)',
+    borderWidth: 1,
+    borderColor: 'rgba(255,190,50,0.30)',
+    borderRadius: 99,
+    paddingHorizontal: 10,
+    paddingVertical: 3,
+  },
+  badgeOnceText: {
+    fontSize: 9,
+    color: '#ffc84a',
+    fontWeight: '600',
+  },
+  priceRow: {
+    flexDirection: 'row',
+    alignItems: 'baseline',
+    gap: 6,
+    marginBottom: 4,
+  },
+  priceCurrency: {
+    fontSize: 16,
+    color: '#ffc84a',
+    fontWeight: '500',
+    marginTop: 6,
+  },
+  priceAmount: {
+    fontSize: 42,
+    fontWeight: '700',
+    color: '#ffffff',
+    letterSpacing: -1,
+  },
+  priceAnchor: {
+    fontSize: 11,
+    color: '#505878',
+    marginBottom: 10,
+  },
+  pillsRow: {
+    flexDirection: 'row',
+    gap: 8,
+    width: '100%',
+  },
+  pill: {
+    flex: 1,
+    backgroundColor: 'rgba(255,255,255,0.04)',
+    borderWidth: 1,
+    borderColor: 'rgba(255,255,255,0.07)',
+    borderRadius: 8,
+    paddingVertical: 5,
+    paddingHorizontal: 10,
+    alignItems: 'center',
+  },
+  pillText: {
+    fontSize: 10,
+    color: '#7a80a8',
+    textAlign: 'center',
+  },
+  guaranteeCard: {
+    width: '100%',
+    marginBottom: 20,
+    backgroundColor: 'rgba(124,255,160,0.05)',
+    borderWidth: 1,
+    borderColor: 'rgba(124,255,160,0.15)',
+    borderRadius: 14,
+    paddingVertical: 12,
+    paddingHorizontal: 16,
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 10,
+  },
+  guaranteeEmoji: {
+    fontSize: 22,
+    flexShrink: 0,
+  },
+  guaranteeTextCol: {
+    flex: 1,
+  },
+  guaranteeTitle: {
+    fontSize: 12,
+    fontWeight: '600',
+    color: '#7cffa0',
+    marginBottom: 2,
+  },
+  guaranteeDesc: {
+    fontSize: 11,
+    color: '#4a6050',
+    lineHeight: 16,
+  },
   errorBox: {
+    width: '100%',
     backgroundColor: 'rgba(239,68,68,0.08)',
     borderRadius: 10,
     padding: 12,
@@ -559,79 +756,168 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     lineHeight: 18,
   },
-
-  cta: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    gap: 8,
-    backgroundColor: '#d4a96a',
-    paddingVertical: 18,
+  ctaOuter: {
+    width: '100%',
+    marginBottom: 10,
     borderRadius: 16,
-    marginBottom: 16,
-    shadowColor: '#d4a96a',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.3,
-    shadowRadius: 12,
-    elevation: 6,
+    overflow: 'hidden',
+    shadowColor: '#ffb020',
+    shadowOffset: { width: 0, height: 10 },
+    shadowOpacity: 0.4,
+    shadowRadius: 24,
+    elevation: 14,
   },
-  ctaDisabled: {
+  ctaOuterDisabled: {
     opacity: 0.65,
   },
-  ctaText: {
-    fontSize: 17,
-    fontWeight: '700',
-    color: '#0d0d16',
-    letterSpacing: 0.2,
-  },
-
-  guarantee: {
-    fontSize: 11,
-    textAlign: 'center',
-    marginBottom: 8,
-    lineHeight: 16,
-  },
-  terms: {
-    fontSize: 10,
-    textAlign: 'center',
-    marginBottom: 24,
-    lineHeight: 14,
-  },
-
-  securityRow: {
-    flexDirection: 'row',
+  ctaGradient: {
+    paddingVertical: 18,
     alignItems: 'center',
+    justifyContent: 'center',
+    position: 'relative',
+    overflow: 'hidden',
+  },
+  ctaTopLight: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    height: 1,
+    backgroundColor: 'rgba(255,255,255,0.30)',
+  },
+  ctaShimmer: {
+    position: 'absolute',
+    width: 80,
+    top: 0,
+    bottom: 0,
+    backgroundColor: 'rgba(255,255,255,0.20)',
+  },
+  ctaLabel: {
+    fontSize: 16,
+    fontWeight: '700',
+    color: '#080a15',
+    letterSpacing: 0.3,
+  },
+  ctaSub: {
+    fontSize: 11,
+    color: '#3a4060',
+    textAlign: 'center',
+    marginBottom: 20,
+  },
+  fundTitle: {
+    fontSize: 9,
+    color: '#3a4060',
+    letterSpacing: 1.4,
+    textTransform: 'uppercase',
+    textAlign: 'center',
+    fontWeight: '600',
+    marginBottom: 10,
+  },
+  researchersRow: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
     gap: 6,
     justifyContent: 'center',
-    flexWrap: 'wrap',
-    marginBottom: 16,
+    width: '100%',
   },
-  securityText: {
-    fontSize: 11,
+  researcherPill: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 5,
+    backgroundColor: 'rgba(255,255,255,0.03)',
+    borderWidth: 1,
+    borderColor: 'rgba(255,255,255,0.07)',
+    borderRadius: 99,
+    paddingVertical: 5,
+    paddingHorizontal: 10,
   },
-  securityDot: {
-    fontSize: 11,
+  pillAvatar: {
+    width: 20,
+    height: 20,
+    borderRadius: 10,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
-
-  footer: {
-    fontSize: 12,
+  pillAvatarMb: {
+    backgroundColor: 'rgba(124,111,255,0.30)',
+  },
+  pillAvatarMw: {
+    backgroundColor: 'rgba(111,200,255,0.25)',
+  },
+  pillAvatarAh: {
+    backgroundColor: 'rgba(160,111,255,0.25)',
+  },
+  pillAvatarCc: {
+    backgroundColor: 'rgba(111,200,160,0.25)',
+  },
+  pillAvatarText: {
+    fontSize: 8,
+    fontWeight: '800',
+  },
+  pillInitialMb: {
+    color: '#c8c0ff',
+  },
+  pillInitialMw: {
+    color: '#a8d8ff',
+  },
+  pillInitialAh: {
+    color: '#c8a8ff',
+  },
+  pillInitialCc: {
+    color: '#a8ffd8',
+  },
+  researcherPillLabel: {
+    fontSize: 10,
+    color: '#6a7090',
+  },
+  disclaimer: {
+    fontSize: 9,
+    color: '#252a38',
     textAlign: 'center',
-    paddingHorizontal: 12,
-    lineHeight: 20,
-    marginBottom: 24,
+    lineHeight: 15,
+    marginTop: 14,
   },
-
+  restoreWrap: {
+    marginTop: 16,
+    paddingVertical: 8,
+  },
+  restoreText: {
+    fontSize: 13,
+    color: '#6a7090',
+    textAlign: 'center',
+    textDecorationLine: 'underline',
+  },
   companyFooter: {
     alignItems: 'center',
-    paddingBottom: 40,
+    paddingTop: 28,
     gap: 4,
   },
   companyText: {
-    fontSize: 12,
+    fontSize: 11,
     fontWeight: '600',
+    color: '#3a4060',
+    textAlign: 'center',
   },
   companyCnpj: {
-    fontSize: 11,
+    fontSize: 10,
+    color: '#252a38',
+    textAlign: 'center',
+  },
+  termsSmall: {
+    fontSize: 10,
+    color: '#252a38',
+    textAlign: 'center',
+    lineHeight: 15,
+    marginTop: 12,
+    paddingHorizontal: 8,
+  },
+  footerSmall: {
+    fontSize: 10,
+    color: '#3a4060',
+    textAlign: 'center',
+    lineHeight: 16,
+    marginTop: 8,
+    paddingHorizontal: 8,
   },
 });
 

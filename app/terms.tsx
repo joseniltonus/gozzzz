@@ -48,20 +48,16 @@ export default function TermsScreen() {
 
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>2. Aceitação dos Termos</Text>
-          <Text style={styles.text}>
-            Ao acessar e usar o GoZzzz, você concorda em se vincular a estes Termos de Serviço. Se não concordar com qualquer parte, por favor, pare de usar o serviço imediatamente.
-          </Text>
+          <Text style={styles.text}>{t('terms.acceptance.text')}</Text>
         </View>
 
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>3. Descrição do Serviço</Text>
-          <Text style={styles.text}>
-            O GoZzzz é um aplicativo educativo que fornece conteúdo e protocolos baseados na ciência do sono.
-          </Text>
-          <Text style={styles.bulletPoint}>• Aulas em vídeo baseadas em pesquisas científicas revisadas por pares sobre o sono</Text>
-          <Text style={styles.bulletPoint}>• Monitoramento do sono e acompanhamento de progresso</Text>
-          <Text style={styles.bulletPoint}>• Coaching especializado e estratégias para o sono</Text>
-          <Text style={styles.bulletPoint}>• Recursos comunitários e suporte</Text>
+          <Text style={styles.text}>{t('terms.service.text')}</Text>
+          <Text style={styles.bulletPoint}>{t('terms.service.item1')}</Text>
+          <Text style={styles.bulletPoint}>{t('terms.service.item2')}</Text>
+          <Text style={styles.bulletPoint}>{t('terms.service.item3')}</Text>
+          <Text style={styles.bulletPoint}>{t('terms.service.item4')}</Text>
         </View>
 
         <View style={styles.divider} />
@@ -145,7 +141,7 @@ export default function TermsScreen() {
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>9. Propriedade Intelectual</Text>
           <Text style={styles.text}>
-            Todo o conteúdo do GoZzzz, incluindo textos, vídeos, áudios, gráficos e software, é propriedade do GoZzzz ou de seus licenciadores e protegido pela lei de direitos autorais. Você recebe apenas uma licença limitada e não exclusiva para uso pessoal.
+            Todo o conteúdo do GoZzzz, incluindo textos, layout, gráficos e software, é propriedade do GoZzzz ou de seus licenciadores e protegido pela lei de direitos autorais. Você recebe apenas uma licença limitada e não exclusiva para uso pessoal.
           </Text>
           <Text style={styles.text}>
             Referências a pesquisadores, cientistas e seus trabalhos publicados são apenas para fins educativos. Tais referências não implicam endosso ou afiliação. Todo o conteúdo é baseado em pesquisas científicas publicadas.
@@ -255,7 +251,7 @@ export default function TermsScreen() {
 
         <View style={styles.footer}>
           <Text style={styles.footerText}>
-            Ao usar o GoZzzz, você reconhece que leu, compreendeu e concordou em se vincular a estes Termos e Condições. Versão 1.2 — 10 de abril de 2026
+            Ao usar o GoZzzz, você reconhece que leu, compreendeu e concordou em se vincular a estes Termos e Condições. Versão 1.3 — 4 de maio de 2026
           </Text>
         </View>
       </View>

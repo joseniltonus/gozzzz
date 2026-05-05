@@ -1,0 +1,144 @@
+{
+  "$schema": "https://tr.designtokens.org/format/",
+  "$description": "Espelho flat de src/screens/entryScreenTokens.ts — importar em Tokens Studio / scripts ou copiar valores para variáveis Figma.",
+  "color": {
+    "canvas": { "value": "#080a15", "type": "color" },
+    "star": { "value": "#ffffff", "type": "color" },
+    "text": {
+      "primary": { "value": "#fafbff", "type": "color" },
+      "secondary": { "value": "#9ca6cc", "type": "color" },
+      "tertiary": { "value": "#8b96b8", "type": "color" },
+      "quaternary": { "value": "#7a8498", "type": "color" },
+      "inverse": { "value": "#ffffff", "type": "color" },
+      "accent": { "value": "#c4b8ff", "type": "color" },
+      "accentMuted": { "value": "#b8b0ff", "type": "color" },
+      "emphasis": { "value": "#dce2f5", "type": "color" },
+      "overline": { "value": "#7a85a8", "type": "color" },
+      "label": { "value": "#6a7698", "type": "color" },
+      "caption": { "value": "#5a6488", "type": "color" },
+      "meta": { "value": "#8b96b8", "type": "color" }
+    },
+    "border": {
+      "hairline": { "value": "rgba(255,255,255,0.085)", "type": "color" },
+      "subtle": { "value": "rgba(255,255,255,0.08)", "type": "color" },
+      "default": { "value": "rgba(255,255,255,0.12)", "type": "color" },
+      "strong": { "value": "rgba(255,255,255,0.14)", "type": "color" },
+      "badge": { "value": "rgba(189,179,255,0.22)", "type": "color" },
+      "cta": { "value": "rgba(255,255,255,0.14)", "type": "color" }
+    },
+    "icon": {
+      "muted": { "value": "#8e9ab8", "type": "color" },
+      "dim": { "value": "#6a7698", "type": "color" },
+      "chevron": { "value": "rgba(255,255,255,0.42)", "type": "color" }
+    },
+    "glow": {
+      "primary": { "value": "rgba(100,80,255,0.14)", "type": "color" },
+      "secondary": { "value": "rgba(70,120,255,0.075)", "type": "color" }
+    },
+    "gradient": {
+      "cta": { "value": ["#9080ff", "#6a5fff", "#4a90ff"], "type": "color" },
+      "brandWordmark": { "value": ["#b8b0ff", "#70d0ff"], "type": "color" },
+      "card": {
+        "value": ["rgba(255,255,255,0.072)", "rgba(255,255,255,0.02)", "rgba(120,100,220,0.04)"],
+        "type": "color"
+      }
+    },
+    "surface": {
+      "badgeFill": { "value": "rgba(169,159,255,0.08)", "type": "color" },
+      "badgeDot": { "value": "#a99fff", "type": "color" },
+      "pillLabel": { "value": "#d4cef8", "type": "color" },
+      "dividerDot": { "value": "rgba(255,255,255,0.08)", "type": "color" },
+      "linkPill": { "value": "rgba(255,255,255,0.035)", "type": "color" },
+      "homeIndicator": { "value": "rgba(255,255,255,0.12)", "type": "color" },
+      "shimmer": { "value": "rgba(255,255,255,0.09)", "type": "color" },
+      "ctaHairline": { "value": "rgba(255,255,255,0.32)", "type": "color" },
+      "cardHairline": { "value": "rgba(255,255,255,0.14)", "type": "color" }
+    },
+    "shadow": {
+      "cta": { "value": "#4030a8", "type": "color" },
+      "card": { "value": "#020510", "type": "color" },
+      "badge": { "value": "#6a50c0", "type": "color" },
+      "check": { "value": "#0a1a12", "type": "color" }
+    },
+    "success": {
+      "fill": { "value": "rgba(124,255,160,0.08)", "type": "color" },
+      "border": { "value": "rgba(140,255,185,0.32)", "type": "color" },
+      "icon": { "value": "#8effb8", "type": "color" }
+    },
+    "headline": {
+      "glow": { "value": "rgba(80,60,180,0.45)", "type": "color" }
+    }
+  },
+  "space": {
+    "0": { "value": 0, "type": "dimension" },
+    "1": { "value": 4, "type": "dimension" },
+    "2": { "value": 8, "type": "dimension" },
+    "3": { "value": 12, "type": "dimension" },
+    "4": { "value": 16, "type": "dimension" },
+    "5": { "value": 20, "type": "dimension" },
+    "6": { "value": 24, "type": "dimension" },
+    "7": { "value": 28, "type": "dimension" },
+    "8": { "value": 32, "type": "dimension" },
+    "10": { "value": 40, "type": "dimension" },
+    "12": { "value": 48, "type": "dimension" },
+    "14": { "value": 56, "type": "dimension" },
+    "pageInline": { "value": 24, "type": "dimension" },
+    "pageTop": { "value": 56, "type": "dimension" },
+    "pageBottom": { "value": 48, "type": "dimension" }
+  },
+  "radius": {
+    "xs": { "value": 4, "type": "dimension" },
+    "sm": { "value": 8, "type": "dimension" },
+    "md": { "value": 12, "type": "dimension" },
+    "lg": { "value": 16, "type": "dimension" },
+    "pill": { "value": 999, "type": "dimension" },
+    "seal": { "value": 11, "type": "dimension" },
+    "homeIndicator": { "value": 2, "type": "dimension" }
+  },
+  "icon": {
+    "xs": { "value": 11, "type": "dimension" },
+    "sm": { "value": 12, "type": "dimension" },
+    "md": { "value": 14, "type": "dimension" },
+    "lg": { "value": 18, "type": "dimension" },
+    "cta": { "value": 18, "type": "dimension" }
+  },
+  "strokeWidth": {
+    "hairline": { "value": 1.5, "type": "number" },
+    "regular": { "value": 1.75, "type": "number" },
+    "medium": { "value": 2, "type": "number" },
+    "emphasis": { "value": 2.25, "type": "number" },
+    "bold": { "value": 2.75, "type": "number" }
+  },
+  "layout": {
+    "contentMax": { "value": 340, "type": "dimension" },
+    "bridgeMax": { "value": 308, "type": "dimension" },
+    "disclaimerMax": { "value": 296, "type": "dimension" },
+    "avatar": { "value": 32, "type": "dimension" },
+    "checkSeal": { "value": 22, "type": "dimension" },
+    "homeBarW": { "value": 128, "type": "dimension" },
+    "homeBarH": { "value": 3, "type": "dimension" },
+    "logoMaskMinW": { "value": 78, "type": "dimension" }
+  },
+  "researcherAvatar": {
+    "MB": {
+      "fill": { "value": "rgba(124,111,255,0.22)", "type": "color" },
+      "text": { "value": "#d8d0ff", "type": "color" },
+      "ring": { "value": "rgba(255,255,255,0.1)", "type": "color" }
+    },
+    "MW": {
+      "fill": { "value": "rgba(111,200,255,0.2)", "type": "color" },
+      "text": { "value": "#b8e8ff", "type": "color" },
+      "ring": { "value": "rgba(255,255,255,0.1)", "type": "color" }
+    },
+    "AH": {
+      "fill": { "value": "rgba(160,111,255,0.2)", "type": "color" },
+      "text": { "value": "#dcc0ff", "type": "color" },
+      "ring": { "value": "rgba(255,255,255,0.1)", "type": "color" }
+    },
+    "CC": {
+      "fill": { "value": "rgba(111,200,160,0.2)", "type": "color" },
+      "text": { "value": "#b8ffe8", "type": "color" },
+      "ring": { "value": "rgba(255,255,255,0.1)", "type": "color" }
+    }
+  }
+}

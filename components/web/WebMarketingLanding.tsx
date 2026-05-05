@@ -21,7 +21,6 @@ import {
   BookOpen,
   Heart,
   Shield,
-  Headphones,
   Lock,
   BadgeCheck,
   Calendar,
@@ -113,14 +112,14 @@ export default function WebLandingPage() {
 
   const steps = language === 'pt'
     ? [
-        { num: 1, icon: Brain, color: '#d4a96a', bg: 'rgba(212,169,106,0.12)', title: 'Entenda Sua Biologia', desc: 'Aprenda como o ritmo circadiano funciona e por que o sono importa', hasVideo: true, hasAudio: true },
-        { num: 2, icon: Sun, color: '#d4a96a', bg: 'rgba(212,169,106,0.12)', title: 'Domine a Exposição à Luz', desc: 'Controle sua exposição à luz para otimizar seu relógio biológico', hasVideo: true, hasAudio: true },
-        { num: 3, icon: Coffee, color: '#10b981', bg: 'rgba(16,185,129,0.12)', title: 'Otimize Seus Horários', desc: 'Aprenda quando comer, exercitar e descansar para dormir melhor', hasVideo: true, hasAudio: true },
+        { num: 1, icon: Brain, color: '#d4a96a', bg: 'rgba(212,169,106,0.12)', title: 'Entenda Sua Biologia', desc: 'Aprenda como o ritmo circadiano funciona e por que o sono importa' },
+        { num: 2, icon: Sun, color: '#d4a96a', bg: 'rgba(212,169,106,0.12)', title: 'Domine a Exposição à Luz', desc: 'Controle sua exposição à luz para otimizar seu relógio biológico' },
+        { num: 3, icon: Coffee, color: '#10b981', bg: 'rgba(16,185,129,0.12)', title: 'Otimize Seus Horários', desc: 'Aprenda quando comer, exercitar e descansar para dormir melhor' },
       ]
     : [
-        { num: 1, icon: Brain, color: '#d4a96a', bg: 'rgba(212,169,106,0.12)', title: 'Understand Your Biology', desc: 'Learn how your circadian rhythm works and why sleep matters', hasVideo: true, hasAudio: true },
-        { num: 2, icon: Sun, color: '#d4a96a', bg: 'rgba(212,169,106,0.12)', title: 'Master Light Exposure', desc: 'Control your light exposure to optimize your body clock', hasVideo: true, hasAudio: true },
-        { num: 3, icon: Coffee, color: '#10b981', bg: 'rgba(16,185,129,0.12)', title: 'Optimize Timing', desc: 'Learn when to eat, exercise, and rest for better sleep', hasVideo: true, hasAudio: true },
+        { num: 1, icon: Brain, color: '#d4a96a', bg: 'rgba(212,169,106,0.12)', title: 'Understand Your Biology', desc: 'Learn how your circadian rhythm works and why sleep matters' },
+        { num: 2, icon: Sun, color: '#d4a96a', bg: 'rgba(212,169,106,0.12)', title: 'Master Light Exposure', desc: 'Control your light exposure to optimize your body clock' },
+        { num: 3, icon: Coffee, color: '#10b981', bg: 'rgba(16,185,129,0.12)', title: 'Optimize Timing', desc: 'Learn when to eat, exercise, and rest for better sleep' },
       ];
 
   const sciencePillars = language === 'pt'
@@ -277,14 +276,6 @@ export default function WebLandingPage() {
                 </View>
                 <Text style={styles.stepTitle}>{step.title}</Text>
                 <Text style={styles.stepDesc}>{step.desc}</Text>
-                <View style={styles.stepResourcesRow}>
-                  {step.hasAudio && (
-                    <View style={styles.stepResourceBadge}>
-                      <Headphones size={11} color="#10b981" />
-                      <Text style={styles.stepResourceText}>Audio</Text>
-                    </View>
-                  )}
-                </View>
                 <TouchableOpacity
                   style={styles.stepLink}
                   onPress={() => router.push('/web/programa')}
@@ -665,17 +656,6 @@ const styles = StyleSheet.create({
   stepBadgeText: { fontSize: 12, fontWeight: '700', color: '#d4a96a' },
   stepTitle: { fontSize: 20, fontWeight: '700', color: '#e8d5b7', marginBottom: 10 },
   stepDesc: { fontSize: 15, color: '#8892a4', lineHeight: 22, marginBottom: 20 },
-  stepResourcesRow: { flexDirection: 'row', gap: 8, marginBottom: 16 },
-  stepResourceBadge: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 4,
-    backgroundColor: 'rgba(255,255,255,0.06)',
-    paddingHorizontal: 10,
-    paddingVertical: 5,
-    borderRadius: 8,
-  },
-  stepResourceText: { fontSize: 12, fontWeight: '600', color: '#8892a4' },
   stepLink: { flexDirection: 'row', alignItems: 'center', gap: 4 },
   stepLinkText: { fontSize: 14, fontWeight: '600', color: '#d4a96a' },
   viewAllBtn: {

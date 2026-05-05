@@ -14,7 +14,7 @@ import {
   Moon,
   ArrowLeft,
   Lock,
-  Play,
+  BookOpen,
   Crown,
   Sparkles,
   Check,
@@ -135,7 +135,7 @@ export default function WebProgramPage() {
                         style={styles.viewLessonBtn}
                         onPress={() => router.push(`/web/licao/${step.id}`)}
                       >
-                        <Play size={13} color="#ffffff" />
+                        <BookOpen size={13} color="#ffffff" />
                         <Text style={styles.viewLessonBtnText}>{t('web.program.viewLesson')}</Text>
                       </TouchableOpacity>
                     </View>

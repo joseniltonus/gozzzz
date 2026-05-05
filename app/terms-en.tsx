@@ -2,6 +2,7 @@ import { View, Text, StyleSheet, ScrollView, TouchableOpacity } from 'react-nati
 import { LinearGradient } from 'expo-linear-gradient';
 import { FileText, ArrowLeft } from 'lucide-react-native';
 import { useRouter } from 'expo-router';
+import { useLanguage } from '@/contexts/LanguageContext';
 
 const QUIZ_DISCLAIMER_EN =
   'The GoZzzz chronotype identification questionnaire was developed ' +
@@ -16,6 +17,7 @@ const CHRONOTYPE_NAMES_EN =
 
 export default function TermsEnScreen() {
   const router = useRouter();
+  const { t } = useLanguage();
 
   return (
     <ScrollView style={styles.container}>
@@ -25,11 +27,11 @@ export default function TermsEnScreen() {
       >
         <TouchableOpacity style={styles.backBtn} onPress={() => router.back()}>
           <ArrowLeft size={20} color="#ffffff" />
-          <Text style={styles.backText}>Back</Text>
+          <Text style={styles.backText}>{t('terms.back', 'en')}</Text>
         </TouchableOpacity>
         <FileText size={48} color="#fbbf24" />
-        <Text style={styles.headerTitle}>Terms & Conditions</Text>
-        <Text style={styles.headerSubtitle}>Last Updated: April 10, 2026</Text>
+        <Text style={styles.headerTitle}>{t('terms.title', 'en')}</Text>
+        <Text style={styles.headerSubtitle}>{t('terms.updated', 'en')}</Text>
         <View style={styles.badgeRow}>
           <View style={styles.badge}><Text style={styles.badgeText}>GDPR</Text></View>
           <View style={styles.badge}><Text style={styles.badgeText}>LGPD</Text></View>
@@ -46,20 +48,16 @@ export default function TermsEnScreen() {
 
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>2. Acceptance of Terms</Text>
-          <Text style={styles.text}>
-            By accessing and using GoZzzz, you agree to be bound by these Terms of Service. If you do not agree with any part, please stop using the service immediately.
-          </Text>
+          <Text style={styles.text}>{t('terms.acceptance.text', 'en')}</Text>
         </View>
 
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>3. Service Description</Text>
-          <Text style={styles.text}>
-            GoZzzz is an educational application that provides content and protocols based on sleep science.
-          </Text>
-          <Text style={styles.bulletPoint}>• Video lessons based on peer-reviewed scientific research on sleep</Text>
-          <Text style={styles.bulletPoint}>• Sleep monitoring and progress tracking</Text>
-          <Text style={styles.bulletPoint}>• Expert coaching and sleep strategies</Text>
-          <Text style={styles.bulletPoint}>• Community resources and support</Text>
+          <Text style={styles.text}>{t('terms.service.text', 'en')}</Text>
+          <Text style={styles.bulletPoint}>{t('terms.service.item1', 'en')}</Text>
+          <Text style={styles.bulletPoint}>{t('terms.service.item2', 'en')}</Text>
+          <Text style={styles.bulletPoint}>{t('terms.service.item3', 'en')}</Text>
+          <Text style={styles.bulletPoint}>{t('terms.service.item4', 'en')}</Text>
         </View>
 
         <View style={styles.divider} />
@@ -142,7 +140,7 @@ export default function TermsEnScreen() {
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>9. Intellectual Property</Text>
           <Text style={styles.text}>
-            All GoZzzz content, including texts, videos, audios, graphics and software, is owned by GoZzzz or its licensors and protected by copyright law. You receive only a limited and non-exclusive license for personal use.
+            All GoZzzz content, including text, layout, graphics, and software, is owned by GoZzzz or its licensors and protected by copyright law. You receive only a limited and non-exclusive license for personal use.
           </Text>
           <Text style={styles.text}>
             References to researchers, scientists and their published work are for educational purposes only. Such references do not imply endorsement or affiliation. All content is based on published scientific research.
@@ -252,7 +250,7 @@ export default function TermsEnScreen() {
 
         <View style={styles.footer}>
           <Text style={styles.footerText}>
-            By using GoZzzz, you acknowledge that you have read, understood and agreed to be bound by these Terms and Conditions. Version 1.2 — April 10, 2026
+            By using GoZzzz, you acknowledge that you have read, understood and agreed to be bound by these Terms and Conditions. Version 1.3 — May 4, 2026
           </Text>
         </View>
       </View>

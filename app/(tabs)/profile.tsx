@@ -1,6 +1,6 @@
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Switch, TextInput } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Switch, TextInput, Platform } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useRouter } from 'expo-router';
 import { User, Crown, Globe, Bell, Moon, Circle as HelpCircle, Shield, LogOut, Gift, QrCode, ChevronRight, Trash2, Download, FileText } from 'lucide-react-native';
@@ -10,6 +10,15 @@ import { useAuth } from '@/contexts/AuthContext';
 import { useTheme } from '@/contexts/ThemeContext';
 import { useToast } from '@/contexts/ToastContext';
 import { useUserProfile } from '@/hooks/useUserProfile';
+import { useEffectiveChronotype } from '@/hooks/useEffectiveChronotype';
+import type { Chronotype } from '@/data/chronotypes';
+import { hasPremiumProgramAccess } from '@/lib/subscriptionAccess';
+import {
+  readEngagementNotificationPref,
+  requestEngagementNotificationPermissions,
+  rescheduleEngagementNotifications,
+  setEngagementNotificationPref,
+} from '@/lib/engagementNotifications';
 
 import { ErrorBoundary } from '@/components/ErrorBoundary';
 
@@ -20,21 +29,37 @@ function ProfileContent() {
   const { isDark, setIsDark } = useTheme();
   const { showSuccess, showError } = useToast();
   const insets = useSafeAreaInsets();
-  useUserProfile();
-  const [notificationsEnabled, setNotificationsEnabled] = useState(true);
+  const { profile } = useUserProfile();
+  const chronotype = useEffectiveChronotype();
+  const [notificationsEnabled, setNotificationsEnabled] = useState(false);
   const [marketingEnabled, setMarketingEnabled] = useState(false);
-  const [subscriptionType] = useState<'free' | 'premium' | 'gift'>('free');
+  const [subscriptionType, setSubscriptionType] = useState<'free' | 'premium' | 'gift'>('free');
 
   const [languageModalVisible, setLanguageModalVisible] = useState(false);
   const [giftModalVisible, setGiftModalVisible] = useState(false);
   const [helpModalVisible, setHelpModalVisible] = useState(false);
   const [privacyModalVisible, setPrivacyModalVisible] = useState(false);
   const [logoutModalVisible, setLogoutModalVisible] = useState(false);
-  const [upgradeModalVisible, setUpgradeModalVisible] = useState(false);
   const [deleteAccountModalVisible, setDeleteAccountModalVisible] = useState(false);
   const [dataRightsModalVisible, setDataRightsModalVisible] = useState(false);
   const [giftCode, setGiftCode] = useState('');
   const [deleteConfirmText, setDeleteConfirmText] = useState('');
+
+  useEffect(() => {
+    let alive = true;
+    readEngagementNotificationPref().then((v) => {
+      if (alive) setNotificationsEnabled(v);
+    });
+    return () => {
+      alive = false;
+    };
+  }, []);
+
+  useEffect(() => {
+    const st = profile?.subscription_type?.toLowerCase();
+    if (st === 'premium' || st === 'gift') setSubscriptionType(st);
+    else setSubscriptionType('free');
+  }, [profile?.subscription_type]);
 
   const tc = {
     bg: isDark ? '#0d0d16' : '#f0f4f8',
@@ -143,6 +168,28 @@ function ProfileContent() {
     await updateConsent('marketing', value);
   };
 
+  const handleNotificationsToggle = async (value: boolean) => {
+    if (Platform.OS !== 'web' && value) {
+      const ok = await requestEngagementNotificationPermissions();
+      if (!ok) {
+        showError(t('profile.notificationsPermissionDenied'));
+        return;
+      }
+    }
+    setNotificationsEnabled(value);
+    await setEngagementNotificationPref(value);
+    if (!user) return;
+    const ct = (chronotype ?? 'bear') as Chronotype;
+    const lang = language === 'en' ? 'en' : 'pt';
+    const isPremium = hasPremiumProgramAccess(profile?.subscription_type, user.email);
+    await rescheduleEngagementNotifications({
+      enabled: value,
+      chronotype: ct,
+      lang,
+      isPremium,
+    });
+  };
+
   const settingItemStyle = [styles.settingItem, { backgroundColor: tc.card, borderColor: tc.border }];
 
   return (
@@ -186,7 +233,7 @@ function ProfileContent() {
                 {t('profile.unlockContent')}
               </Text>
               <View style={styles.subscriptionButtons}>
-                <TouchableOpacity style={styles.upgradeButton} onPress={() => setUpgradeModalVisible(true)}>
+                <TouchableOpacity style={styles.upgradeButton} onPress={() => router.push('/checkout')}>
                   <Crown size={18} color="#ffffff" />
                   <Text style={styles.upgradeButtonText}>{t('profile.subscribePremium')}</Text>
                 </TouchableOpacity>
@@ -237,7 +284,7 @@ function ProfileContent() {
             </View>
             <Switch
               value={notificationsEnabled}
-              onValueChange={setNotificationsEnabled}
+              onValueChange={handleNotificationsToggle}
               trackColor={{ false: '#e2e8f0', true: '#d4a96a' }}
               thumbColor="#ffffff"
             />
@@ -493,30 +540,6 @@ function ProfileContent() {
               <Text style={styles.modalButtonText}>{t('modal.logout.confirm')}</Text>
             </TouchableOpacity>
           </View>
-        </View>
-      </Modal>
-
-      <Modal
-        visible={upgradeModalVisible}
-        onClose={() => setUpgradeModalVisible(false)}
-        title={t('modal.upgrade.title')}
-      >
-        <View style={styles.modalContent}>
-          <Text style={styles.modalText}>
-            {t('modal.upgrade.text')}
-          </Text>
-          <View style={styles.modalFeatures}>
-            <Text style={styles.modalFeature}>✓ {t('modal.upgrade.feature1')}</Text>
-          </View>
-          <TouchableOpacity
-            style={styles.modalButton}
-            onPress={() => {
-              setUpgradeModalVisible(false);
-              router.push('/checkout');
-            }}
-          >
-            <Text style={styles.modalButtonText}>{t('modal.upgrade.viewPlans')}</Text>
-          </TouchableOpacity>
         </View>
       </Modal>
 
@@ -892,15 +915,6 @@ const styles = StyleSheet.create({
     height: 20,
     borderRadius: 10,
     backgroundColor: '#d4a96a',
-  },
-  modalFeatures: {
-    gap: 12,
-    paddingVertical: 8,
-  },
-  modalFeature: {
-    fontSize: 15,
-    color: '#1e293b',
-    fontWeight: '500',
   },
 });
 

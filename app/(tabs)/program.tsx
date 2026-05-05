@@ -1,7 +1,7 @@
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Modal as RNModal, Pressable, Platform } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Modal as RNModal, Pressable } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { LinearGradient } from 'expo-linear-gradient';
-import { Lock, CircleCheck as CheckCircle, Crown, Shield, BadgeCheck, ArrowRight, X } from 'lucide-react-native';
+import { Lock, CircleCheck as CheckCircle } from 'lucide-react-native';
 import { useRouter, useFocusEffect } from 'expo-router';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useTheme } from '@/contexts/ThemeContext';
@@ -11,8 +11,9 @@ import { supabase } from '@/lib/supabase';
 import FreeTierPaywallModal from '@/components/FreeTierPaywallModal';
 import { useUserProfile } from '@/hooks/useUserProfile';
 import { hasPremiumProgramAccess } from '@/lib/subscriptionAccess';
-import { useState, useEffect, useCallback } from 'react';
-import * as SecureStore from 'expo-secure-store';
+import { useState, useEffect, useCallback, useMemo } from 'react';
+import { useEffectiveChronotype } from '@/hooks/useEffectiveChronotype';
+import { useProgress } from '@/contexts/ProgressContext';
 
 import { ErrorBoundary } from '@/components/ErrorBoundary';
 function ProgramContent() {
@@ -22,67 +23,21 @@ function ProgramContent() {
   const { user } = useAuth();
   const insets = useSafeAreaInsets();
   const { profile } = useUserProfile();
+  const effectiveChronotype = useEffectiveChronotype();
+  const { progress, refreshProgress } = useProgress();
+  const completedLessonKey = progress.completedLessonIds.join(',');
+  const completedLessons = useMemo(() => {
+    if (!completedLessonKey) return new Set<string>();
+    return new Set(completedLessonKey.split(','));
+  }, [completedLessonKey]);
   const [hasPremiumAccess, setHasPremiumAccess] = useState(false);
   const [lockedModalVisible, setLockedModalVisible] = useState(false);
-  const [completedLessons, setCompletedLessons] = useState<Set<string>>(new Set());
   const [showFreeTierPaywall, setShowFreeTierPaywall] = useState(false);
-  const [localChronotype, setLocalChronotype] = useState<string | null>(null);
-
-  useEffect(() => {
-    const loadLocalChronotype = async () => {
-      if (!user?.id) {
-        setLocalChronotype(null);
-        return;
-      }
-      const key = `quiz_chronotype_${user.id}`;
-      try {
-        const latestKey = 'quiz_latest_chronotype';
-        const [userValue, latestValue] = Platform.OS === 'web'
-          ? [localStorage.getItem(key), localStorage.getItem(latestKey)]
-          : [await SecureStore.getItemAsync(key), await SecureStore.getItemAsync(latestKey)];
-        const value = latestValue ?? userValue;
-        setLocalChronotype(value);
-      } catch {
-        setLocalChronotype(null);
-      }
-    };
-    loadLocalChronotype();
-  }, [user?.id]);
-
-  const fetchUserProgress = useCallback(async () => {
-    if (!user) {
-      setCompletedLessons(new Set());
-      return;
-    }
-
-    try {
-      const { data } = await supabase
-        .from('user_progress')
-        .select('lesson_id, completed')
-        .eq('user_id', user.id)
-        .eq('completed', true) as any;
-
-      if (data) {
-        const completedIds = data.map((p: any) => String(p.lesson_id));
-        const completed = new Set<string>(completedIds);
-        setCompletedLessons(completed);
-
-        if (completed.has('3') && !hasPremiumAccess) {
-          const hasLessonFour = completed.has('4');
-          if (!hasLessonFour) {
-            setShowFreeTierPaywall(true);
-          }
-        }
-      }
-    } catch {
-      setCompletedLessons(new Set());
-    }
-  }, [user, hasPremiumAccess]);
 
   useFocusEffect(
     useCallback(() => {
-      fetchUserProgress();
-    }, [fetchUserProgress])
+      void refreshProgress();
+    }, [refreshProgress])
   );
 
   const tc = {
@@ -114,7 +69,16 @@ function ProgramContent() {
   }, [profile, user]);
 
   useEffect(() => {
-    fetchUserProgress();
+    if (!user) return;
+    const completed =
+      completedLessonKey.length === 0 ? new Set<string>() : new Set(completedLessonKey.split(','));
+    if (completed.has('3') && !hasPremiumAccess && !completed.has('4')) {
+      setShowFreeTierPaywall(true);
+    }
+  }, [user, hasPremiumAccess, completedLessonKey]);
+
+  useEffect(() => {
+    void refreshProgress();
 
     if (!user) return;
 
@@ -129,7 +93,7 @@ function ProgramContent() {
           filter: `user_id=eq.${user.id}`,
         },
         () => {
-          fetchUserProgress();
+          void refreshProgress();
         }
       )
       .subscribe();
@@ -137,7 +101,7 @@ function ProgramContent() {
     return () => {
       channel.unsubscribe();
     };
-  }, [user, fetchUserProgress]);
+  }, [user, refreshProgress]);
 
   const getLessonTitle = (lesson: typeof LESSONS_DATA[0]) => {
     if (language === 'pt') return lesson.title_pt;
@@ -149,8 +113,6 @@ function ProgramContent() {
                  lesson.description_en;
     return desc?.substring(0, 100) + '...' || '';
   };
-
-  const getChronotype = () => localChronotype || profile?.chronotype || null;
 
   const getChronotypeEmoji = (chronotype: string) => {
     const emojis: Record<string, string> = {
@@ -186,7 +148,7 @@ function ProgramContent() {
 
         <View style={styles.content}>
         {LESSONS_DATA.map((lesson, index) => {
-          const chronotype = getChronotype();
+          const chronotype = effectiveChronotype;
           const isLocked = lesson.step_number > 3 && !hasPremiumAccess;
           const isCompleted = completedLessons.has(lesson.id);
           const chronotypeBadge = chronotype && lesson.step_number <= 3 ? (
@@ -282,28 +244,25 @@ function ProgramContent() {
         })}
 
         {!hasPremiumAccess && (
-        <View style={[styles.ctaBanner, { backgroundColor: tc.ctaBg, borderColor: isDark ? 'rgba(212,169,106,0.18)' : 'rgba(0,0,0,0.1)' }]}>
-          <View style={styles.ctaBannerHeader}>
-            <Crown size={28} color="#d4a96a" />
-            <View style={styles.ctaBannerText}>
-              <Text style={[styles.ctaBannerTitle, { color: isDark ? '#ffffff' : '#1a202c' }]}>{t('payment.unlockAllLessons')}</Text>
-              <Text style={[styles.ctaBannerSub, { color: tc.textSecondary }]}>{t('payment.premiumAccess')}</Text>
+        <View style={styles.paywallBanner}>
+          <View style={styles.paywallBannerTopLight} />
+          <View style={styles.paywallBannerRow}>
+            <Text style={styles.paywallBannerEmoji}>👑</Text>
+            <View style={styles.paywallBannerTextCol}>
+              <Text style={styles.paywallBannerTitle}>
+                {language === 'pt' ? 'Desbloqueie todos os 21 passos' : 'Unlock all 21 steps'}
+              </Text>
+              <Text style={styles.paywallBannerSub}>
+                {language === 'pt'
+                  ? 'Acesso vitalício por R$147 — pagamento único'
+                  : 'Lifetime access for $24.99 — one-time payment'}
+              </Text>
             </View>
-          </View>
-          <TouchableOpacity style={styles.ctaFilledBtn} onPress={() => router.push('/payment')}>
-            <Crown size={18} color="#0f172a" />
-            <Text style={styles.ctaFilledBtnText}>{t('payment.subscribe')}</Text>
-            <ArrowRight size={18} color="#0f172a" />
-          </TouchableOpacity>
-          <View style={styles.ctaSecurityRow}>
-            <Lock size={12} color="#d4a96a" />
-            <Text style={[styles.ctaSecurityText, { color: isDark ? '#4a5568' : '#64748b' }]}>{t('payment.ssl')}</Text>
-            <Text style={[styles.ctaSecurityDot, { color: isDark ? '#374151' : '#94a3b8' }]}>·</Text>
-            <Shield size={12} color="#d4a96a" />
-            <Text style={[styles.ctaSecurityText, { color: isDark ? '#4a5568' : '#64748b' }]}>{t('payment.pciDss')}</Text>
-            <Text style={[styles.ctaSecurityDot, { color: isDark ? '#374151' : '#94a3b8' }]}>·</Text>
-            <BadgeCheck size={12} color="#d4a96a" />
-            <Text style={[styles.ctaSecurityText, { color: isDark ? '#4a5568' : '#64748b' }]}>{t('payment.secureCheckout')}</Text>
+            <TouchableOpacity style={styles.paywallBannerBtn} onPress={() => router.push('/payment')} activeOpacity={0.88}>
+              <Text style={styles.paywallBannerBtnText}>
+                {language === 'pt' ? 'Desbloquear' : 'Unlock'}
+              </Text>
+            </TouchableOpacity>
           </View>
         </View>
         )}
@@ -322,74 +281,56 @@ function ProgramContent() {
       <RNModal
         visible={lockedModalVisible}
         transparent
-        animationType="fade"
+        animationType="slide"
         onRequestClose={() => setLockedModalVisible(false)}
       >
-        <Pressable
-          style={styles.modalOverlay}
-          onPress={() => setLockedModalVisible(false)}
-        >
-          <Pressable
-            style={[styles.modalContent, { backgroundColor: tc.modalBg, borderColor: tc.modalBorder }]}
-            onPress={() => {}}
-          >
-            <View style={[styles.modalHeader, { borderBottomColor: isDark ? 'rgba(212,169,106,0.1)' : 'rgba(0,0,0,0.08)' }]}>
-              <View style={styles.modalIconRow}>
-                <Lock size={20} color="#d4a96a" />
-                <Text style={styles.modalLabel}>{t('program.modal.badge')}</Text>
-              </View>
-              <TouchableOpacity
-                style={[styles.modalCloseButton, { backgroundColor: isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.05)' }]}
-                onPress={() => setLockedModalVisible(false)}
-              >
-                <X size={24} color="#64748b" />
-              </TouchableOpacity>
+        <Pressable style={styles.lockedOverlay} onPress={() => setLockedModalVisible(false)}>
+          <Pressable style={styles.lockedSheet} onPress={() => {}}>
+            <View style={styles.lockedHandleBar} />
+
+            <View style={styles.lockedIconCircle}>
+              <Text style={styles.lockedIconEmoji}>🔒</Text>
             </View>
 
-            <View style={styles.modalBody}>
-              <Text style={[styles.modalTitle, { color: isDark ? '#ffffff' : '#1a202c' }]}>
-                {t('program.modal.title')}
-              </Text>
+            <Text style={styles.lockedHeadline}>
+              {language === 'pt' ? 'Conteúdo Premium' : 'Premium content'}
+            </Text>
+            <Text style={styles.lockedSubtitle}>
+              {language === 'pt'
+                ? 'Este passo faz parte do programa completo.'
+                : 'This step is part of the full program.'}
+            </Text>
 
-              <View style={[styles.modalFeatures, { backgroundColor: isDark ? 'rgba(212,169,106,0.05)' : 'rgba(212,169,106,0.08)' }]}>
-                {[
-                  language === 'pt' ? '21 lições interativas que guiam você passo a passo para noites melhores' : '21 interactive lessons that guide you step by step to better nights',
-                  language === 'pt' ? 'Cada etapa fundamentada nas pesquisas das melhores universidades e publicações científicas dos EUA' : 'Each step based on research from the best universities and scientific publications in the USA',
-                  language === 'pt' ? 'Avance no seu próprio ritmo — sem pressa, com propósito' : 'Progress at your own pace — no rush, with purpose',
-                  language === 'pt' ? 'Disponível na Web, iOS e Android' : 'Available on Web, iOS, and Android',
-                ].map((text, idx) => (
-                  <View key={idx} style={styles.featureItem}>
-                    <Text style={styles.featureIcon}>✓</Text>
-                    <Text style={[styles.featureText, { color: isDark ? '#c8a876' : '#9a7c4e' }]}>{text}</Text>
-                  </View>
-                ))}
-              </View>
-
-              <TouchableOpacity
-                style={styles.modalCta}
-                onPress={() => {
-                  setLockedModalVisible(false);
-                  router.push('/payment');
-                }}
+            <TouchableOpacity
+              style={styles.lockedCtaWrap}
+              onPress={() => {
+                setLockedModalVisible(false);
+                router.push('/payment');
+              }}
+              activeOpacity={0.88}
+            >
+              <LinearGradient
+                colors={['#ffd060', '#ffb020']}
+                start={{ x: 0, y: 0 }}
+                end={{ x: 1, y: 1 }}
+                style={styles.lockedCtaGradient}
               >
-                <Crown size={18} color="#0f172a" />
-                <Text style={styles.modalCtaText}>
-                  {t('program.modal.cta')}
+                <Text style={styles.lockedCtaText}>
+                  {language === 'pt' ? 'Desbloquear programa completo' : 'Unlock the full program'}
                 </Text>
-              </TouchableOpacity>
+              </LinearGradient>
+            </TouchableOpacity>
 
-              <TouchableOpacity
-                style={styles.modalSecondary}
-                onPress={() => {
-                  setLockedModalVisible(false);
-                  router.push('/(auth)/login');
-                }}
-              >
-                <Text style={styles.modalSecondaryText}>
-                  {t('program.modal.alreadySub')}
-                </Text>
-              </TouchableOpacity>
-            </View>
+            <TouchableOpacity
+              style={styles.lockedSecondary}
+              onPress={() => {
+                setLockedModalVisible(false);
+                router.push('/(auth)/login');
+              }}
+              activeOpacity={0.75}
+            >
+              <Text style={styles.lockedSecondaryText}>{t('program.modal.alreadySub')}</Text>
+            </TouchableOpacity>
           </Pressable>
         </Pressable>
       </RNModal>
@@ -628,42 +569,58 @@ const styles = StyleSheet.create({
     color: '#0f172a',
   },
 
-  ctaBanner: {
-    borderRadius: 16,
-    padding: 20,
-    marginTop: 8,
-    marginBottom: 32,
+  paywallBanner: {
+    width: '100%',
+    backgroundColor: 'rgba(255,190,50,0.06)',
     borderWidth: 1,
+    borderColor: 'rgba(255,190,50,0.18)',
+    borderRadius: 16,
+    padding: 16,
+    marginTop: 16,
+    marginBottom: 32,
+    position: 'relative',
+    overflow: 'hidden',
   },
-  ctaBannerHeader: {
+  paywallBannerTopLight: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    height: 1,
+    backgroundColor: 'rgba(255,190,50,0.30)',
+  },
+  paywallBannerRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 14,
-    marginBottom: 20,
+    gap: 12,
   },
-  ctaBannerText: { flex: 1 },
-  ctaBannerTitle: { fontSize: 18, fontWeight: '800' },
-  ctaBannerSub: { fontSize: 13, marginTop: 2 },
-  ctaFilledBtn: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    gap: 8,
-    backgroundColor: '#d4a96a',
-    paddingVertical: 16,
-    borderRadius: 14,
-    marginBottom: 16,
+  paywallBannerEmoji: {
+    fontSize: 20,
   },
-  ctaFilledBtnText: { fontSize: 16, fontWeight: '800', color: '#0f172a' },
-  ctaSecurityRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 6,
-    justifyContent: 'center',
-    flexWrap: 'wrap',
+  paywallBannerTextCol: {
+    flex: 1,
   },
-  ctaSecurityText: { fontSize: 11 },
-  ctaSecurityDot: { fontSize: 11 },
+  paywallBannerTitle: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: '#dde0f8',
+    marginBottom: 2,
+  },
+  paywallBannerSub: {
+    fontSize: 12,
+    color: '#8090b0',
+  },
+  paywallBannerBtn: {
+    backgroundColor: '#ffc84a',
+    borderRadius: 10,
+    paddingHorizontal: 14,
+    paddingVertical: 8,
+  },
+  paywallBannerBtnText: {
+    fontSize: 13,
+    fontWeight: '700',
+    color: '#080a15',
+  },
   programFooter: {
     paddingVertical: 24,
     alignItems: 'center',
@@ -672,124 +629,82 @@ const styles = StyleSheet.create({
   programFooterCompany: { fontSize: 12, fontWeight: '600' },
   programFooterCnpj: { fontSize: 12 },
 
-  modalOverlay: {
+  lockedOverlay: {
     flex: 1,
-    backgroundColor: 'rgba(0, 0, 0, 0.7)',
-    justifyContent: 'center',
-    alignItems: 'center',
-    padding: 20,
+    backgroundColor: 'rgba(0,0,0,0.85)',
+    justifyContent: 'flex-end',
   },
-  modalContent: {
-    borderRadius: 24,
-    width: '100%',
-    maxWidth: 420,
+  lockedSheet: {
+    backgroundColor: '#0d0f1e',
+    borderTopLeftRadius: 28,
+    borderTopRightRadius: 28,
+    paddingHorizontal: 22,
+    paddingTop: 24,
+    paddingBottom: 36,
     borderWidth: 1,
+    borderColor: 'rgba(255,255,255,0.07)',
   },
-  modalHeader: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    paddingHorizontal: 24,
-    paddingTop: 24,
-    paddingBottom: 16,
-    borderBottomWidth: 1,
-  },
-  modalIconRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 8,
-  },
-  modalLabel: {
-    fontSize: 11,
-    fontWeight: '800',
-    color: '#d4a96a',
-    letterSpacing: 0.6,
-    textTransform: 'uppercase',
-  },
-  modalCloseButton: {
-    width: 36,
-    height: 36,
-    borderRadius: 18,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  modalBody: {
-    paddingHorizontal: 24,
-    paddingTop: 24,
-    paddingBottom: 24,
-  },
-  modalTitle: {
-    fontSize: 22,
-    fontWeight: '800',
-    marginBottom: 12,
-    lineHeight: 28,
-  },
-  modalDescription: {
-    fontSize: 15,
-    lineHeight: 22,
-    marginBottom: 24,
-  },
-  modalFeatures: {
-    borderRadius: 12,
-    padding: 16,
-    marginBottom: 24,
-    gap: 12,
-  },
-  featureItem: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 12,
-  },
-  featureIcon: {
-    fontSize: 16,
-    color: '#10b981',
-    fontWeight: '800',
-  },
-  featureText: {
-    fontSize: 14,
-    fontWeight: '500',
-  },
-  priceSection: {
-    alignItems: 'center',
+  lockedHandleBar: {
+    width: 40,
+    height: 4,
+    borderRadius: 2,
+    backgroundColor: 'rgba(255,255,255,0.12)',
+    alignSelf: 'center',
     marginBottom: 20,
   },
-  priceLabel: {
-    fontSize: 12,
-    color: '#64748b',
-    marginBottom: 4,
-  },
-  priceAmount: {
-    fontSize: 32,
-    fontWeight: '800',
-    color: '#d4a96a',
-    marginBottom: 2,
-  },
-  priceFreq: {
-    fontSize: 14,
-    color: '#64748b',
-  },
-  modalCta: {
-    flexDirection: 'row',
+  lockedIconCircle: {
+    width: 52,
+    height: 52,
+    borderRadius: 26,
+    backgroundColor: 'rgba(255,255,255,0.05)',
+    borderWidth: 1,
+    borderColor: 'rgba(255,255,255,0.10)',
+    alignSelf: 'center',
+    marginBottom: 14,
     alignItems: 'center',
     justifyContent: 'center',
-    gap: 8,
-    backgroundColor: '#d4a96a',
-    paddingVertical: 16,
+  },
+  lockedIconEmoji: {
+    fontSize: 22,
+    textAlign: 'center',
+  },
+  lockedHeadline: {
+    fontSize: 20,
+    fontWeight: '700',
+    color: '#ffffff',
+    textAlign: 'center',
+    marginBottom: 8,
+  },
+  lockedSubtitle: {
+    fontSize: 14,
+    color: '#8090b0',
+    textAlign: 'center',
+    marginBottom: 20,
+  },
+  lockedCtaWrap: {
+    width: '100%',
+    marginBottom: 10,
     borderRadius: 14,
-    marginBottom: 12,
+    overflow: 'hidden',
   },
-  modalCtaText: {
-    fontSize: 16,
-    fontWeight: '800',
-    color: '#0f172a',
+  lockedCtaGradient: {
+    paddingVertical: 15,
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderRadius: 14,
   },
-  modalSecondary: {
-    paddingVertical: 12,
+  lockedCtaText: {
+    fontSize: 15,
+    fontWeight: '700',
+    color: '#080a15',
+  },
+  lockedSecondary: {
+    paddingVertical: 8,
     alignItems: 'center',
   },
-  modalSecondaryText: {
-    fontSize: 14,
-    color: '#64748b',
-    fontWeight: '500',
+  lockedSecondaryText: {
+    fontSize: 13,
+    color: '#3a4060',
+    textAlign: 'center',
   },
 });

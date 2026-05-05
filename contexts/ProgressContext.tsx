@@ -1,12 +1,12 @@
 import { createContext, useContext, useState, useCallback, useEffect, ReactNode } from 'react';
-import { supabase } from '@/lib/supabase';
 import { useAuth } from '@/contexts/AuthContext';
-import { Platform } from 'react-native';
-import * as SecureStore from 'expo-secure-store';
+import { deriveProgressMetrics, loadMergedCompletedLessonIds } from '@/lib/programProgressMerge';
 
 interface Progress {
   completedCount: number;
   nextStep: number;
+  /** Merged server + device; same set the program list uses for checkmarks */
+  completedLessonIds: string[];
 }
 
 interface ProgressContextType {
@@ -16,48 +16,28 @@ interface ProgressContextType {
 
 const ProgressContext = createContext<ProgressContextType | undefined>(undefined);
 
+const emptyProgress: Progress = { completedCount: 0, nextStep: 1, completedLessonIds: [] };
+
 export function ProgressProvider({ children }: { children: ReactNode }) {
   const { user } = useAuth();
-  const [progress, setProgress] = useState<Progress>({ completedCount: 0, nextStep: 1 });
+  const [progress, setProgress] = useState<Progress>(emptyProgress);
 
   const refreshProgress = useCallback(async () => {
-    if (!user) return;
-    console.log('PROGRESS CONTEXT: refreshProgress called for user', user.id);
-    const localProgressKey = `user_progress_local_${user.id}`;
-
-    const { data, error } = await supabase
-      .from('user_progress')
-      .select('lesson_id')
-      .eq('user_id', user.id)
-      .eq('completed', true);
-
-    let localCount = 0;
-    try {
-      const localRaw =
-        Platform.OS === 'web'
-          ? localStorage.getItem(localProgressKey)
-          : await SecureStore.getItemAsync(localProgressKey);
-      if (localRaw) {
-        const parsed = JSON.parse(localRaw);
-        if (Array.isArray(parsed)) localCount = parsed.length;
-      }
-    } catch {}
-
-    if (!error && data) {
-      const completedCount = Math.max(data.length, localCount);
-      const nextStep = completedCount + 1;
-      console.log('PROGRESS CONTEXT: completedCount:', completedCount, 'nextStep:', nextStep);
-      setProgress({ completedCount, nextStep });
-    } else if (error) {
-      console.log('PROGRESS CONTEXT: fetch error', error.message);
-      const completedCount = localCount;
-      const nextStep = completedCount + 1;
-      setProgress({ completedCount, nextStep });
+    if (!user) {
+      setProgress(emptyProgress);
+      return;
     }
+
+    console.log('PROGRESS CONTEXT: refreshProgress called for user', user.id);
+    const merged = await loadMergedCompletedLessonIds(user.id);
+    const { completedCount, nextStep } = deriveProgressMetrics(merged);
+    const completedLessonIds = [...merged].sort();
+    console.log('PROGRESS CONTEXT: merged size:', merged.size, 'completedCount:', completedCount, 'nextStep:', nextStep);
+    setProgress({ completedCount, nextStep, completedLessonIds });
   }, [user]);
 
   useEffect(() => {
-    refreshProgress();
+    void refreshProgress();
   }, [refreshProgress]);
 
   return (

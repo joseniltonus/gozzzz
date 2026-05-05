@@ -6,6 +6,7 @@ import {
   TouchableOpacity,
   Image,
   Platform,
+  ActivityIndicator,
 } from 'react-native';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { LinearGradient } from 'expo-linear-gradient';
@@ -21,6 +22,7 @@ import { LESSONS_DATA } from '@/data/lessons';
 import { LESSON_ENHANCEMENTS } from '@/data/lessonEnhancements';
 import { useAuth } from '@/contexts/AuthContext';
 import { useUserProfile } from '@/hooks/useUserProfile';
+import { useEffectiveChronotype } from '@/hooks/useEffectiveChronotype';
 import { useProgress } from '@/contexts/ProgressContext';
 import { supabase } from '@/lib/supabase';
 import { hasPremiumProgramAccess } from '@/lib/subscriptionAccess';
@@ -39,14 +41,12 @@ export default function WebLessonPage() {
   const { language, t } = useLanguage();
   const { user } = useAuth();
   const { profile, loading: profileLoading } = useUserProfile();
+  const chronotype = useEffectiveChronotype();
   const { refreshProgress } = useProgress();
   const [hasPremiumAccess, setHasPremiumAccess] = useState(false);
   const [accessChecked, setAccessChecked] = useState(false);
   const [completingLesson, setCompletingLesson] = useState(false);
   const [sleepLessonComplete, setSleepLessonComplete] = useState(false);
-
-  // Derive chronotype from profile (single source of truth: database)
-  const chronotype = profile?.chronotype || null;
 
   // Check premium / gift access: wait for profile hook, then direct fetch fallback
   useEffect(() => {
@@ -98,7 +98,33 @@ export default function WebLessonPage() {
     );
   }
 
-  if (lesson.step_number > 3 && (!accessChecked || !hasPremiumAccess)) {
+  const isPremiumStep = lesson.step_number > 3;
+  const accessPending = Boolean(user && isPremiumStep && !accessChecked);
+  const isLocked = isPremiumStep && (!user || (accessChecked && !hasPremiumAccess));
+
+  if (accessPending) {
+    return (
+      <View style={styles.lockedPage}>
+        <LinearGradient colors={['#0f172a', '#1e293b']} style={styles.nav}>
+          <View style={styles.navInner}>
+            <TouchableOpacity onPress={() => router.push('/web')} style={styles.navBrand}>
+              <Moon size={22} color="#fbbf24" />
+              <Text style={styles.navBrandText}>GoZzzz</Text>
+            </TouchableOpacity>
+            <TouchableOpacity onPress={() => router.push('/web/programa')} style={styles.backBtn}>
+              <ArrowLeft size={18} color="#94a3b8" />
+              <Text style={styles.backBtnText}>{t('web.lesson.program')}</Text>
+            </TouchableOpacity>
+          </View>
+        </LinearGradient>
+        <View style={[styles.lockedBody, { flex: 1, justifyContent: 'center' }]}>
+          <ActivityIndicator size="large" color="#fbbf24" />
+        </View>
+      </View>
+    );
+  }
+
+  if (isLocked) {
     return (
       <View style={styles.lockedPage}>
         <LinearGradient colors={['#0f172a', '#1e293b']} style={styles.nav}>
@@ -129,8 +155,6 @@ export default function WebLessonPage() {
       </View>
     );
   }
-
-  const isLocked = lesson.step_number > 3 && (!accessChecked || !hasPremiumAccess);
 
   const getTitle = () => {
     if (language === 'pt') return lesson.title_pt;
@@ -183,7 +207,7 @@ export default function WebLessonPage() {
       await refreshProgress();
       const nextLesson = LESSONS_DATA.find((l) => l.step_number === lesson.step_number + 1);
       if (nextLesson) {
-        if (nextLesson.step_number > 3 && !hasPremiumAccess) {
+        if (nextLesson.step_number > 3 && accessChecked && !hasPremiumAccess) {
           router.push('/web/programa');
           setCompletingLesson(false);
           return;

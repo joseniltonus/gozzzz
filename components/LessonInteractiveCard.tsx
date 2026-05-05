@@ -391,19 +391,6 @@ const styles = StyleSheet.create({
     lineHeight: 18,
     fontStyle: 'italic',
   },
-  videoButton: {
-    marginHorizontal: 16,
-    marginVertical: 20,
-    backgroundColor: '#6366f1',
-    paddingVertical: 14,
-    borderRadius: 10,
-    alignItems: 'center',
-  },
-  videoButtonText: {
-    color: '#ffffff',
-    fontSize: 16,
-    fontWeight: '700',
-  },
   spacer: {
     height: 20,
   },

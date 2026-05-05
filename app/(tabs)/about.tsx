@@ -1,14 +1,24 @@
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { LinearGradient } from 'expo-linear-gradient';
-import { Heart, BookOpen, Users, Target, Moon, Crown, ArrowRight } from 'lucide-react-native';
+import {
+  Heart,
+  BookOpen,
+  Users,
+  Target,
+  Moon,
+  Crown,
+  ArrowRight,
+  Sparkles,
+  ShieldCheck,
+  Compass,
+} from 'lucide-react-native';
 import { useRouter } from 'expo-router';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useTheme } from '@/contexts/ThemeContext';
 import { useAuth } from '@/contexts/AuthContext';
-import { supabase } from '@/lib/supabase';
 import { hasPremiumProgramAccess } from '@/lib/subscriptionAccess';
-import { useState, useEffect } from 'react';
+import { useUserProfile } from '@/hooks/useUserProfile';
 
 import { ErrorBoundary } from '@/components/ErrorBoundary';
 import { getAppVersion } from '@/lib/appVersion';
@@ -19,23 +29,8 @@ function AboutContent() {
   const { isDark } = useTheme();
   const insets = useSafeAreaInsets();
   const { user } = useAuth();
-  const [hasPremiumAccess, setHasPremiumAccess] = useState(false);
-
-  useEffect(() => {
-    const checkAccess = async () => {
-      if (!user) {
-        setHasPremiumAccess(false);
-        return;
-      }
-      const { data } = await supabase
-        .from('profiles')
-        .select('subscription_type')
-        .eq('id', user.id)
-        .maybeSingle() as any;
-      setHasPremiumAccess(hasPremiumProgramAccess(data?.subscription_type, user.email));
-    };
-    checkAccess();
-  }, [user]);
+  const { profile } = useUserProfile();
+  const hasPremiumAccess = hasPremiumProgramAccess(profile?.subscription_type ?? null, user?.email ?? null);
 
   const tc = {
     bg: isDark ? '#0d0d16' : '#f0f4f8',
@@ -52,27 +47,81 @@ function AboutContent() {
     whyBg: isDark ? '#1a1408' : 'rgba(212,169,106,0.08)',
     whyText: isDark ? '#c8a876' : '#92702e',
     credibilityBg: isDark ? 'rgba(212,169,106,0.06)' : 'rgba(212,169,106,0.06)',
+    manifestoBg: isDark ? 'rgba(15,15,24,0.92)' : 'rgba(255,255,255,0.97)',
+    pillarIconBg: isDark ? 'rgba(212,169,106,0.12)' : 'rgba(212,169,106,0.18)',
   };
 
+  const statKeys = [
+    { valueKey: 'about.stat1Value', labelKey: 'about.stat1Label' },
+    { valueKey: 'about.stat2Value', labelKey: 'about.stat2Label' },
+    { valueKey: 'about.stat3Value', labelKey: 'about.stat3Label' },
+  ] as const;
+
+  const pillarConfig = [
+    { icon: ShieldCheck, titleKey: 'about.pillar1Title', bodyKey: 'about.pillar1Body' },
+    { icon: Compass, titleKey: 'about.pillar2Title', bodyKey: 'about.pillar2Body' },
+    { icon: Sparkles, titleKey: 'about.pillar3Title', bodyKey: 'about.pillar3Body' },
+  ] as const;
+
   return (
-    <ScrollView style={[styles.container, { backgroundColor: tc.bg }]}>
+    <ScrollView style={[styles.container, { backgroundColor: tc.bg }]} showsVerticalScrollIndicator={false}>
       <LinearGradient
         colors={tc.gradientColors}
         style={[styles.header, { paddingTop: insets.top + 24 }]}
       >
         <View style={styles.headerContent}>
-          <Moon size={64} color="#ffffff" />
+          <Text style={[styles.heroEyebrow, { color: 'rgba(255,255,255,0.72)' }]}>{t('about.heroEyebrow')}</Text>
+          <Moon size={56} color="#ffffff" />
           <Text style={styles.headerTitle}>
-            <Text style={styles.headerTitleGo}>Sobre o Go</Text>
+            <Text style={styles.headerTitleGo}>Go</Text>
             <Text style={styles.headerTitleZzzz}>Zzzz</Text>
           </Text>
-          <Text style={styles.headerSubtitle}>
-            {t('about.headerSubtitle')}
-          </Text>
+          <Text style={styles.headerBrandLine}>{t('about.brandLine')}</Text>
+          <Text style={styles.headerSubtitle}>{t('about.headerSubtitle')}</Text>
+          <Text style={styles.heroKicker}>{t('about.heroKicker')}</Text>
+          <View style={styles.statStrip}>
+            {statKeys.map((sk, i) => (
+              <View
+                key={i}
+                style={[styles.statCell, { borderColor: 'rgba(255,255,255,0.18)', backgroundColor: 'rgba(0,0,0,0.2)' }]}
+              >
+                <Text style={styles.statValue}>{t(sk.valueKey)}</Text>
+                <Text style={styles.statLabel}>{t(sk.labelKey)}</Text>
+              </View>
+            ))}
+          </View>
         </View>
       </LinearGradient>
 
       <View style={styles.content}>
+        <View style={[styles.manifestoCard, { backgroundColor: tc.manifestoBg, borderColor: tc.border }]}>
+          <Text style={[styles.manifestoQuote, { color: tc.textPrimary }]}>“{t('about.manifesto')}”</Text>
+          <Text style={[styles.manifestoAuthor, { color: tc.textSecondary }]}>{t('about.manifestoAuthor')}</Text>
+        </View>
+
+        <View style={[styles.trustCard, { backgroundColor: tc.card, borderColor: tc.border }]}>
+          <View style={styles.trustHeader}>
+            <ShieldCheck size={22} color="#d4a96a" />
+            <Text style={[styles.trustTitle, { color: tc.textPrimary }]}>{t('about.trustTitle')}</Text>
+          </View>
+          <Text style={[styles.trustBody, { color: tc.textSecondary }]}>{t('about.trustBody')}</Text>
+        </View>
+
+        <View style={styles.pillarsRow}>
+          {pillarConfig.map((p, i) => {
+            const Icon = p.icon;
+            return (
+              <View key={i} style={[styles.pillarItem, { backgroundColor: tc.card, borderColor: tc.border }]}>
+                <View style={[styles.pillarIconWrap, { backgroundColor: tc.pillarIconBg }]}>
+                  <Icon size={22} color="#d4a96a" />
+                </View>
+                <Text style={[styles.pillarTitle, { color: tc.textPrimary }]}>{t(p.titleKey)}</Text>
+                <Text style={[styles.pillarBody, { color: tc.textSecondary }]}>{t(p.bodyKey)}</Text>
+              </View>
+            );
+          })}
+        </View>
+
         <View style={styles.storySection}>
           <View style={styles.sectionHeader}>
             <Heart size={24} color="#d4a96a" />
@@ -182,13 +231,13 @@ function AboutContent() {
           <View style={styles.unlockHeader}>
             <Crown size={28} color="#d4a96a" />
             <View style={styles.unlockContent}>
-              <Text style={[styles.unlockTitle, { color: tc.textPrimary }]}>Desbloquear Todas as Lições</Text>
-              <Text style={[styles.unlockSubtitle, { color: tc.textSecondary }]}>Obtenha acesso premium ao programa completo</Text>
+              <Text style={[styles.unlockTitle, { color: tc.textPrimary }]}>{t('about.unlockTitle')}</Text>
+              <Text style={[styles.unlockSubtitle, { color: tc.textSecondary }]}>{t('about.unlockSubtitle')}</Text>
             </View>
           </View>
           <TouchableOpacity style={styles.unlockButton} onPress={() => router.push('/payment')}>
             <Crown size={18} color="#0f172a" />
-            <Text style={styles.unlockButtonText}>Assinar Premium Agora</Text>
+            <Text style={styles.unlockButtonText}>{t('about.unlockCta')}</Text>
             <ArrowRight size={18} color="#0f172a" />
           </TouchableOpacity>
         </View>
@@ -250,11 +299,150 @@ const styles = StyleSheet.create({
     color: '#ffffff',
   },
   headerSubtitle: {
-    fontSize: 16,
-    color: '#d4a96a',
+    fontSize: 15,
+    color: '#f5e7c9',
     fontWeight: '600',
     textAlign: 'center',
+    lineHeight: 22,
+    paddingHorizontal: 8,
+  },
+  heroEyebrow: {
+    fontSize: 10,
+    fontWeight: '800',
+    letterSpacing: 2,
+    textTransform: 'uppercase',
+    marginBottom: 14,
+    textAlign: 'center',
+  },
+  headerBrandLine: {
+    fontSize: 13,
+    fontWeight: '700',
+    color: 'rgba(255,255,255,0.88)',
+    marginTop: 6,
+    marginBottom: 6,
+    letterSpacing: 0.4,
+  },
+  heroKicker: {
+    fontSize: 14,
+    lineHeight: 21,
+    color: 'rgba(255,255,255,0.82)',
+    textAlign: 'center',
+    marginTop: 12,
+    paddingHorizontal: 6,
+    fontWeight: '500',
+  },
+  statStrip: {
+    flexDirection: 'row',
+    gap: 10,
+    marginTop: 22,
+    width: '100%',
+    paddingHorizontal: 2,
+  },
+  statCell: {
+    flex: 1,
+    borderRadius: 14,
+    paddingVertical: 14,
+    paddingHorizontal: 6,
+    alignItems: 'center',
+    borderWidth: 1,
+  },
+  statValue: {
+    fontSize: 22,
+    fontWeight: '800',
+    color: '#ffffff',
+    letterSpacing: 0.2,
+  },
+  statLabel: {
+    fontSize: 10,
+    fontWeight: '600',
+    color: 'rgba(255,255,255,0.78)',
+    textAlign: 'center',
+    marginTop: 6,
+    lineHeight: 13,
+  },
+  manifestoCard: {
+    borderRadius: 18,
+    padding: 22,
+    marginBottom: 18,
+    borderWidth: 1,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 10 },
+    shadowOpacity: 0.12,
+    shadowRadius: 20,
+    elevation: 4,
+  },
+  manifestoQuote: {
+    fontSize: 17,
+    lineHeight: 28,
+    fontWeight: '600',
     fontStyle: 'italic',
+  },
+  manifestoAuthor: {
+    fontSize: 13,
+    fontWeight: '700',
+    marginTop: 14,
+    letterSpacing: 0.3,
+  },
+  trustCard: {
+    borderRadius: 16,
+    padding: 20,
+    marginBottom: 18,
+    borderWidth: 1,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 6 },
+    shadowOpacity: 0.08,
+    shadowRadius: 14,
+    elevation: 3,
+  },
+  trustHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 10,
+    marginBottom: 12,
+  },
+  trustTitle: {
+    fontSize: 17,
+    fontWeight: '800',
+    letterSpacing: 0.2,
+    flex: 1,
+  },
+  trustBody: {
+    fontSize: 14,
+    lineHeight: 22,
+    fontWeight: '500',
+  },
+  pillarsRow: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: 12,
+    marginBottom: 28,
+  },
+  pillarItem: {
+    flexGrow: 1,
+    flexBasis: '47%',
+    minWidth: 148,
+    borderRadius: 16,
+    padding: 16,
+    borderWidth: 1,
+  },
+  pillarIconWrap: {
+    width: 44,
+    height: 44,
+    borderRadius: 12,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginBottom: 12,
+  },
+  pillarTitle: {
+    fontSize: 15,
+    fontWeight: '800',
+    marginBottom: 8,
+    letterSpacing: 0.2,
+  },
+  pillarBody: {
+    fontSize: 13,
+    lineHeight: 20,
+    fontWeight: '500',
   },
   content: {
     padding: 20,

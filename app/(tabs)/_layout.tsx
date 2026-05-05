@@ -1,5 +1,5 @@
 import { useMemo } from 'react';
-import { Platform, StyleSheet } from 'react-native';
+import { Platform, StyleSheet, Text } from 'react-native';
 import { Tabs } from 'expo-router';
 import { Hop as Home, BookOpen, Heart, User, Info, Moon } from 'lucide-react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -7,17 +7,42 @@ import { useLanguage } from '@/contexts/LanguageContext';
 import { useTheme } from '@/contexts/ThemeContext';
 import { ProgressProvider } from '@/contexts/ProgressContext';
 
+const ICON_PX = 22;
+
+const androidLabel = Platform.OS === 'android' ? ({ includeFontPadding: false } as const) : {};
+
 /**
- * Altura mínima da *área útil* (acima do inset inferior): ícone ~28px + label ~16px + margens.
- * O React Navigation usa ~49px por defeito — apertado demais com 5 abas visíveis + paddingTop.
+ * Rótulos longos ("Programa", "Concierge") + pouca largura por aba → texto cortado.
+ * Duas linhas + fonte ligeiramente menor + sem padding extra no item libertam espaço.
  */
-const TAB_INNER_MIN = 52;
+function TabBarLabelText({ color, children }: { color: string; children: string }) {
+  return (
+    <Text
+      numberOfLines={2}
+      adjustsFontSizeToFit={Platform.OS !== 'web'}
+      minimumFontScale={0.82}
+      maxFontSizeMultiplier={1.2}
+      style={{
+        color,
+        fontSize: Platform.OS === 'web' ? 10 : 10.5,
+        fontWeight: '600',
+        lineHeight: Platform.OS === 'android' ? 13 : 12,
+        textAlign: 'center',
+        marginTop: 2,
+        width: '100%',
+        ...androidLabel,
+      }}
+    >
+      {children}
+    </Text>
+  );
+}
 
 export default function TabLayout() {
   const { t } = useLanguage();
   const { isDark } = useTheme();
   const insets = useSafeAreaInsets();
-  const bottomInset = Math.max(insets.bottom, Platform.OS === 'android' ? 6 : 0);
+  const bottomInset = Math.max(insets.bottom, Platform.OS === 'android' ? 8 : 0);
 
   const screenOptions = useMemo(
     () => ({
@@ -27,26 +52,27 @@ export default function TabLayout() {
       tabBarActiveTintColor: '#d4a96a',
       tabBarInactiveTintColor: isDark ? '#cbd5e1' : '#475569',
       tabBarAllowFontScaling: true,
-      tabBarLabelStyle: {
-        fontSize: 11,
-        fontWeight: '600' as const,
-        marginTop: 4,
-        marginBottom: 0,
-        lineHeight: 13,
-      },
+      tabBarLabel: ({ color, children }: { color: string; children: string }) => (
+        <TabBarLabelText color={color} children={children} />
+      ),
       tabBarItemStyle: {
         flex: 1,
-        paddingTop: 2,
-        paddingBottom: 2,
+        paddingVertical: 0,
+        paddingHorizontal: 1,
+        justifyContent: 'center' as const,
+        minWidth: 0,
       },
       tabBarStyle: {
         backgroundColor: isDark ? '#07070f' : '#ffffff',
         borderTopWidth: StyleSheet.hairlineWidth,
         borderTopColor: isDark ? 'rgba(212,169,106,0.2)' : 'rgba(0,0,0,0.08)',
-        paddingTop: 4,
+        paddingTop: 6,
         paddingBottom: bottomInset,
-        /** Total = zona útil + padding topo + home indicator (evita cortar o texto). */
-        height: TAB_INNER_MIN + 4 + bottomInset,
+        /**
+         * Área interior ≈ (62 + bottomInset) - 6 - bottomInset = 56px para ícone+2 linhas de texto.
+         * Valores abaixo de ~54 cortavam labels em iPhones com home indicator.
+         */
+        height: 62 + bottomInset,
       },
     }),
     [isDark, bottomInset],
@@ -60,7 +86,7 @@ export default function TabLayout() {
           options={{
             title: t('tab.home'),
             tabBarLabel: t('tab.home'),
-            tabBarIcon: ({ size, color }) => <Home size={size} color={color} />,
+            tabBarIcon: ({ color }) => <Home size={ICON_PX} color={color} />,
           }}
         />
         <Tabs.Screen
@@ -68,7 +94,7 @@ export default function TabLayout() {
           options={{
             title: t('tab.program'),
             tabBarLabel: t('tab.program'),
-            tabBarIcon: ({ size, color }) => <BookOpen size={size} color={color} />,
+            tabBarIcon: ({ color }) => <BookOpen size={ICON_PX} color={color} />,
           }}
         />
         <Tabs.Screen
@@ -76,7 +102,7 @@ export default function TabLayout() {
           options={{
             title: t('tab.coach'),
             tabBarLabel: t('tab.coach'),
-            tabBarIcon: ({ size, color }) => <Moon size={size} color={color} />,
+            tabBarIcon: ({ color }) => <Moon size={ICON_PX} color={color} />,
           }}
         />
         <Tabs.Screen
@@ -84,7 +110,7 @@ export default function TabLayout() {
           options={{
             title: t('tab.profile'),
             tabBarLabel: t('tab.profile'),
-            tabBarIcon: ({ size, color }) => <User size={size} color={color} />,
+            tabBarIcon: ({ color }) => <User size={ICON_PX} color={color} />,
           }}
         />
         <Tabs.Screen
@@ -93,7 +119,7 @@ export default function TabLayout() {
             title: t('tab.coach'),
             tabBarLabel: t('tab.coach'),
             href: null,
-            tabBarIcon: ({ size, color }) => <Heart size={size} color={color} />,
+            tabBarIcon: ({ color }) => <Heart size={ICON_PX} color={color} />,
           }}
         />
         <Tabs.Screen
@@ -101,7 +127,7 @@ export default function TabLayout() {
           options={{
             title: t('tab.about'),
             tabBarLabel: t('tab.about'),
-            tabBarIcon: ({ size, color }) => <Info size={size} color={color} />,
+            tabBarIcon: ({ color }) => <Info size={ICON_PX} color={color} />,
           }}
         />
         <Tabs.Screen

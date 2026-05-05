@@ -735,31 +735,6 @@ const styles = StyleSheet.create({
     color: '#10b981',
     fontWeight: '600',
   },
-  videoSection: {
-    marginTop: 32,
-    paddingTop: 24,
-    borderTopWidth: 1,
-    borderTopColor: '#1e293b',
-    alignItems: 'center',
-    gap: 12,
-  },
-  videoLabel: {
-    fontSize: 14,
-    color: '#64748b',
-  },
-  videoBtn: {
-    backgroundColor: '#1e293b',
-    paddingHorizontal: 24,
-    paddingVertical: 14,
-    borderRadius: 12,
-    borderWidth: 1,
-    borderColor: '#334155',
-  },
-  videoBtnText: {
-    fontSize: 15,
-    fontWeight: '600',
-    color: '#94a3b8',
-  },
   navRow: {
     flexDirection: 'row',
     alignItems: 'center',

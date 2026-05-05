@@ -2,12 +2,12 @@ import { createContext, useContext, useState, ReactNode, useEffect } from 'react
 import { Platform } from 'react-native';
 import * as Localization from 'expo-localization';
 
-type Language = 'pt' | 'en';
+export type Language = 'pt' | 'en';
 
 interface LanguageContextType {
   language: Language;
   setLanguage: (lang: Language) => void;
-  t: (key: string) => string;
+  t: (key: string, lang?: Language) => string;
   languageSelected: boolean;
   confirmLanguage: () => void;
 }
@@ -159,6 +159,7 @@ const translations = {
     'profile.settings': 'Configurações',
     'profile.language': 'Idioma',
     'profile.notifications': 'Notificações',
+    'profile.notificationsPermissionDenied': 'Permissão negada. Ative notificações nas definições do sistema para lembretes de rotina.',
     'profile.darkMode': 'Modo Escuro',
     'profile.enabled': 'Ativado',
     'profile.disabled': 'Desativado',
@@ -187,16 +188,11 @@ const translations = {
     'modal.help.title': 'Central de Ajuda',
     'modal.help.text': 'Para qualquer dúvida em relação ao app por favor entre em contato conosco:',
     'modal.privacy.title': 'Privacidade e Termos',
-    'modal.privacy.text': 'Acesse nossa política de privacidade e termos de uso completos em:',
+    'modal.privacy.text': 'Consulte a Política de Privacidade e os Termos e Condições completos nas páginas dedicadas:',
     'modal.logout.title': 'Sair da Conta',
     'modal.logout.text': 'Tem certeza que deseja sair da sua conta?',
     'modal.logout.cancel': 'Cancelar',
     'modal.logout.confirm': 'Sair',
-    'modal.upgrade.title': 'Upgrade para Premium',
-    'modal.upgrade.text': 'Acesse o programa completo de 21 passos e todo o conteúdo exclusivo!',
-    'modal.upgrade.feature1': '21 lições completas',
-    'modal.upgrade.feature2': 'Vídeos e podcasts dos especialistas',
-    'modal.upgrade.viewPlans': 'Ver Planos',
 
     // Program CTA
     'program.activateTest': 'Ativar Premium (Teste)',
@@ -227,7 +223,7 @@ const translations = {
     'coach.disclaimer': '⚠️ Este serviço é exclusivamente educacional e de coaching comportamental do sono. Não realizamos diagnósticos, não prescrevemos tratamentos e não substituímos consulta médica, psicológica ou de qualquer profissional de saúde regulamentado pelo CFM, CFP ou outros conselhos profissionais.',
 
     // About hardcoded
-    'about.headerSubtitle': 'Quando a dor se transforma em propósito',
+    'about.headerSubtitle': 'Da insônia à clareza — com método, rigor e humanidade',
     'about.storyTitle': 'Minha História',
     'about.story1': 'Por quase 10 anos, vivi uma batalha silenciosa que poucos compreendiam. Noites intermináveis olhando para o teto, sonos fragmentados que me deixavam exausto, dias nebulosos onde mal conseguia funcionar. A insônia não era apenas sobre não dormir - era sobre perder a essência de quem eu era.',
     'about.story2': 'Tentei de tudo. Medicamentos que me deixavam como um zumbi. Chás e melatonina que não faziam diferença. Meditações que só aumentavam minha frustração. Cada noite era uma nova esperança que se transformava em decepção.',
@@ -255,6 +251,28 @@ const translations = {
     'about.disclaimer2': 'Antes de iniciar qualquer programa de mudança de hábitos relacionados ao sono, consulte um médico ou profissional de saúde qualificado, especialmente se você apresentar condições como apneia do sono, insônia crônica, transtornos do humor, uso de medicamentos ou outras condições médicas.',
     'about.disclaimer3': 'Os resultados descritos são experiências individuais e podem variar de pessoa para pessoa. O GoZzzz não garante resultados específicos. Em caso de sintomas persistentes ou agravamento de qualquer condição, procure atendimento médico imediatamente.',
     'about.disclaimer4': 'Este aplicativo não substitui o cuidado médico profissional.',
+    'about.brandLine': 'Sobre nós',
+    'about.heroEyebrow': 'Programa premium de sono',
+    'about.heroKicker': 'Ciência aplicável, hábitos realistas e uma trilha clara — para quem quer resultados sem achismo.',
+    'about.stat1Value': '21',
+    'about.stat1Label': 'dias estruturados',
+    'about.stat2Value': '21',
+    'about.stat2Label': 'passos práticos',
+    'about.stat3Value': '4',
+    'about.stat3Label': 'cronótipos guiados',
+    'about.manifesto': 'Sono excelente não é sorte — é uma sequência de decisões pequenas, repetidas, apoiadas por evidência.',
+    'about.manifestoAuthor': 'Filosofia GoZzzz',
+    'about.trustTitle': 'Porque isto é credível',
+    'about.trustBody': 'Referências a investigadores e publicações de referência. Linguagem responsável: educamos e motivamos — não substituímos o seu médico nem prometemos curas.',
+    'about.pillar1Title': 'Evidência, não moda',
+    'about.pillar1Body': 'Cada tema liga-se a literatura revisada por pares ou manuais reconhecidos — sem "life hack" vazio.',
+    'about.pillar2Title': 'Cronótipo com nuance',
+    'about.pillar2Body': 'Leão, Urso, Lobo e Golfinho organizam o dia — sempre com o aviso de que são modelos educativos, não etiquetas clínicas.',
+    'about.pillar3Title': 'Do conhecimento ao hábito',
+    'about.pillar3Body': 'Vinte e um passos para sair da teoria e instalar rotinas que o relógio biológico reconhece.',
+    'about.unlockTitle': 'Desbloquear o programa completo',
+    'about.unlockSubtitle': 'Premium com todos os passos, atualizações de conteúdo e experiência sem limitações.',
+    'about.unlockCta': 'Quero Premium',
 
     // Profile hardcoded
     'profile.footerSubtext': 'Feito com dedicação para apoiar o seu sono',
@@ -305,7 +323,7 @@ const translations = {
     'web.pricing.subscribeMonthly': 'Assinar Mensal',
     'web.pricing.subscribeAnnual': 'Assinar Anual',
     'web.pricing.feature1': '21 passos completos do programa',
-    'web.pricing.feature2': 'Vídeos e podcasts dos especialistas',
+    'web.pricing.feature2': 'Programa estruturado em 21 passos com base em ciência',
     'web.pricing.feature3': 'Baseado em ciência de 4 pesquisadores de referência',
     'web.pricing.feature4': 'Atualizações gratuitas incluídas',
     'web.pricing.feature5': 'Cancele a qualquer momento',
@@ -385,7 +403,7 @@ const translations = {
     'web.coach.price1.f1': 'Mapeamento dos seus hábitos de sono',
     'web.coach.price1.f1sub': 'Analisamos seu histórico, rotina, ambiente e padrões — para entender exatamente por que você não dorme bem.',
     'web.coach.price1.f2': 'Sessão online de 90 minutos',
-    'web.coach.price1.f2sub': 'Via vídeo, sem pressa, de onde você estiver. Você fala, nós ouvimos — sem julgamento, sem receitas prontas.',
+    'web.coach.price1.f2sub': 'À distância, no seu ritmo, de onde estiver. Você fala, nós ouvimos — sem julgamento, sem receitas prontas.',
     'web.coach.price1.f3': 'Relatório de sono pós-sessão',
     'web.coach.price1.f3sub': 'Documento completo com descobertas, estratégias e próximos passos — entregue no seu email em até 72h.',
     'web.coach.price1.f4': 'Suporte via WhatsApp',
@@ -469,7 +487,7 @@ const translations = {
     'web.program.ctaTitle': 'Desbloqueie Todas as 21 Lições',
     'web.program.ctaDesc': 'Obtenha acesso ao programa completo com conteúdo exclusivo',
     'web.program.feature1': 'Programa completo de 21 passos',
-    'web.program.feature2': 'Lições em vídeo e áudio',
+    'web.program.feature2': 'Lições escritas e passos práticos',
     'web.program.feature3': 'Coaching de especialista incluído',
     'web.program.subscribeNow': 'Assinar Agora',
 
@@ -494,7 +512,7 @@ const translations = {
     'web.about.programFeature1': 'Construído por cientistas e pesquisadores de sono',
     'web.about.programFeature2': 'Respaldado por neurociência revisada por pares',
     'web.about.programFeature3': 'Coaching e suporte personalizados',
-    'web.about.programFeature4': 'Acesso vitalício a todos os materiais',
+    'web.about.programFeature4': 'Acesso contínuo ao conteúdo do programa e atualizações',
     'web.about.whyTitle': 'Por que GoZzzz?',
     'web.about.whyText': 'Porque o sono merece a mesma atenção científica que damos à nutrição, condicionamento físico e saúde mental. O sono de qualidade é a base de tudo mais.',
     'web.about.disclaimerTitle': 'Aviso Médico',
@@ -527,7 +545,7 @@ const translations = {
     'web.subscribe.disclaimer': 'Cancele quando quiser. Sem taxas ocultas. Acesso imediato após confirmação.',
     'web.subscribe.included': 'O que está incluído',
     'web.subscribe.feature1': 'Programa completo de 21 passos',
-    'web.subscribe.feature2': 'Áudios para ouvir em qualquer lugar',
+    'web.subscribe.feature2': 'Resumos e ações claras em cada passo',
     'web.subscribe.feature3': 'Baseado em pesquisas científicas revisadas por pares',
     'web.subscribe.feature4': 'Neurociência do sono',
     'web.subscribe.feature5': 'Medicina e ritmos circadianos',
@@ -540,7 +558,7 @@ const translations = {
     'web.subscribe.testimonial2Name': 'R.C.',
     'web.subscribe.testimonial2Text': 'Entendi a base fisiológica da minha fadiga matinal. O passo 2 sobre ritmo circadiano foi especialmente útil.',
     'web.subscribe.testimonial3Name': 'L.F.',
-    'web.subscribe.testimonial3Text': 'O programa é muito bem estruturado. Os vídeos dos especialistas valem cada centavo.',
+    'web.subscribe.testimonial3Text': 'O programa é muito bem estruturado; cada passo traduz ciência em hábitos concretos.',
     'web.subscribe.guaranteeTitle': 'Garantia de satisfação',
     'web.subscribe.guaranteeDesc': 'Se você não estiver satisfeito nos primeiros 7 dias, oferecemos reembolso de 100% do seu dinheiro. Sem perguntas.',
     'web.subscribe.perMonth': '/mês',
@@ -836,7 +854,7 @@ const translations = {
     'payment.redirect': 'Você será redirecionado ao Stripe...',
     'payment.whatIncluded': 'O que está incluído',
     'payment.feature1': '21 passos completos do programa',
-    'payment.feature2': 'Áudios para ouvir em movimento',
+    'payment.feature2': 'Orientações práticas em cada passo',
     'payment.feature3': 'Conteúdo baseado em neurociência do sono',
     'payment.feature4': 'Protocolos de medicina circadiana',
     'payment.feature5': 'Atualizações gratuitas incluídas',
@@ -859,10 +877,10 @@ const translations = {
     // Program/Lesson Premium Modal
     'program.premiumAccess': 'ACESSO PREMIUM',
     'program.premiumTitle': 'Este passo faz parte do plano Premium',
-    'program.premiumDesc': 'Desbloqueie todos os 21 passos do programa completo com vídeos em HD, áudios premium e muito mais.',
+    'program.premiumDesc': 'Desbloqueie todos os 21 passos do programa completo, com atualizações de conteúdo e experiência premium no app.',
     'program.feature1': 'Todos os 21 passos',
-    'program.feature2': 'Vídeos em HD',
-    'program.feature3': 'Áudios premium',
+    'program.feature2': 'Lições escritas passo a passo',
+    'program.feature3': 'Acompanhamento de progresso no app',
     'program.feature4': 'Certificado final',
     'program.startingFrom': 'A partir de',
     'program.perMonth': '/mês',
@@ -963,10 +981,10 @@ const translations = {
     // Privacy Policy
     'privacy.back': 'Voltar',
     'privacy.title': 'Política de Privacidade',
-    'privacy.updated': 'Atualizada em 17 de março de 2026',
+    'privacy.updated': 'Atualizada em 4 de maio de 2026',
     'privacy.ukDpa': 'UK DPA 2018',
     'privacy.summary.title': 'Resumo',
-    'privacy.summary.text': 'O GoZzzz coleta apenas os dados necessários para prestar o serviço. Nunca vendemos seus dados. Você pode acessar, corrigir, exportar ou excluir seus dados a qualquer momento. Esta política está em conformidade com o GDPR (UE/Reino Unido) e a LGPD (Brasil).',
+    'privacy.summary.text': 'O GoZzzz é um programa educativo de sono; referências a investigadores e publicações servem apenas para contexto científico, sem afiliação ou endosso. Coletamos apenas os dados necessários para prestar o serviço. Nunca vendemos seus dados. Você pode acessar, corrigir, exportar ou excluir seus dados a qualquer momento. Esta política está em conformidade com o GDPR (UE/Reino Unido) e a LGPD (Brasil).',
     'privacy.dataController.title': '1. Controlador de Dados',
     'privacy.dataController.text': 'GoZzzz é o controlador dos seus dados pessoais. Para exercer seus direitos ou dúvidas sobre privacidade, entre em contato pelo e-mail:',
     'privacy.dataController.privacy': 'suporte@gozzzz.app',
@@ -1074,18 +1092,18 @@ const translations = {
     'privacy.contact.authorities': 'Autoridades supervisoras:\n• Brasil: ANPD — anpd.gov.br\n• UE: autoridade do país de residência\n• Reino Unido: ICO — ico.org.uk',
 
     // Footer
-    'privacy.footer': 'Ao usar o GoZzzz, você reconhece ter lido e compreendido esta Política de Privacidade. Versão 1.1 — 17 de março de 2026',
+    'privacy.footer': 'Ao usar o GoZzzz, você reconhece ter lido e compreendido esta Política de Privacidade. Versão 1.3 — 4 de maio de 2026',
 
     // Terms & Conditions
     'terms.back': 'Voltar',
     'terms.title': 'Termos e Condições',
-    'terms.updated': 'Atualizado em 17 de março de 2026',
+    'terms.updated': 'Atualizado em 4 de maio de 2026',
     'terms.acceptance.title': '1. Aceitação dos Termos',
-    'terms.acceptance.text': 'Ao criar uma conta e usar o GoZzzz, você concorda com estes Termos e Condições. Se você não concordar com qualquer parte destes termos, não deve usar nossos serviços.',
+    'terms.acceptance.text': 'Ao criar uma conta e usar o GoZzzz, você concorda com estes Termos e Condições. O serviço é educativo e de coaching comportamental do sono; não substitui cuidados de saúde regulamentados. Se você não concordar com qualquer parte destes termos, não deve usar nossos serviços.',
     'terms.service.title': '2. Descrição do Serviço',
     'terms.service.text': 'O GoZzzz é um aplicativo de bem-estar focado em melhorar a qualidade do sono através de um programa estruturado de 21 passos. Oferecemos:',
     'terms.service.item1': '• Programa educacional de 21 lições sobre higiene do sono',
-    'terms.service.item2': '• Conteúdo em vídeo e áudio baseado em pesquisas científicas',
+    'terms.service.item2': '• Lições escritas e orientações práticas baseadas em pesquisas científicas',
     'terms.service.item3': '• Ferramentas de acompanhamento de progresso',
     'terms.service.item4': '• Acesso a recursos premium mediante assinatura',
 
@@ -1243,6 +1261,7 @@ const translations = {
     'profile.settings': 'Settings',
     'profile.language': 'Language',
     'profile.notifications': 'Notifications',
+    'profile.notificationsPermissionDenied': 'Permission denied. Enable notifications in system settings for gentle routine reminders.',
     'profile.darkMode': 'Dark Mode',
     'profile.enabled': 'Enabled',
     'profile.disabled': 'Disabled',
@@ -1271,16 +1290,11 @@ const translations = {
     'modal.help.title': 'Help Center',
     'modal.help.text': 'For any questions about the app, please contact us:',
     'modal.privacy.title': 'Privacy and Terms',
-    'modal.privacy.text': 'Access our complete privacy policy and terms of use at:',
+    'modal.privacy.text': 'Read the full Privacy Policy and Terms & Conditions on the dedicated pages:',
     'modal.logout.title': 'Sign Out',
     'modal.logout.text': 'Are you sure you want to sign out?',
     'modal.logout.cancel': 'Cancel',
     'modal.logout.confirm': 'Sign Out',
-    'modal.upgrade.title': 'Upgrade to Premium',
-    'modal.upgrade.text': 'Access the complete 21-step program and all exclusive content!',
-    'modal.upgrade.feature1': '21 complete lessons',
-    'modal.upgrade.feature2': 'Expert videos and podcasts',
-    'modal.upgrade.viewPlans': 'View Plans',
 
     // Program CTA
     'program.activateTest': 'Activate Premium (Test)',
@@ -1310,7 +1324,7 @@ const translations = {
     'coach.ctaSecurity': 'SSL 256-bit · PCI DSS · Secure payment',
 
     // About hardcoded
-    'about.headerSubtitle': 'When pain becomes purpose',
+    'about.headerSubtitle': 'From insomnia to clarity — method, rigor, and humanity',
     'about.storyTitle': 'My Story',
     'about.story1': 'For almost 10 years, I lived a silent battle that few understood. Endless nights staring at the ceiling, fragmented sleep that left me exhausted, foggy days where I could barely function. Insomnia was not just about not sleeping — it was about losing the essence of who I was.',
     'about.story2': 'I tried everything. Medications that left me like a zombie. Teas and melatonin that made no difference. Meditations that only increased my frustration. Every night was a new hope that turned into disappointment.',
@@ -1338,6 +1352,28 @@ const translations = {
     'about.disclaimer2': 'Before starting any sleep habit change program, consult a doctor or qualified health professional, especially if you have conditions such as sleep apnea, chronic insomnia, mood disorders, medication use or other medical conditions.',
     'about.disclaimer3': 'Results described are individual experiences and may vary from person to person. GoZzzz does not guarantee specific results. If symptoms persist or any condition worsens, seek medical attention immediately.',
     'about.disclaimer4': 'This app does not replace professional medical care.',
+    'about.brandLine': 'About us',
+    'about.heroEyebrow': 'Premium sleep program',
+    'about.heroKicker': 'Actionable science, realistic habits, and a clear path — for people who want progress without guesswork.',
+    'about.stat1Value': '21',
+    'about.stat1Label': 'structured days',
+    'about.stat2Value': '21',
+    'about.stat2Label': 'practical steps',
+    'about.stat3Value': '4',
+    'about.stat3Label': 'guided chronotypes',
+    'about.manifesto': 'Great sleep is not luck — it is a chain of small decisions, repeated, grounded in evidence.',
+    'about.manifestoAuthor': 'GoZzzz philosophy',
+    'about.trustTitle': 'Why this is credible',
+    'about.trustBody': 'We cite leading sleep and circadian researchers and publications. We use responsible language: we educate and motivate — we do not replace your clinician or promise cures.',
+    'about.pillar1Title': 'Evidence over trends',
+    'about.pillar1Body': 'Each theme maps to peer-reviewed science or established manuals — no empty "life hacks".',
+    'about.pillar2Title': 'Chronotype with nuance',
+    'about.pillar2Body': 'Lion, Bear, Wolf, and Dolphin help structure your day — always framed as teaching models, not clinical labels.',
+    'about.pillar3Title': 'From knowledge to habit',
+    'about.pillar3Body': 'Twenty-one steps designed to turn insight into routines your biology can recognize.',
+    'about.unlockTitle': 'Unlock the full program',
+    'about.unlockSubtitle': 'Premium access to every step, content updates, and the full experience.',
+    'about.unlockCta': 'Get Premium',
 
     // Profile hardcoded
     'profile.footerSubtext': 'Made with dedication to support your sleep',
@@ -1388,7 +1424,7 @@ const translations = {
     'web.pricing.subscribeMonthly': 'Subscribe Monthly',
     'web.pricing.subscribeAnnual': 'Subscribe Annual',
     'web.pricing.feature1': '21 complete program steps',
-    'web.pricing.feature2': 'Expert videos and podcasts included',
+    'web.pricing.feature2': 'Science-based 21-step structured program',
     'web.pricing.feature3': 'Based on research from 4 sleep scientists',
     'web.pricing.feature4': 'Free updates included',
     'web.pricing.feature5': 'Cancel anytime',
@@ -1416,9 +1452,9 @@ const translations = {
     'web.program.unlock': 'Unlock',
     'web.program.lockedDesc': 'Premium content. Subscribe to unlock this step and access the full program.',
     'web.program.ctaTitle': 'Unlock all 21 steps',
-    'web.program.ctaDesc': 'From $11.90/month. Access the complete program, videos, audios and free updates.',
+    'web.program.ctaDesc': 'From $11.90/month. Access the full program, written lessons, and free updates.',
     'web.program.ctaFeature1': '21 complete steps',
-    'web.program.ctaFeature2': 'Videos and podcasts included',
+    'web.program.ctaFeature2': 'Written lessons and practical steps',
     'web.program.ctaFeature3': 'Science-based',
     'web.program.ctaFeature4': 'Cancel anytime',
     'web.program.ctaBtn': 'Subscribe Premium Now',
@@ -1492,7 +1528,7 @@ const translations = {
     'web.coach.price1.f1': 'Complete mapping of your sleep habits',
     'web.coach.price1.f1sub': 'We analyze your history, routine, environment, and patterns — to understand exactly why you\'re not sleeping well.',
     'web.coach.price1.f2': '90-minute online session',
-    'web.coach.price1.f2sub': 'Via video, no rush, from wherever you are. You talk, we listen — no judgment, no one-size-fits-all solutions.',
+    'web.coach.price1.f2sub': 'Remotely, at your pace, from wherever you are. You talk, we listen — no judgment, no one-size-fits-all solutions.',
     'web.coach.price1.f3': 'Post-session sleep report',
     'web.coach.price1.f3sub': 'A complete document with findings, strategies, and next steps — delivered to your email within 72h.',
     'web.coach.price1.f4': 'WhatsApp support',
@@ -1814,7 +1850,7 @@ const translations = {
     'payment.redirect': 'You will be redirected to Stripe...',
     'payment.whatIncluded': 'What\'s included',
     'payment.feature1': '21 complete program steps',
-    'payment.feature2': 'Audios to listen on the go',
+    'payment.feature2': 'Practical guidance in every step',
     'payment.feature3': 'Content grounded in sleep neuroscience',
     'payment.feature4': 'Circadian medicine protocols',
     'payment.feature5': 'Free updates included',
@@ -1836,10 +1872,10 @@ const translations = {
     // Program/Lesson Premium Modal
     'program.premiumAccess': 'PREMIUM ACCESS',
     'program.premiumTitle': 'This step is part of the Premium plan',
-    'program.premiumDesc': 'Unlock all 21 steps of the complete program with HD videos, premium audio and much more.',
+    'program.premiumDesc': 'Unlock all 21 steps of the full program, with content updates and the premium in-app experience.',
     'program.feature1': 'All 21 steps',
-    'program.feature2': 'HD videos',
-    'program.feature3': 'Premium audio',
+    'program.feature2': 'Written step-by-step lessons',
+    'program.feature3': 'In-app progress tracking',
     'program.feature4': 'Final certificate',
     'program.startingFrom': 'Starting at',
     'program.perMonth': '/month',
@@ -1940,10 +1976,10 @@ const translations = {
     // Privacy Policy
     'privacy.back': 'Back',
     'privacy.title': 'Privacy Policy',
-    'privacy.updated': 'Updated March 17, 2026',
+    'privacy.updated': 'Updated May 4, 2026',
     'privacy.ukDpa': 'UK DPA 2018',
     'privacy.summary.title': 'Summary',
-    'privacy.summary.text': 'GoZzzz collects only the data necessary to provide the service. We never sell your data. You can access, correct, export or delete your data at any time. This policy complies with the GDPR (EU/UK) and the LGPD (Brazil).',
+    'privacy.summary.text': 'GoZzzz is an educational sleep program; references to researchers and publications are for scientific context only, without affiliation or endorsement. We collect only the data necessary to provide the service. We never sell your data. You can access, correct, export or delete your data at any time. This policy complies with the GDPR (EU/UK) and the LGPD (Brazil).',
     'privacy.dataController.title': '1. Data Controller',
     'privacy.dataController.text': 'GoZzzz is the controller of your personal data. To exercise your rights or for privacy questions, contact us at:',
     'privacy.dataController.privacy': 'suporte@gozzzz.app',
@@ -2051,18 +2087,18 @@ const translations = {
     'privacy.contact.authorities': 'Supervisory authorities:\n• Brazil: ANPD — anpd.gov.br\n• EU: authority in your country of residence\n• UK: ICO — ico.org.uk',
 
     // Footer
-    'privacy.footer': 'By using GoZzzz, you acknowledge that you have read and understood this Privacy Policy. Version 1.1 — March 17, 2026',
+    'privacy.footer': 'By using GoZzzz, you acknowledge that you have read and understood this Privacy Policy. Version 1.3 — May 4, 2026',
 
     // Terms & Conditions
     'terms.back': 'Back',
     'terms.title': 'Terms & Conditions',
-    'terms.updated': 'Updated March 17, 2026',
+    'terms.updated': 'Updated May 4, 2026',
     'terms.acceptance.title': '1. Acceptance of Terms',
-    'terms.acceptance.text': 'By creating an account and using GoZzzz, you agree to these Terms and Conditions. If you do not agree with any part of these terms, you should not use our services.',
+    'terms.acceptance.text': 'By creating an account and using GoZzzz, you agree to these Terms and Conditions. The service is educational sleep and behavioral coaching; it does not replace regulated healthcare. If you do not agree with any part of these terms, you should not use our services.',
     'terms.service.title': '2. Service Description',
     'terms.service.text': 'GoZzzz is a wellness application focused on improving sleep quality through a structured 21-step program. We offer:',
     'terms.service.item1': '• Educational program of 21 lessons on sleep hygiene',
-    'terms.service.item2': '• Video and audio content based on scientific research',
+    'terms.service.item2': '• Written lessons and practical guidance based on scientific research',
     'terms.service.item3': '• Progress tracking tools',
     'terms.service.item4': '• Access to premium resources through subscription',
 
@@ -2095,7 +2131,7 @@ const translations = {
     'web.about.programFeature1': 'Built by sleep scientists and researchers',
     'web.about.programFeature2': 'Backed by peer-reviewed neuroscience',
     'web.about.programFeature3': 'Personalized coaching and support',
-    'web.about.programFeature4': 'Lifetime access to all materials',
+    'web.about.programFeature4': 'Ongoing access to program content and updates',
     'web.about.whyTitle': 'Why GoZzzz?',
     'web.about.whyText': 'Because sleep deserves the same scientific attention we give to nutrition, fitness, and mental health. Quality sleep is the foundation of everything else.',
     'web.about.disclaimerTitle': 'Medical Disclaimer',
@@ -2128,7 +2164,7 @@ const translations = {
     'web.subscribe.disclaimer': 'Cancel anytime. No hidden fees. Immediate access after confirmation.',
     'web.subscribe.included': 'What\'s included',
     'web.subscribe.feature1': 'Complete 21-step program',
-    'web.subscribe.feature2': 'Audios to listen on the go',
+    'web.subscribe.feature2': 'Clear summaries and actions in each step',
     'web.subscribe.feature3': 'Based on peer-reviewed sleep science research',
     'web.subscribe.feature4': 'Sleep neuroscience',
     'web.subscribe.feature5': 'Circadian medicine',
@@ -2141,7 +2177,7 @@ const translations = {
     'web.subscribe.testimonial2Name': 'R.C.',
     'web.subscribe.testimonial2Text': 'I understood the physiological basis of my morning fatigue. Step 2 on circadian rhythm was especially useful.',
     'web.subscribe.testimonial3Name': 'L.F.',
-    'web.subscribe.testimonial3Text': 'The program is very well structured. The expert videos are worth every penny.',
+    'web.subscribe.testimonial3Text': 'The program is very well structured; each step turns science into concrete habits.',
     'web.subscribe.guaranteeTitle': 'Satisfaction guarantee',
     'web.subscribe.guaranteeDesc': 'If you\'re not satisfied in the first 7 days, we refund 100% of your money. No questions asked.',
     'web.subscribe.perMonth': '/month',
@@ -2296,8 +2332,9 @@ export function LanguageProvider({ children }: { children: ReactNode }) {
     }
   };
 
-  const t = (key: string): string => {
-    return (translations[language] as Record<string, string>)[key] || key;
+  const t = (key: string, lang?: Language): string => {
+    const loc = lang ?? language;
+    return (translations[loc] as Record<string, string>)[key] || key;
   };
 
   useEffect(() => {
@@ -2314,7 +2351,7 @@ export function LanguageProvider({ children }: { children: ReactNode }) {
 const defaultLanguageContext: LanguageContextType = {
   language: 'pt',
   setLanguage: () => {},
-  t: (key: string) => key,
+  t: (key: string, _lang?: Language) => key,
   languageSelected: true,
   confirmLanguage: () => {},
 };

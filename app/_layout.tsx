@@ -7,6 +7,7 @@ import { ToastProvider } from '@/contexts/ToastContext';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { StyleSheet, View, ActivityIndicator, Text, TouchableOpacity, Modal } from 'react-native';
 import { CookieConsent } from '@/components/CookieConsent';
+import { EngagementNotificationSync } from '@/components/EngagementNotificationSync';
 import { ToastContainer } from '@/components/Toast';
 import { ErrorBoundary } from '@/components/ErrorBoundary';
 import { useEffect, useRef, useState } from 'react';
@@ -176,6 +177,7 @@ export default function AppLayout() {
             <AuthProvider>
               <ToastProvider>
                 <RootNavigator />
+                <EngagementNotificationSync />
                 <CookieConsent />
                 <ToastContainer />
               </ToastProvider>

@@ -191,21 +191,6 @@ const styles = StyleSheet.create({
     lineHeight: 20,
     fontStyle: 'italic',
   },
-  videoButton: {
-    marginHorizontal: isWeb ? 48 : 16,
-    marginVertical: isWeb ? 40 : 20,
-    backgroundColor: '#6366f1',
-    paddingVertical: 16,
-    borderRadius: 10,
-    alignItems: 'center',
-    maxWidth: isWeb ? 400 : undefined,
-    alignSelf: 'center',
-  },
-  videoButtonText: {
-    color: '#ffffff',
-    fontSize: 16,
-    fontWeight: '700',
-  },
   spacer: {
     height: 20,
   },
