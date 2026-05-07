@@ -27,15 +27,16 @@ const isWeb = Platform.OS === 'web';
 
 export default function WebProgramPage() {
   const router = useRouter();
-  const { t } = useLanguage();
+  const { t: translate } = useLanguage();
+  const t = (key: string) => translate(key, 'pt');
 
 
   const allSteps = [
     ...LESSONS_DATA.map((l) => ({
       id: l.id,
       num: l.step_number,
-      title: l.title_en,
-      desc: l.description_en.substring(0, 120) + '...',
+      title: l.title_pt,
+      desc: l.description_pt.substring(0, 120) + '...',
       free: l.step_number <= 3,
     })),
   ];
@@ -62,7 +63,7 @@ export default function WebProgramPage() {
           </TouchableOpacity>
           <TouchableOpacity onPress={() => router.back()} style={styles.backBtn}>
             <ArrowLeft size={18} color="#ffffff" />
-            <Text style={styles.backBtnText}>Back</Text>
+            <Text style={styles.backBtnText}>Voltar</Text>
           </TouchableOpacity>
         </View>
       </LinearGradient>
@@ -87,7 +88,7 @@ export default function WebProgramPage() {
           </View>
           <View style={styles.headerStatDiv} />
           <View style={styles.headerStat}>
-            <Text style={styles.headerStatNum}>5min</Text>
+            <Text style={styles.headerStatNum}>5 min</Text>
             <Text style={styles.headerStatLabel}>{t('web.program.eachStep')}</Text>
           </View>
         </View>
@@ -169,7 +170,7 @@ export default function WebProgramPage() {
             <View style={styles.ctaPayRow}>
               <View style={styles.ctaPayBadge}>
                 <CreditCard size={13} color="#94a3b8" />
-                <Text style={styles.ctaPayBadgeText}>Card</Text>
+                <Text style={styles.ctaPayBadgeText}>Cartão</Text>
               </View>
               <View style={styles.ctaPayBadge}>
                 <Text style={styles.ctaPayBadgeEmoji}></Text>
@@ -188,7 +189,7 @@ export default function WebProgramPage() {
               <Lock size={12} color="#10b981" />
               <Text style={styles.ctaSecurityText}>{t('payment.ssl')}</Text>
               <Shield size={12} color="#3b82f6" />
-              <Text style={styles.ctaSecurityText}>Stripe Secure</Text>
+              <Text style={styles.ctaSecurityText}>Pagamento seguro via Stripe</Text>
               <BadgeCheck size={12} color="#f59e0b" />
               <Text style={styles.ctaSecurityText}>{t('payment.pciDss')}</Text>
             </View>
@@ -198,7 +199,7 @@ export default function WebProgramPage() {
 
       {/* FOOTER */}
       <View style={styles.footer}>
-        <Text style={styles.footerText}>© 2026 GoZzzz · MORFEU SAUDE E TECNOLOGIA LTDA · CNPJ: 66.059.212/0001-52</Text>
+        <Text style={styles.footerText}>© 2026 GoZzzz · MORFEU SAÚDE E TECNOLOGIA LTDA · CNPJ: 66.059.212/0001-52</Text>
         </View>
       </ScrollView>
     </>

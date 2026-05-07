@@ -239,7 +239,7 @@ export default function TermsEnScreen() {
 
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>19. Contact</Text>
-          <Text style={styles.companyName}>MORFEU SAUDE E TECNOLOGIA LTDA</Text>
+          <Text style={styles.companyName}>MORFEU SAÚDE E TECNOLOGIA LTDA</Text>
           <Text style={styles.companyCnpj}>CNPJ: 66.059.212/0001-52</Text>
           <Text style={styles.text}>
             Questions about these terms?

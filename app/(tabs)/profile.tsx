@@ -92,14 +92,14 @@ function ProfileContent() {
 
   const handleRedeemGift = async () => {
     if (!giftCode.trim()) {
-      showError(t('profile.giftAlert') || 'Please enter a gift code');
+      showError(t('profile.giftCodeRequired'));
       return;
     }
 
     try {
       const { data: { session } } = await (await import('@/lib/supabase')).supabase.auth.getSession();
       if (!session) {
-        showError('Not authenticated');
+        showError(t('profile.notAuthenticated'));
         return;
       }
 
@@ -118,16 +118,16 @@ function ProfileContent() {
       const data = await response.json();
 
       if (!response.ok) {
-        showError(data.error || 'Failed to redeem gift code');
+        showError(data.error || t('profile.giftRedeemError'));
         return;
       }
 
-      showSuccess(t('profile.giftAlert') || 'Gift code redeemed successfully!');
+      showSuccess(t('profile.giftRedeemSuccess'));
       setGiftCode('');
       setGiftModalVisible(false);
     } catch (err) {
       console.error('Redeem error:', err);
-      showError('An error occurred. Please try again.');
+      showError(t('auth.login.errorUnexpected'));
     }
   };
 
@@ -427,7 +427,7 @@ function ProfileContent() {
           <Text style={[styles.footerSubtext, { color: tc.footerSubtext }]}>
             {t('profile.footerSubtext')}
           </Text>
-          <Text style={[styles.footerCompany, { color: tc.textSecondary }]}>MORFEU SAUDE E TECNOLOGIA LTDA</Text>
+          <Text style={[styles.footerCompany, { color: tc.textSecondary }]}>MORFEU SAÚDE E TECNOLOGIA LTDA</Text>
           <Text style={[styles.footerCnpj, { color: tc.footerText }]}>CNPJ: 66.059.212/0001-52</Text>
         </View>
       </View>

@@ -155,7 +155,7 @@ export default function LoginScreen() {
           </View>
 
           <Text style={styles.footer}>{t('auth.login.footer')}</Text>
-          <Text style={styles.companyName}>MORFEU SAUDE E TECNOLOGIA LTDA</Text>
+          <Text style={styles.companyName}>MORFEU SAÚDE E TECNOLOGIA LTDA</Text>
           <Text style={styles.companyCnpj}>CNPJ: 66.059.212/0001-52</Text>
         </ScrollView>
         </SafeAreaView>

@@ -87,12 +87,14 @@ const CONTENT = {
 
 export default function WebAssinarPage() {
   const router = useRouter();
-  const { t, language } = useLanguage();
+  const { t: translate } = useLanguage();
+  const language: 'pt' = 'pt';
+  const t = (key: string) => translate(key, 'pt');
   const [selectedPlan] = useState<'annual'>('annual');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
-  const [pricing, setPricing] = useState<PricingData>(DEFAULT_PRICING[language]);
+  const [pricing, setPricing] = useState<PricingData>(DEFAULT_PRICING.pt);
 
   useEffect(() => {
     if (isWeb) {
@@ -106,8 +108,7 @@ export default function WebAssinarPage() {
   useEffect(() => {
     (async () => {
       try {
-        const currencyMap = { pt: 'BRL', en: 'USD' };
-        const currency = currencyMap[language as keyof typeof currencyMap];
+        const currency = 'BRL';
         const { data } = await (supabase.from('pricing') as any)
           .select('price, label, equiv, note')
           .eq('plan_type', 'annual')
@@ -119,7 +120,7 @@ export default function WebAssinarPage() {
         if (data) {
           setPricing({
             currency,
-            symbol: language === 'pt' ? 'R$' : '$',
+            symbol: 'R$',
             annual: {
               price: data.price,
               label: data.label,
@@ -130,10 +131,10 @@ export default function WebAssinarPage() {
         }
       } catch (err) {
         console.error('Error fetching pricing:', err);
-        setPricing(DEFAULT_PRICING[language]);
+        setPricing(DEFAULT_PRICING.pt);
       }
     })();
-  }, [language]);
+  }, []);
 
   const c = CONTENT;
   const p = pricing;
@@ -344,7 +345,7 @@ export default function WebAssinarPage() {
 
       <View style={styles.footer}>
         <Text style={styles.footerText}>{t('web.footer.copyright')}</Text>
-        <Text style={styles.footerCompany}>MORFEU SAUDE E TECNOLOGIA LTDA</Text>
+        <Text style={styles.footerCompany}>MORFEU SAÚDE E TECNOLOGIA LTDA</Text>
         <Text style={styles.footerCnpj}>CNPJ: 66.059.212/0001-52</Text>
       </View>
       </ScrollView>

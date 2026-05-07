@@ -455,12 +455,14 @@ const styles = StyleSheet.create({
   scroll: {
     flex: 1,
     zIndex: 1,
+    backgroundColor: T.color.canvas,
   },
   scrollInner: {
     paddingHorizontal: T.space.pageInline,
     paddingTop: T.space.pageTop,
     paddingBottom: T.space.pageBottom,
     alignItems: 'center',
+    backgroundColor: T.color.canvas,
   },
   logoBlock: {
     alignItems: 'center',

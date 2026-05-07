@@ -72,7 +72,7 @@ export default function CadastroScreen() {
     }
 
     if (!consentTerms) {
-      showError(t('auth.signup.errorAgreements'));
+      showError(t('auth.signup.errorConsent'));
       return;
     }
 
@@ -112,7 +112,7 @@ export default function CadastroScreen() {
       }
     } catch {
       setLoading(false);
-      showError('An unexpected error occurred');
+      showError(t('auth.login.errorUnexpected'));
     }
   };
 
@@ -324,7 +324,7 @@ export default function CadastroScreen() {
             </View>
 
             <Text style={styles.footer}>{t('auth.signup.footer')}</Text>
-            <Text style={styles.companyName}>MORFEU SAUDE E TECNOLOGIA LTDA</Text>
+            <Text style={styles.companyName}>MORFEU SAÚDE E TECNOLOGIA LTDA</Text>
             <Text style={styles.companyCnpj}>CNPJ: 66.059.212/0001-52</Text>
           </View>
         </ScrollView>

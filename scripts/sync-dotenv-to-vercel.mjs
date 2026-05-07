@@ -58,11 +58,10 @@ function isUsableSupabaseAnonKey(key) {
 }
 
 function vercelEnvSet(name, value, environment) {
-  const r = spawnSync('npx', ['vercel', 'env', 'add', name, environment, '--force'], {
+  const r = spawnSync('npx', ['vercel', 'env', 'add', name, environment, '--force', '-y', '--value', value], {
     cwd: root,
-    input: value,
     encoding: 'utf8',
-    stdio: ['pipe', 'inherit', 'inherit'],
+    stdio: ['inherit', 'inherit', 'inherit'],
     env: { ...process.env },
   });
   if (r.status !== 0) {

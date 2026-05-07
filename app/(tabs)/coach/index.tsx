@@ -1,7 +1,7 @@
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Linking } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { LinearGradient } from 'expo-linear-gradient';
-import { Heart, Sparkles, MessageCircle, Calendar, ArrowRight, Crown, Lock, Shield, BadgeCheck } from 'lucide-react-native';
+import { Heart, Sparkles, MessageCircle, Calendar, ArrowRight, Crown, Lock, Shield, BadgeCheck, ArrowLeft } from 'lucide-react-native';
 import { useRouter } from 'expo-router';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useTheme } from '@/contexts/ThemeContext';
@@ -12,7 +12,7 @@ import { useState, useEffect } from 'react';
 
 import { ErrorBoundary } from '@/components/ErrorBoundary';
 
-function CoachContent() {
+export function CoachContent({ showBack = false }: { showBack?: boolean }) {
   const router = useRouter();
   const { t } = useLanguage();
   const { isDark } = useTheme();
@@ -61,6 +61,11 @@ function CoachContent() {
         colors={tc.gradientColors}
         style={[styles.header, { paddingTop: insets.top + 24 }]}
       >
+        {showBack ? (
+          <TouchableOpacity onPress={() => router.back()} style={styles.backButton}>
+            <ArrowLeft size={24} color="#ffffff" />
+          </TouchableOpacity>
+        ) : null}
         <View style={styles.headerContent}>
           <Heart size={48} color="#ffffff" />
           <Text style={styles.headerTitle}>{t('coach.title')}</Text>
@@ -72,25 +77,43 @@ function CoachContent() {
 
       <View style={styles.content}>
         <View style={styles.introSection}>
-          <Text style={[styles.introTitle, { color: tc.textPrimary }]}>{t('coach.intro.title')}</Text>
+          {t('coach.intro.title').length > 0 ? (
+            <Text style={[styles.introTitle, { color: tc.textPrimary }]}>{t('coach.intro.title')}</Text>
+          ) : null}
           <Text style={[styles.introText, { color: tc.textSecondary }]}>
             {t('coach.intro.text')}
           </Text>
         </View>
 
-        <View style={styles.servicesSection}>
-          <Text style={[styles.sectionTitle, { color: tc.textPrimary }]}>{t('coach.services.title')}</Text>
+        <View style={styles.testimonialsSection}>
+          <Text style={[styles.sectionTitle, { color: tc.textPrimary }]}>{t('coach.pain.title')}</Text>
+          <View style={[styles.credentialsBox, { backgroundColor: tc.credentialsBg }]}>
+            <Text style={[styles.credentialsText, { color: tc.textSecondary }]}>
+              {t('coach.pain.body')}
+            </Text>
+          </View>
+        </View>
 
-          <View style={[styles.serviceCard, { backgroundColor: tc.card, borderColor: tc.border }]}>
-            <View style={[styles.serviceIcon, { backgroundColor: 'rgba(212,169,106,0.12)' }]}>
-              <Sparkles size={28} color="#d4a96a" />
-            </View>
-            <View style={styles.serviceContent}>
-              <Text style={[styles.serviceTitle, { color: tc.textPrimary }]}>{t('coach.service2.title')}</Text>
-              <Text style={[styles.serviceDescription, { color: tc.textSecondary }]}>
-                {t('coach.service2.desc')}
+        <View style={styles.testimonialsSection}>
+          <Text style={[styles.sectionTitle, { color: tc.textPrimary }]}>{t('coach.cause.title')}</Text>
+          <View style={[styles.credentialsBox, { backgroundColor: tc.credentialsBg }]}>
+            <Text style={[styles.credentialsText, { color: tc.textSecondary }]}>
+              {t('coach.cause.body')}
+            </Text>
+          </View>
+        </View>
+
+        <View style={styles.testimonialsSection}>
+          <Text style={[styles.sectionTitle, { color: tc.textPrimary }]}>{t('coach.trust.title')}</Text>
+          <View style={[styles.credentialsBox, { backgroundColor: tc.credentialsBg }]}>
+            <Text style={[styles.credentialsText, { color: tc.textSecondary }]}>
+              {t('coach.trust.text1')}
+            </Text>
+            {t('coach.trust.text2').length > 0 ? (
+              <Text style={[styles.credentialsText, { color: tc.textSecondary }]}>
+                {t('coach.trust.text2')}
               </Text>
-            </View>
+            ) : null}
           </View>
         </View>
 
@@ -134,16 +157,104 @@ function CoachContent() {
           </View>
         </View>
 
-        <View style={styles.testimonialsSection}>
-          <Text style={[styles.sectionTitle, { color: tc.textPrimary }]}>{t('coach.trust.title')}</Text>
-          <View style={[styles.credentialsBox, { backgroundColor: tc.credentialsBg }]}>
-            <Text style={[styles.credentialsText, { color: tc.textSecondary }]}>
-              {t('coach.trust.text1')}
-            </Text>
-            <Text style={[styles.credentialsText, { color: tc.textSecondary }]}>
-              {t('coach.trust.text2')}
-            </Text>
+        <View style={styles.servicesSection}>
+          <Text style={[styles.sectionTitle, { color: tc.textPrimary }]}>{t('coach.services.title')}</Text>
+
+          <View style={[styles.serviceCard, { backgroundColor: tc.card, borderColor: tc.border }]}>
+            <View style={[styles.serviceIcon, { backgroundColor: 'rgba(212,169,106,0.12)' }]}>
+              <Sparkles size={28} color="#d4a96a" />
+            </View>
+            <View style={styles.serviceContent}>
+              <Text style={[styles.serviceTitle, { color: tc.textPrimary }]}>{t('coach.service2.title')}</Text>
+              <Text style={[styles.serviceDescription, { color: tc.textSecondary }]}>
+                {t('coach.service2.desc')}
+              </Text>
+            </View>
           </View>
+        </View>
+
+        <View style={styles.investmentSection}>
+          <Text style={[styles.investmentTitle, { color: tc.textPrimary }]}>{t('coach.investment.title')}</Text>
+          <View style={[styles.priceCard, { backgroundColor: tc.card, borderColor: tc.border }]}>
+            <View style={styles.priceHeader}>
+              <Text style={[styles.priceLabel, { color: tc.textPrimary }]}>{t('coach.price1.label')}</Text>
+              <View style={styles.priceBadge}>
+                <Text style={styles.priceBadgeText}>{t('coach.price1.badge')}</Text>
+              </View>
+            </View>
+
+            <View style={styles.priceTaglines}>
+              <Text style={styles.priceTagline}>{t('web.coach.price1.tagline1')}</Text>
+              <Text style={styles.priceTagline}>{t('web.coach.price1.tagline2')}</Text>
+              <Text style={styles.priceTagline}>{t('web.coach.price1.tagline3')}</Text>
+            </View>
+
+            <View style={styles.priceAmountRow}>
+              <Text style={styles.priceAmount}>{t('web.coach.price1')}</Text>
+              <Text style={[styles.priceAmountSub, { color: tc.textSecondary }]}>{t('web.coach.price1Sub')}</Text>
+            </View>
+
+            <Text style={[styles.priceDescription, { color: tc.textSecondary }]}>{t('web.coach.price1.desc')}</Text>
+
+            <View style={styles.priceDivider} />
+
+            <View style={styles.priceFeatures}>
+              <View style={styles.priceFeatureItem}>
+                <Text style={styles.priceFeatureIcon}>•</Text>
+                <View style={styles.priceFeatureContent}>
+                  <Text style={[styles.priceFeatureTitle, { color: tc.textPrimary }]}>{t('web.coach.price1.f1')}</Text>
+                  {t('web.coach.price1.f1sub').length > 0 ? (
+                    <Text style={[styles.priceFeatureSub, { color: tc.textSecondary }]}>{t('web.coach.price1.f1sub')}</Text>
+                  ) : null}
+                </View>
+              </View>
+
+              <View style={styles.priceFeatureItem}>
+                <Text style={styles.priceFeatureIcon}>•</Text>
+                <View style={styles.priceFeatureContent}>
+                  <Text style={[styles.priceFeatureTitle, { color: tc.textPrimary }]}>{t('web.coach.price1.f2')}</Text>
+                  {t('web.coach.price1.f2sub').length > 0 ? (
+                    <Text style={[styles.priceFeatureSub, { color: tc.textSecondary }]}>{t('web.coach.price1.f2sub')}</Text>
+                  ) : null}
+                </View>
+              </View>
+
+              <View style={styles.priceFeatureItem}>
+                <Text style={styles.priceFeatureIcon}>•</Text>
+                <View style={styles.priceFeatureContent}>
+                  <Text style={[styles.priceFeatureTitle, { color: tc.textPrimary }]}>{t('web.coach.price1.f3')}</Text>
+                  {t('web.coach.price1.f3sub').length > 0 ? (
+                    <Text style={[styles.priceFeatureSub, { color: tc.textSecondary }]}>{t('web.coach.price1.f3sub')}</Text>
+                  ) : null}
+                </View>
+              </View>
+
+              <View style={styles.priceFeatureItem}>
+                <Text style={styles.priceFeatureIcon}>•</Text>
+                <View style={styles.priceFeatureContent}>
+                  <Text style={[styles.priceFeatureTitle, { color: tc.textPrimary }]}>{t('web.coach.price1.f4')}</Text>
+                  {t('web.coach.price1.f4sub').length > 0 ? (
+                    <Text style={[styles.priceFeatureSub, { color: tc.textSecondary }]}>{t('web.coach.price1.f4sub')}</Text>
+                  ) : null}
+                </View>
+              </View>
+
+              <View style={styles.priceFeatureItem}>
+                <Text style={styles.priceFeatureIcon}>•</Text>
+                <View style={styles.priceFeatureContent}>
+                  <Text style={[styles.priceFeatureTitle, { color: tc.textPrimary }]}>{t('web.coach.price1.f5')}</Text>
+                  {t('web.coach.price1.f5sub').length > 0 ? (
+                    <Text style={[styles.priceFeatureSub, { color: tc.textSecondary }]}>{t('web.coach.price1.f5sub')}</Text>
+                  ) : null}
+                </View>
+              </View>
+            </View>
+
+            <TouchableOpacity style={styles.priceCta} onPress={handleBookConsultation}>
+              <Text style={styles.priceCtaText}>{t('web.coach.price1.btn')}</Text>
+            </TouchableOpacity>
+          </View>
+
         </View>
 
         <View style={[styles.ctaSection, { backgroundColor: tc.card, borderColor: tc.border }]}>
@@ -192,82 +303,16 @@ function CoachContent() {
         </View>
         )}
 
-        <View style={styles.investmentSection}>
-          <Text style={[styles.investmentTitle, { color: tc.textPrimary }]}>{t('coach.investment.title')}</Text>
-          <View style={[styles.priceCard, { backgroundColor: tc.card, borderColor: tc.border }]}>
-            <View style={styles.priceHeader}>
-              <Text style={[styles.priceLabel, { color: tc.textPrimary }]}>{t('coach.price1.label')}</Text>
-              <View style={styles.priceBadge}>
-                <Text style={styles.priceBadgeText}>{t('coach.price1.badge')}</Text>
-              </View>
-            </View>
-
-            <View style={styles.priceTaglines}>
-              <Text style={styles.priceTagline}>{t('web.coach.price1.tagline1')}</Text>
-              <Text style={styles.priceTagline}>{t('web.coach.price1.tagline2')}</Text>
-              <Text style={styles.priceTagline}>{t('web.coach.price1.tagline3')}</Text>
-            </View>
-
-            <View style={styles.priceAmountRow}>
-              <Text style={styles.priceAmount}>{t('web.coach.price1')}</Text>
-              <Text style={[styles.priceAmountSub, { color: tc.textSecondary }]}>{t('web.coach.price1Sub')}</Text>
-            </View>
-
-            <Text style={[styles.priceDescription, { color: tc.textSecondary }]}>{t('web.coach.price1.desc')}</Text>
-
-            <View style={styles.priceDivider} />
-
-            <View style={styles.priceFeatures}>
-              <View style={styles.priceFeatureItem}>
-                <Text style={styles.priceFeatureIcon}>🔍</Text>
-                <View style={styles.priceFeatureContent}>
-                  <Text style={[styles.priceFeatureTitle, { color: tc.textPrimary }]}>{t('web.coach.price1.f1')}</Text>
-                  <Text style={[styles.priceFeatureSub, { color: tc.textSecondary }]}>{t('web.coach.price1.f1sub')}</Text>
-                </View>
-              </View>
-
-              <View style={styles.priceFeatureItem}>
-                <Text style={styles.priceFeatureIcon}>🎥</Text>
-                <View style={styles.priceFeatureContent}>
-                  <Text style={[styles.priceFeatureTitle, { color: tc.textPrimary }]}>{t('web.coach.price1.f2')}</Text>
-                  <Text style={[styles.priceFeatureSub, { color: tc.textSecondary }]}>{t('web.coach.price1.f2sub')}</Text>
-                </View>
-              </View>
-
-              <View style={styles.priceFeatureItem}>
-                <Text style={styles.priceFeatureIcon}>📄</Text>
-                <View style={styles.priceFeatureContent}>
-                  <Text style={[styles.priceFeatureTitle, { color: tc.textPrimary }]}>{t('web.coach.price1.f3')}</Text>
-                  <Text style={[styles.priceFeatureSub, { color: tc.textSecondary }]}>{t('web.coach.price1.f3sub')}</Text>
-                </View>
-              </View>
-
-              <View style={styles.priceFeatureItem}>
-                <Text style={styles.priceFeatureIcon}>💬</Text>
-                <View style={styles.priceFeatureContent}>
-                  <Text style={[styles.priceFeatureTitle, { color: tc.textPrimary }]}>{t('web.coach.price1.f4')}</Text>
-                  <Text style={[styles.priceFeatureSub, { color: tc.textSecondary }]}>{t('web.coach.price1.f4sub')}</Text>
-                </View>
-              </View>
-
-              <View style={styles.priceFeatureItem}>
-                <Text style={styles.priceFeatureIcon}>⭐</Text>
-                <View style={styles.priceFeatureContent}>
-                  <Text style={[styles.priceFeatureTitle, { color: tc.textPrimary }]}>{t('web.coach.price1.f5')}</Text>
-                  <Text style={[styles.priceFeatureSub, { color: tc.textSecondary }]}>{t('web.coach.price1.f5sub')}</Text>
-                </View>
-              </View>
-            </View>
-
-            <TouchableOpacity style={styles.priceCta} onPress={handleBookConsultation}>
-              <Text style={styles.priceCtaText}>{t('web.coach.price1.btn')}</Text>
-            </TouchableOpacity>
+        {showBack ? (
+          <View style={styles.disclaimerSection}>
+            <Text style={[styles.disclaimerText, { color: tc.textSecondary }]}>
+              {t('coach.disclaimer')}
+            </Text>
           </View>
-
-        </View>
+        ) : null}
 
         <View style={styles.coachFooter}>
-          <Text style={[styles.coachFooterCompany, { color: tc.textSecondary }]}>MORFEU SAUDE E TECNOLOGIA LTDA</Text>
+          <Text style={[styles.coachFooterCompany, { color: tc.textSecondary }]}>MORFEU SAÚDE E TECNOLOGIA LTDA</Text>
           <Text style={[styles.coachFooterCnpj, { color: tc.textSecondary }]}>CNPJ: 66.059.212/0001-52</Text>
         </View>
       </View>
@@ -290,6 +335,9 @@ const styles = StyleSheet.create({
   header: {
     paddingBottom: 40,
     paddingHorizontal: 24,
+  },
+  backButton: {
+    marginBottom: 16,
   },
   headerContent: {
     alignItems: 'center',
@@ -622,4 +670,13 @@ const styles = StyleSheet.create({
   },
   coachFooterCompany: { fontSize: 12, fontWeight: '600' },
   coachFooterCnpj: { fontSize: 12 },
+  disclaimerSection: {
+    paddingHorizontal: 0,
+    paddingVertical: 8,
+    marginBottom: 16,
+  },
+  disclaimerText: {
+    fontSize: 12,
+    lineHeight: 18,
+  },
 });

@@ -50,7 +50,7 @@ export default function WebSobrePage() {
           </TouchableOpacity>
           <TouchableOpacity onPress={() => router.back()} style={styles.backBtn}>
             <ArrowLeft size={18} color="#ffffff" />
-            <Text style={styles.backBtnText}>Back</Text>
+            <Text style={styles.backBtnText}>Voltar</Text>
           </TouchableOpacity>
         </View>
       </LinearGradient>
@@ -163,7 +163,7 @@ export default function WebSobrePage() {
             <Text style={styles.disclaimerText}>{t('web.about.disclaimerText3')}</Text>
             <View style={styles.affiliationDisclaimer}>
               <Text style={styles.affiliationDisclaimerText}>
-                GoZzzz is not affiliated with, endorsed by, or associated with Matthew Walker, Andrew Huberman, Michael Breus, Charles Czeisler, or their respective universities, employers, or institutions. Any reference to these researchers constitutes citation of their independently published work only.
+                O GoZzzz não é afiliado, endossado nem associado a Matthew Walker, Andrew Huberman, Michael Breus, Charles Czeisler, nem às respectivas universidades, empregadores ou instituições. Qualquer referência a esses pesquisadores tem apenas finalidade de citação de trabalhos publicados de forma independente.
               </Text>
             </View>
           </View>
@@ -175,7 +175,7 @@ export default function WebSobrePage() {
       <View style={styles.footer}>
         <Text style={styles.footerText}>{t('web.about.footerText')}</Text>
         <Text style={styles.footerCopy}>{t('web.about.footerCopy')}</Text>
-        <Text style={styles.footerCompany}>MORFEU SAUDE E TECNOLOGIA LTDA</Text>
+        <Text style={styles.footerCompany}>MORFEU SAÚDE E TECNOLOGIA LTDA</Text>
         <Text style={styles.footerCnpj}>CNPJ: 66.059.212/0001-52</Text>
       </View>
       </ScrollView>

@@ -118,7 +118,7 @@ export default function ForgotPasswordScreen() {
           )}
 
           <View style={styles.companyFooter}>
-            <Text style={styles.companyFooterName}>MORFEU SAUDE E TECNOLOGIA LTDA</Text>
+            <Text style={styles.companyFooterName}>MORFEU SAÚDE E TECNOLOGIA LTDA</Text>
             <Text style={styles.companyFooterCnpj}>CNPJ: 66.059.212/0001-52</Text>
           </View>
         </View>

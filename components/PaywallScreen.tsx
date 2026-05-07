@@ -14,34 +14,6 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { X } from 'lucide-react-native';
 import { supabase } from '@/lib/supabase';
 
-function TrustBlock({ language = 'pt' }: { language: 'pt' | 'en' }) {
-  const label = language === 'pt' ? 'Um programa construído sobre pesquisas de:' : 'A program built on research from:';
-  const researchers = [
-    { name: 'Walker', subtitle: 'UC Berkeley' },
-    { name: 'Breus', subtitle: 'Chronotype Specialist' },
-    { name: 'Huberman', subtitle: 'Stanford' },
-    { name: 'Czeisler', subtitle: 'Harvard' },
-  ];
-
-  return (
-    <View style={trustStyles.container}>
-      <Text style={trustStyles.label}>{label}</Text>
-      <View style={trustStyles.namesRow}>
-        {researchers.map((researcher, index) => (
-          <View key={index} style={trustStyles.nameWrapper}>
-            <Text style={trustStyles.nameText}>{researcher.name}</Text>
-            <Text style={trustStyles.dash}>—</Text>
-            <Text style={trustStyles.subtitleText}>{researcher.subtitle}</Text>
-            {index < researchers.length - 1 && (
-              <Text style={trustStyles.separator}>·</Text>
-            )}
-          </View>
-        ))}
-      </View>
-    </View>
-  );
-}
-
 interface PaywallScreenProps {
   onClose?: () => void;
   onRestore?: () => void;
@@ -479,7 +451,7 @@ export default function PaywallScreen({
         ) : null}
 
         <View style={styles.companyFooter}>
-          <Text style={styles.companyText}>MORFEU SAUDE E TECNOLOGIA LTDA</Text>
+          <Text style={styles.companyText}>MORFEU SAÚDE E TECNOLOGIA LTDA</Text>
           <Text style={styles.companyCnpj}>CNPJ: 66.059.212/0001-52</Text>
         </View>
       </ScrollView>
@@ -511,13 +483,14 @@ const styles = StyleSheet.create({
   },
   scroll: {
     flex: 1,
-    backgroundColor: 'transparent',
+    backgroundColor: '#080a15',
   },
   scrollContent: {
     paddingHorizontal: 22,
     paddingTop: Platform.OS === 'ios' ? 48 : 40,
     paddingBottom: 40,
     alignItems: 'center',
+    backgroundColor: '#080a15',
   },
   closeRow: {
     width: '100%',
@@ -918,54 +891,5 @@ const styles = StyleSheet.create({
     lineHeight: 16,
     marginTop: 8,
     paddingHorizontal: 8,
-  },
-});
-
-const trustStyles = StyleSheet.create({
-  container: {
-    backgroundColor: '#0f0f1a',
-    borderWidth: 1,
-    borderColor: '#1a1a2e',
-    borderRadius: 12,
-    padding: 16,
-    alignItems: 'center',
-    marginBottom: 24,
-  },
-  label: {
-    fontSize: 12,
-    color: '#888888',
-    textAlign: 'center',
-    marginBottom: 12,
-  },
-  namesRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    flexWrap: 'wrap',
-    gap: 8,
-  },
-  nameWrapper: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 4,
-  },
-  nameText: {
-    fontSize: 12,
-    fontWeight: '700',
-    color: '#FFFFFF',
-  },
-  dash: {
-    fontSize: 12,
-    color: '#888888',
-    marginHorizontal: 4,
-  },
-  subtitleText: {
-    fontSize: 12,
-    color: '#888888',
-  },
-  separator: {
-    fontSize: 12,
-    color: '#888888',
-    marginLeft: 4,
   },
 });

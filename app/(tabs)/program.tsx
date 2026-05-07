@@ -268,7 +268,7 @@ function ProgramContent() {
         )}
 
         <View style={styles.programFooter}>
-          <Text style={[styles.programFooterCompany, { color: tc.textSecondary }]}>MORFEU SAUDE E TECNOLOGIA LTDA</Text>
+          <Text style={[styles.programFooterCompany, { color: tc.textSecondary }]}>MORFEU SAÚDE E TECNOLOGIA LTDA</Text>
           <Text style={[styles.programFooterCnpj, { color: isDark ? '#64748b' : '#94a3b8' }]}>CNPJ: 66.059.212/0001-52</Text>
         </View>
       </View>

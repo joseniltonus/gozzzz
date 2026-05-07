@@ -256,7 +256,7 @@ function AboutContent() {
           <Text style={[styles.footerVersion, { color: tc.textPrimary }]}>
             {t('about.version')} {getAppVersion()}
           </Text>
-          <Text style={styles.footerCompany}>MORFEU SAUDE E TECNOLOGIA LTDA</Text>
+          <Text style={styles.footerCompany}>MORFEU SAÚDE E TECNOLOGIA LTDA</Text>
           <Text style={styles.footerCnpj}>CNPJ: 66.059.212/0001-52</Text>
           <Text style={styles.footerText}>{t('about.contact')}</Text>
         </View>

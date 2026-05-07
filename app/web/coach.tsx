@@ -83,12 +83,12 @@ export default function WebCoachPage() {
     {
       quote: t('web.coach.testimonial1'),
       author: t('web.coach.testimonial1Author'),
-      result: 'Sleeping 8+ hours',
+      result: 'Dormindo 8+ horas',
     },
     {
       quote: t('web.coach.testimonial2'),
       author: t('web.coach.testimonial2Author'),
-      result: 'More focused at work',
+      result: 'Mais foco no trabalho',
     },
   ];
 
@@ -157,13 +157,13 @@ export default function WebCoachPage() {
               <Text style={styles.storyText}>{t('web.coach.storyText')}</Text>
               <View style={styles.expertTags}>
                 <View style={styles.expertTag}>
-                  <Text style={styles.expertTagText}>Science-Based</Text>
+                  <Text style={styles.expertTagText}>Baseado em ciencia</Text>
                 </View>
                 <View style={styles.expertTag}>
-                  <Text style={styles.expertTagText}>Personalized</Text>
+                  <Text style={styles.expertTagText}>Personalizado</Text>
                 </View>
                 <View style={styles.expertTag}>
-                  <Text style={styles.expertTagText}>Proven Results</Text>
+                  <Text style={styles.expertTagText}>Resultados comprovados</Text>
                 </View>
               </View>
               <Text style={styles.storyEnd}>{t('web.coach.storyEnd')}</Text>
@@ -259,7 +259,7 @@ export default function WebCoachPage() {
             <View style={styles.priceCardFeaturedNew}>
               <View style={styles.priceCardHeader}>
                 <View style={styles.price1OnlineBadge}>
-                  <Text style={styles.price1OnlineText}>100% ONLINE</Text>
+                  <Text style={styles.price1OnlineText}>100% online</Text>
                 </View>
                 <Text style={styles.priceCardLabelFeatured}>{t('web.coach.price1.label')}</Text>
               </View>
@@ -310,8 +310,8 @@ export default function WebCoachPage() {
             <View style={styles.priceCard}>
               <Text style={styles.priceCardLabel}>{t('web.coach.price3.label')}</Text>
               <Text style={styles.priceCardAmount}>
-                $99
-                <Text style={styles.priceCardPer}>/month</Text>
+                R$ 99
+                <Text style={styles.priceCardPer}>/mês</Text>
               </Text>
               <Text style={styles.priceCardDesc}>{t('web.coach.price3.desc')}</Text>
               <View style={styles.priceFeatures}>
@@ -397,10 +397,10 @@ export default function WebCoachPage() {
           </TouchableOpacity>
           <View style={styles.securityRow}>
             <Lock size={13} color={GOLD} />
-            <Text style={styles.securityText}>Secure</Text>
+            <Text style={styles.securityText}>Seguro</Text>
             <Text style={styles.securityDot}>·</Text>
             <Shield size={13} color={GOLD} />
-            <Text style={styles.securityText}>Private</Text>
+            <Text style={styles.securityText}>Privado</Text>
             <Text style={styles.securityDot}>·</Text>
             <BadgeCheck size={13} color={GOLD} />
             <Text style={styles.securityText}>{t('web.coach.securePayment')}</Text>
@@ -424,7 +424,7 @@ export default function WebCoachPage() {
           </TouchableOpacity>
         </View>
         <Text style={styles.footerCopy}>{t('web.coach.footerCopy')}</Text>
-        <Text style={styles.footerCompany}>MORFEU SAUDE E TECNOLOGIA LTDA</Text>
+        <Text style={styles.footerCompany}>MORFEU SAÚDE E TECNOLOGIA LTDA</Text>
         <Text style={styles.footerCnpj}>CNPJ: 66.059.212/0001-52</Text>
       </View>
 

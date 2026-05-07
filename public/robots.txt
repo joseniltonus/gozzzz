@@ -1,4 +1,4 @@
 User-agent: *
 Allow: /
 
-Sitemap: https://gozzzz.com.br/sitemap.xml
+Sitemap: https://gozzzz.app/sitemap.xml

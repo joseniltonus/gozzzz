@@ -1,7 +1,7 @@
 import { View, Text, StyleSheet } from 'react-native';
 import { useLanguage, type Language } from '@/contexts/LanguageContext';
 
-const LEGAL_ENTITY = 'MORFEU SAUDE E TECNOLOGIA LTDA';
+const LEGAL_ENTITY = 'MORFEU SAÚDE E TECNOLOGIA LTDA';
 const CNPJ_LINE = 'CNPJ: 66.059.212/0001-52';
 
 type Props = { lang?: Language };

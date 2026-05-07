@@ -12,7 +12,7 @@ const ICON_PX = 22;
 const androidLabel = Platform.OS === 'android' ? ({ includeFontPadding: false } as const) : {};
 
 /**
- * Rótulos longos ("Programa", "Concierge") + pouca largura por aba → texto cortado.
+ * Rótulos longos ("Programa", "Sono+") + pouca largura por aba → texto cortado.
  * Duas linhas + fonte ligeiramente menor + sem padding extra no item libertam espaço.
  */
 function TabBarLabelText({ color, children }: { color: string; children: string }) {

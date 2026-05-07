@@ -1,0 +1,522 @@
+<!doctype html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Por que você acorda cansado mesmo dormindo 8 horas — e como mudar isso</title>
+    <meta
+      name="description"
+      content="Insônia, sono fragmentado, cansaço ao acordar: um programa de 21 passos baseado em ciência do sono para quem quer dormir melhor de verdade. Sem promessas. Sem milagre."
+    />
+    <meta
+      name="keywords"
+      content="como dormir melhor, insônia o que fazer, acordo cansado todo dia, higiene do sono, cronotipo, sono fragmentado, qualidade do sono, dívida de sono"
+    />
+    <link rel="canonical" href="https://gozzzz.app/web/sono-plus" />
+    <meta property="og:title" content="Por que você acorda cansado mesmo dormindo 8 horas" />
+    <meta
+      property="og:description"
+      content="Programa de 21 passos baseado em neurociência do sono. 3 lições gratuitas para começar agora."
+    />
+    <meta property="og:type" content="website" />
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@type": "Course",
+        "name": "Programa de 21 Passos — Sono GoZzzz",
+        "description": "Programa baseado em ciência do sono com 21 passos práticos para melhorar qualidade do sono, tratar insônia e eliminar cansaço ao acordar.",
+        "provider": { "@type": "Organization", "name": "GoZzzz" },
+        "inLanguage": "pt-BR",
+        "offers": { "@type": "Offer", "priceCurrency": "BRL", "availability": "https://schema.org/InStock" }
+      }
+    </script>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&family=DM+Serif+Display:ital@0;1&family=JetBrains+Mono:wght@500;700&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      :root {
+        --bg: #0a0d14;
+        --bg-card: #111520;
+        --bg-card-hover: #161c2e;
+        --accent: #c9963a;
+        --accent-soft: rgba(201, 150, 58, 0.15);
+        --text-primary: #f0ede6;
+        --text-secondary: #8a8fa8;
+        --text-muted: #4a5068;
+        --green: #2ecc8a;
+        --border: rgba(255, 255, 255, 0.07);
+      }
+      * {
+        box-sizing: border-box;
+      }
+      html,
+      body {
+        margin: 0;
+        background: radial-gradient(circle at 20% -20%, rgba(201, 150, 58, 0.14), transparent 42%), var(--bg);
+        color: var(--text-primary);
+        font-family: "DM Sans", system-ui, -apple-system, sans-serif;
+      }
+      a {
+        color: inherit;
+      }
+      .container {
+        max-width: 760px;
+        margin: 0 auto;
+        padding: 0 20px;
+      }
+      .section {
+        padding-top: 80px;
+      }
+      .label {
+        font-size: 11px;
+        letter-spacing: 0.12em;
+        text-transform: uppercase;
+        color: var(--accent);
+        font-weight: 700;
+        margin-bottom: 12px;
+      }
+      h1,
+      h2 {
+        margin: 0;
+      }
+      h1 {
+        font-family: "DM Serif Display", serif;
+        font-size: clamp(34px, 5vw, 52px);
+        line-height: 1.05;
+      }
+      h2 {
+        font-family: "DM Serif Display", serif;
+        font-size: clamp(28px, 4vw, 40px);
+        line-height: 1.12;
+      }
+      p {
+        color: var(--text-secondary);
+        line-height: 1.75;
+      }
+      .hero {
+        padding-top: 88px;
+      }
+      .hero-sub {
+        margin-top: 12px;
+        color: var(--text-secondary);
+        font-size: 18px;
+      }
+      .hero-actions {
+        margin-top: 28px;
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+        align-items: flex-start;
+      }
+      .btn-primary {
+        display: inline-flex;
+        border: 0;
+        background: var(--accent);
+        color: #10131f;
+        padding: 14px 20px;
+        border-radius: 12px;
+        font-weight: 800;
+        text-decoration: none;
+      }
+      .btn-link {
+        color: #c6cadd;
+        text-decoration: none;
+        font-weight: 600;
+      }
+      .pills {
+        margin-top: 22px;
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+      }
+      .pill {
+        border: 1px solid var(--border);
+        background: rgba(255, 255, 255, 0.03);
+        border-radius: 999px;
+        padding: 8px 12px;
+        color: #bbc2dc;
+        font-size: 12px;
+        font-weight: 600;
+      }
+      .recognition-grid {
+        margin-top: 20px;
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 12px;
+      }
+      .mini-card {
+        border: 1px solid var(--border);
+        background: var(--bg-card);
+        border-radius: 14px;
+        padding: 14px;
+        color: #d3d8ec;
+        font-size: 14px;
+      }
+      .cards-scroll {
+        display: flex;
+        gap: 12px;
+        overflow-x: auto;
+        padding-bottom: 8px;
+        scroll-snap-type: x mandatory;
+      }
+      .lesson-card {
+        min-width: 220px;
+        max-width: 220px;
+        background: var(--bg-card);
+        border: 1px solid var(--border);
+        border-radius: 14px;
+        padding: 14px;
+        scroll-snap-align: start;
+      }
+      .lesson-top {
+        display: flex;
+        justify-content: space-between;
+        color: var(--text-secondary);
+        font-size: 12px;
+      }
+      .badge {
+        border-radius: 999px;
+        padding: 4px 8px;
+        font-size: 10px;
+        font-weight: 700;
+      }
+      .free {
+        background: rgba(46, 204, 138, 0.15);
+        color: #94f0c4;
+      }
+      .premium {
+        background: var(--accent-soft);
+        color: #f2cd88;
+      }
+      .lesson-title {
+        margin-top: 10px;
+        color: var(--text-primary);
+        font-weight: 700;
+        line-height: 1.45;
+      }
+      .steps-list,
+      .act-list,
+      .benefit-grid,
+      .faq-list {
+        margin-top: 18px;
+        display: grid;
+        gap: 12px;
+      }
+      .act,
+      .step,
+      .benefit,
+      .faq-item,
+      .pricing-box,
+      .coach-box {
+        background: var(--bg-card);
+        border: 1px solid var(--border);
+        border-radius: 14px;
+        padding: 16px;
+      }
+      .act strong,
+      .step strong {
+        display: block;
+        margin-bottom: 8px;
+      }
+      .stats {
+        margin-top: 18px;
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 10px;
+      }
+      .stat {
+        border: 1px solid var(--border);
+        background: var(--bg-card);
+        border-radius: 12px;
+        padding: 16px;
+        text-align: center;
+      }
+      .stat-num {
+        font-family: "JetBrains Mono", monospace;
+        color: var(--text-primary);
+        font-size: 24px;
+        font-weight: 700;
+      }
+      .stat-lbl {
+        margin-top: 6px;
+        color: var(--text-secondary);
+        font-size: 12px;
+      }
+      .research-line {
+        font-size: 18px;
+        color: #dde2f2;
+      }
+      .pricing-copy {
+        margin: 8px 0 18px;
+        color: #bdc5df;
+        font-weight: 600;
+      }
+      .included {
+        margin: 0;
+        padding-left: 18px;
+        color: #cad0e6;
+        line-height: 1.8;
+      }
+      .guarantee {
+        margin-top: 16px;
+        border-radius: 12px;
+        background: rgba(46, 204, 138, 0.1);
+        border: 1px solid rgba(46, 204, 138, 0.25);
+        padding: 12px;
+        color: #95e9c1;
+      }
+      .coach-price {
+        display: inline-block;
+        margin-bottom: 14px;
+        background: var(--accent-soft);
+        border: 1px solid rgba(201, 150, 58, 0.4);
+        border-radius: 10px;
+        padding: 10px 12px;
+        color: #f0c478;
+        font-family: "JetBrains Mono", monospace;
+        font-weight: 700;
+      }
+      .coach-list {
+        display: grid;
+        gap: 10px;
+      }
+      .coach-item {
+        border: 1px solid var(--border);
+        background: #0f1422;
+        border-radius: 12px;
+        padding: 12px;
+      }
+      .coach-item strong {
+        color: #e5e9f7;
+      }
+      .coach-item small {
+        display: block;
+        margin-top: 6px;
+        color: var(--text-secondary);
+        line-height: 1.6;
+      }
+      .btn-outline {
+        display: inline-flex;
+        border: 1px solid rgba(201, 150, 58, 0.45);
+        color: #edc175;
+        padding: 13px 18px;
+        border-radius: 12px;
+        text-decoration: none;
+        font-weight: 700;
+      }
+      .cta-final {
+        text-align: center;
+        padding-bottom: 90px;
+      }
+      .cta-final p {
+        margin: 12px auto 24px;
+        max-width: 560px;
+      }
+      .cta-actions {
+        display: flex;
+        justify-content: center;
+        gap: 10px;
+        flex-wrap: wrap;
+      }
+      .link-tertiary {
+        display: inline-block;
+        margin-top: 14px;
+        color: var(--text-secondary);
+        text-decoration: none;
+        font-weight: 600;
+      }
+      .reveal {
+        opacity: 0;
+        transform: translateY(16px);
+        transition: opacity 0.5s ease, transform 0.5s ease;
+      }
+      .reveal.show {
+        opacity: 1;
+        transform: translateY(0);
+      }
+      @media (max-width: 700px) {
+        .recognition-grid,
+        .stats {
+          grid-template-columns: 1fr;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <main class="container">
+      <section class="hero reveal">
+        <h1>Por que você acorda cansado mesmo dormindo 8 horas</h1>
+        <p class="hero-sub">
+          Um programa de 21 passos baseado em ciência do sono — construído para quem quer entender o que está
+          errado e consertar.
+        </p>
+        <div class="hero-actions">
+          <a class="btn-primary" href="/web/programa">Começar grátis — 3 lições sem cadastro</a>
+          <a class="btn-link" href="/web/programa">Ver todas as lições</a>
+        </div>
+        <div class="pills">
+          <span class="pill">21 Passos</span>
+          <span class="pill">3 Lições Gratuitas</span>
+          <span class="pill">~5 min · passo</span>
+          <span class="pill">Baseado em neurociência</span>
+        </div>
+      </section>
+
+      <section class="section reveal">
+        <div class="label">Antes de começar</div>
+        <h2>Você se reconhece aqui?</h2>
+        <div class="recognition-grid">
+          <div class="mini-card">😮‍💨 Acorda cansado mesmo depois de 8 horas na cama</div>
+          <div class="mini-card">🧠 Mente acelerada na hora de dormir</div>
+          <div class="mini-card">⏰ Acorda no meio da noite e demora a voltar</div>
+          <div class="mini-card">🌅 Manhãs que puxam para baixo, não para cima</div>
+          <div class="mini-card">📱 Sabe que deveria largar o celular — e não consegue</div>
+          <div class="mini-card">😶 Dormiu, mas não descansou</div>
+        </div>
+        <p>Se você marcou dois ou mais, o problema não é força de vontade. É mecânica do sono — e tem como ajustar.</p>
+      </section>
+
+      <section class="section reveal">
+        <div class="label">Antes de assinar</div>
+        <h2>Os primeiros tópicos da sua trilha</h2>
+        <p>Arraste para o lado — estes são títulos reais das lições.</p>
+        <div class="cards-scroll">
+          <article class="lesson-card"><div class="lesson-top"><span>#1</span><span class="badge free">Gratuito</span></div><div class="lesson-title">Ciclos e Estágios do Sono</div></article>
+          <article class="lesson-card"><div class="lesson-top"><span>#2</span><span class="badge free">Gratuito</span></div><div class="lesson-title">Cronotipos — Qual é o Seu?</div></article>
+          <article class="lesson-card"><div class="lesson-top"><span>#3</span><span class="badge free">Gratuito</span></div><div class="lesson-title">Dívida de Sono — Como a Sua se Acumula</div></article>
+          <article class="lesson-card"><div class="lesson-top"><span>#4</span><span class="badge premium">Premium</span></div><div class="lesson-title">Ritmo Circadiano — Seu Relógio Pessoal</div></article>
+          <article class="lesson-card"><div class="lesson-top"><span>#5</span><span class="badge premium">Premium</span></div><div class="lesson-title">O Que Está Destruindo Seu Sono Profundo</div></article>
+          <article class="lesson-card"><div class="lesson-top"><span>#6</span><span class="badge premium">Premium</span></div><div class="lesson-title">O Que Está Destruindo Seu REM</div></article>
+          <article class="lesson-card"><div class="lesson-top"><span>#7</span><span class="badge premium">Premium</span></div><div class="lesson-title">Revelação do Seu Perfil de Sono</div></article>
+          <article class="lesson-card"><div class="lesson-top"><span>#8</span><span class="badge premium">Premium</span></div><div class="lesson-title">Luz Matinal (nos Primeiros 30 Min)</div></article>
+        </div>
+      </section>
+
+      <section class="section reveal">
+        <div class="label">Estrutura</div>
+        <h2>21 passos em três movimentos</h2>
+        <div class="act-list">
+          <div class="act"><strong>Ato 1 · Mapear (1–7)</strong><p>Entender ciclos, cronotipo, dívida de sono e o que fragmenta o seu descanso.</p></div>
+          <div class="act"><strong>Ato 2 · Reconstruir (8–14)</strong><p>Protocolos práticos — luz, temperatura, rotina e hábitos — um de cada vez.</p></div>
+          <div class="act"><strong>Ato 3 · Consolidar (15–21)</strong><p>Fechar o ciclo: manter ganhos, ajustar o que falha e fixar um ritmo sustentável.</p></div>
+        </div>
+      </section>
+
+      <section class="section reveal">
+        <div class="label">Na prática</div>
+        <h2>Como o programa funciona na prática</h2>
+        <div class="steps-list">
+          <div class="step"><strong>1. Uma lição, uma ação</strong><p>Cada passo vira uma decisão prática para o mesmo dia.</p></div>
+          <div class="step"><strong>2. Ajustes por prioridade</strong><p>Você corrige primeiro o que mais impacta sua noite.</p></div>
+          <div class="step"><strong>3. Consolidação contínua</strong><p>As ações se somam para estabilizar o ritmo com consistência.</p></div>
+        </div>
+      </section>
+
+      <section class="section reveal">
+        <div class="label">O programa de 21 passos</div>
+        <h2>Números que definem o ritual</h2>
+        <div class="stats">
+          <div class="stat"><div class="stat-num">21</div><div class="stat-lbl">Passos</div></div>
+          <div class="stat"><div class="stat-num">3</div><div class="stat-lbl">Lições Gratuitas</div></div>
+          <div class="stat"><div class="stat-num">~5 min</div><div class="stat-lbl">Por passo</div></div>
+        </div>
+      </section>
+
+      <section class="section reveal">
+        <div class="label">Ao seguir os passos</div>
+        <h2>O que você treina ao longo do programa</h2>
+        <div class="benefit-grid">
+          <div class="benefit">Menos fragmentação durante a noite.</div>
+          <div class="benefit">Rotina guiada dia a dia.</div>
+          <div class="benefit">Ciência aplicada ao que você faz em casa.</div>
+          <div class="benefit">Clareza para ajustar o que não funciona.</div>
+        </div>
+      </section>
+
+      <section class="section reveal">
+        <div class="label">Base científica</div>
+        <h2>Pesquisadores de referência</h2>
+        <p class="research-line">Walker · Breus · Huberman · Czeisler</p>
+      </section>
+
+      <section class="section reveal">
+        <div class="label">Assinar Premium</div>
+        <h2>Acesse o programa completo — 21 passos baseados em ciência</h2>
+        <p class="pricing-copy">Pague uma vez. Acesse para sempre. Garantia de 7 dias.</p>
+        <div class="pricing-box">
+          <ul class="included">
+            <li>Programa completo de 21 passos</li>
+            <li>Resumos e ações claras em cada passo</li>
+            <li>Baseado em pesquisas científicas revisadas por pares</li>
+            <li>Neurociência do sono</li>
+            <li>Medicina e ritmos circadianos</li>
+            <li>Atualizações gratuitas incluídas</li>
+            <li>Acesso imediato após pagamento</li>
+            <li>Suporte para continuar no seu ritmo</li>
+          </ul>
+          <div class="guarantee">Garantia de 7 dias. Se não fizer sentido para você, reembolso integral.</div>
+        </div>
+      </section>
+
+      <section class="section reveal">
+        <div class="label">Opcional · Sono+</div>
+        <h2>Coaching Individual de Sono</h2>
+        <p>Uma sessão de diagnóstico e um plano concreto para começar a dormir melhor.</p>
+        <div class="coach-box">
+          <div class="coach-price">R$497 · sessão única · 60 min online</div>
+          <div class="coach-list">
+            <div class="coach-item"><strong>✓ Mapeamento completo dos seus hábitos, rotina e ambiente de sono</strong><small>Entendemos o que está impedindo o seu sono antes de qualquer recomendação.</small></div>
+            <div class="coach-item"><strong>✓ Sessão online de 60 minutos — de onde você estiver, sem julgamentos</strong><small>Conversa focada, sem enrolação, com especialista em comportamento do sono.</small></div>
+            <div class="coach-item"><strong>✓ Relatório personalizado com diagnóstico, estratégias e próximos passos</strong><small>Entregue em até 72h. Você sai com um plano, não com sugestões genéricas.</small></div>
+            <div class="coach-item"><strong>✓ Suporte via WhatsApp para dúvidas pontuais — acesso direto, sem IA</strong><small>Por 30 dias após a sessão, para ajustes no plano.</small></div>
+            <div class="coach-item"><strong>✓ 30 dias de GoZzzz Premium com todos os recursos desbloqueados</strong><small>Para acompanhar o programa enquanto aplica o que discutimos.</small></div>
+          </div>
+          <p style="margin-top: 18px"><a class="btn-primary" href="https://wa.me/5511982820759?text=SONO" target="_blank" rel="noopener">Agendar minha sessão</a></p>
+        </div>
+      </section>
+
+      <section class="section reveal">
+        <h2>Perguntas frequentes</h2>
+        <div class="faq-list">
+          <div class="faq-item"><strong>1. O que são exatamente os 21 passos?</strong><p>Uma sequência guiada: cada passo traduz princípios de ciência do sono em ações concretas para o dia seguinte — em blocos que cobrem entender o seu padrão, reconstruir hábitos e consolidar resultados.</p></div>
+          <div class="faq-item"><strong>2. Posso experimentar antes de assinar?</strong><p>Sim. As 3 primeiras lições são gratuitas para você sentir o ritmo e a clareza do método.</p></div>
+          <div class="faq-item"><strong>3. Como melhorar a qualidade do sono de verdade?</strong><p>Qualidade do sono melhora com ajustes em três áreas: ritmo circadiano, pressão do sono e o ambiente onde você dorme. O programa cobre cada uma delas em ordem lógica — sem atalhos que não funcionam a longo prazo.</p></div>
+          <div class="faq-item"><strong>4. O que fazer quando não consigo dormir mesmo cansado?</strong><p>Dificuldade de adormecer mesmo com sono é quase sempre sinal de ritmo circadiano desregulado ou alerta noturno elevado. As lições 3 a 7 do programa tratam exatamente isso.</p></div>
+          <div class="faq-item"><strong>5. O que é higiene do sono?</strong><p>Higiene do sono é o conjunto de comportamentos e condições ambientais que preparam o cérebro para dormir com qualidade. É o ponto de partida — mas não é suficiente sozinho. O programa vai além disso.</p></div>
+          <div class="faq-item"><strong>6. Como descobrir meu cronotipo?</strong><p>A lição 2 do programa explica o que é cronotipo e como identificar o seu. É gratuita — você pode acessar agora sem cadastro.</p></div>
+          <div class="faq-item"><strong>7. O GoZzzz substitui acompanhamento médico?</strong><p>Não. Conteúdo e consultoria comportamental são educativos — não fazem diagnóstico nem prescrevem tratamento médico. Se você suspeita de apneia ou outro distúrbio do sono, consulte um especialista.</p></div>
+          <div class="faq-item"><strong>8. Isso funciona para insônia crônica?</strong><p>O programa é baseado em princípios da Terapia Cognitivo-Comportamental para Insônia (TCC-I) — a abordagem de primeira linha recomendada pela literatura científica. Para insônia severa, o coaching complementa com acompanhamento individualizado.</p></div>
+        </div>
+      </section>
+
+      <section class="section cta-final reveal">
+        <div style="font-size: 30px">🌙</div>
+        <h2>Chega de acordar cansado.</h2>
+        <p>Comece pelas 3 lições gratuitas. Sem cadastro, sem cartão.</p>
+        <div class="cta-actions">
+          <a class="btn-primary" href="/web/programa">Começar grátis agora</a>
+          <a class="btn-outline" href="/web/programa">Ver todas as lições</a>
+        </div>
+        <a class="link-tertiary" href="https://wa.me/5511982820759?text=SONO" target="_blank" rel="noopener">Falar sobre Sono+ (WhatsApp)</a>
+      </section>
+    </main>
+
+    <script>
+      const observer = new IntersectionObserver(
+        (entries) => {
+          for (const entry of entries) {
+            if (entry.isIntersecting) {
+              entry.target.classList.add("show");
+              observer.unobserve(entry.target);
+            }
+          }
+        },
+        { threshold: 0.12 }
+      );
+      document.querySelectorAll(".reveal").forEach((el) => observer.observe(el));
+    </script>
+  </body>
+</html>

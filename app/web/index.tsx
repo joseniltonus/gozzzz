@@ -68,6 +68,9 @@ function WebNav() {
             <TouchableOpacity onPress={() => router.push('/web/coach')}>
               <Text style={styles.navLink}>{t('web.nav.coach')}</Text>
             </TouchableOpacity>
+            <TouchableOpacity onPress={() => router.push('/web/sono-plus')}>
+              <Text style={styles.navLink}>Sono+</Text>
+            </TouchableOpacity>
             <TouchableOpacity onPress={() => router.push('/web/sobre')}>
               <Text style={styles.navLink}>{t('web.nav.about')}</Text>
             </TouchableOpacity>

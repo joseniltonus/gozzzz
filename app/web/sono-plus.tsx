@@ -1,0 +1,1177 @@
+import { useMemo, useState, useEffect } from 'react';
+import {
+  View,
+  Text,
+  StyleSheet,
+  ScrollView,
+  TouchableOpacity,
+  Platform,
+  Linking,
+} from 'react-native';
+import Head from 'expo-router/head';
+import { useRouter } from 'expo-router';
+import { LinearGradient } from 'expo-linear-gradient';
+import {
+  ArrowRight,
+  BookOpen,
+  Brain,
+  Calendar,
+  Check,
+  Crown,
+  MessageCircle,
+  Moon,
+  Lock,
+  BadgeCheck,
+  Shield,
+  Sparkles,
+  Sunrise,
+  Zap,
+} from 'lucide-react-native';
+import { useLanguage } from '@/contexts/LanguageContext';
+import { LESSONS_DATA } from '@/data/lessons';
+import { supabase } from '@/lib/supabase';
+import { ResearcherTrustBlock } from '@/components/ResearcherTrustBlock';
+
+const isWeb = Platform.OS === 'web';
+const WHATSAPP = 'https://wa.me/5511982820759?text=SONO';
+
+const GOLD = '#d4a96a';
+const GOLD_DIM = 'rgba(212,169,106,0.14)';
+const BG = '#07070f';
+const BG_CARD = '#12121e';
+const TEXT_MAIN = '#e8e5df';
+const TEXT_MUTED = '#94a3b8';
+const NAV_H = 56;
+
+interface PricingAnnual {
+  price: number;
+  label: string;
+  equiv: string;
+  note: string;
+}
+interface PricingData {
+  currency: string;
+  symbol: string;
+  annual: PricingAnnual;
+}
+const DEFAULT_WEB_PRICING: Record<'pt' | 'en', PricingData> = {
+  pt: {
+    currency: 'BRL',
+    symbol: 'R$',
+    annual: { price: 147, label: 'R$ 147', equiv: 'acesso vitalício', note: 'pagamento único' },
+  },
+  en: {
+    currency: 'USD',
+    symbol: '$',
+    annual: { price: 24.99, label: '$24.99', equiv: 'lifetime access', note: 'one-time payment' },
+  },
+};
+
+const SUBSCRIBE_FEATURE_KEYS = [
+  'web.subscribe.feature1',
+  'web.subscribe.feature2',
+  'web.subscribe.feature3',
+  'web.subscribe.feature4',
+  'web.subscribe.feature5',
+  'web.subscribe.feature6',
+  'web.subscribe.feature7',
+  'web.subscribe.feature8',
+] as const;
+
+/** Landing web: programa 21 passos como produto principal; Sono+ como opcional premium. Sem depoimentos inventados. */
+export default function SonoPlusLandingPage() {
+  const router = useRouter();
+  const { t: translate } = useLanguage();
+  const language: 'pt' = 'pt';
+  const t = (key: string) => translate(key, 'pt');
+  const isPt = true;
+  const [pricing, setPricing] = useState<PricingData>(DEFAULT_WEB_PRICING[language]);
+
+  const openWhatsApp = () => Linking.openURL(WHATSAPP);
+
+  useEffect(() => {
+    (async () => {
+      try {
+        const currencyMap = { pt: 'BRL', en: 'USD' } as const;
+        const currency = currencyMap[language];
+        const { data } = await (supabase.from('pricing') as any)
+          .select('price, label, equiv, note')
+          .eq('plan_type', 'annual')
+          .eq('currency', currency)
+          .maybeSingle();
+        if (data) {
+          setPricing({
+            currency,
+            symbol: language === 'pt' ? 'R$' : '$',
+            annual: {
+              price: data.price,
+              label: data.label,
+              equiv: data.equiv,
+              note: data.note,
+            },
+          });
+        }
+      } catch {
+        setPricing(DEFAULT_WEB_PRICING[language]);
+      }
+    })();
+  }, [language]);
+
+  const headTitle = isPt
+    ? 'GoZzzz | Programa 21 passos — sono com método e evidência'
+    : 'GoZzzz | 21-step sleep program — structured, evidence-guided';
+
+  const headDesc = isPt
+    ? 'Trilha de 21 passos para reorganizar sono, ritmo e rotina — com 3 primeiras lições gratuitas. Sono+: consultoria opcional.'
+    : 'A 21-step path to reorganize sleep, rhythm, and routine — start with 3 free lessons. Sono+: optional live consulting.';
+
+  const previewLessons = useMemo(() => {
+    return [...LESSONS_DATA]
+      .sort((a, b) => a.step_number - b.step_number)
+      .slice(0, 8)
+      .map((l) => ({
+        id: l.id,
+        num: l.step_number,
+        title: language === 'pt' ? l.title_pt : l.title_en,
+        free: l.step_number <= 3,
+      }));
+  }, [language]);
+
+  const faq = [
+    {
+      question: 'O que são exatamente os 21 passos?',
+      answer:
+        'Uma sequência guiada: cada passo traduz princípios de ciência do sono em ações concretas para o dia seguinte — em blocos que cobrem entender o seu padrão, reconstruir hábitos e consolidar resultados.',
+    },
+    {
+      question: 'Posso experimentar antes de assinar?',
+      answer:
+        'Sim. As 3 primeiras lições são gratuitas para você sentir o ritmo e a clareza do método.',
+    },
+    {
+      question: 'O que é Sono+ em relação ao programa?',
+      answer:
+        'O programa cobre o percurso completo na app/web. Sono+ é a linha opcional de acompanhamento ao vivo quando o seu caso beneficia de conversa e ajuste fino — combinamos pelo WhatsApp.',
+    },
+    {
+      question: 'Isso substitui acompanhamento médico?',
+      answer:
+        'Não. Conteúdo e consultoria comportamental são educativos — não fazem diagnóstico nem prescrevem tratamento médico.',
+    },
+  ];
+
+  const schemaFaq = {
+    '@context': 'https://schema.org',
+    '@type': 'FAQPage',
+    mainEntity: faq.map((item) => ({
+      '@type': 'Question',
+      name: item.question,
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: item.answer,
+      },
+    })),
+  };
+
+  const socialImageUrl = 'https://gozzzz.app/og/sono-plus.png';
+
+  const schemaService = {
+    '@context': 'https://schema.org',
+    '@type': 'Product',
+    name: 'GoZzzz programa de sono — 21 passos',
+    description: headDesc,
+    image: socialImageUrl,
+    brand: { '@type': 'Brand', name: 'GoZzzz' },
+    offers: {
+      '@type': 'Offer',
+      url: 'https://gozzzz.app/web/assinar',
+      availability: 'https://schema.org/InStock',
+    },
+  };
+  const schemaWebPage = {
+    '@context': 'https://schema.org',
+    '@type': 'WebPage',
+    name: headTitle,
+    description: headDesc,
+    url: 'https://gozzzz.app/web/sono-plus',
+    inLanguage: isPt ? 'pt-BR' : 'en-US',
+    image: socialImageUrl,
+    isPartOf: {
+      '@type': 'WebSite',
+      name: 'GoZzzz',
+      url: 'https://gozzzz.app',
+    },
+  };
+
+  const heroProof = [
+    `21 ${t('web.program.steps')}`,
+    `3 ${t('web.program.freeLessons')}`,
+    t('web.program.pillApproxStep'),
+    t('web.badge.scienceBased'),
+  ];
+
+  const programPathSteps = [
+    t('web.program.path1'),
+    t('web.program.path2'),
+    t('web.program.path3'),
+  ];
+
+  const curiosity = isPt
+    ? [
+        {
+          Ico: Brain,
+          title: 'Por que a mente não “desliga”?',
+          sub: 'Pressão do sono, alerta noturno e ritmo circadiano — em linguagem que você aplica na rotina.',
+        },
+        {
+          Ico: Zap,
+          title: 'O que realmente muda o seu descanso',
+          sub: 'Passos pequenos, repetíveis, com foco no que a literatura costuma priorizar primeiro.',
+        },
+        {
+          Ico: Sunrise,
+          title: 'Manhã que puxa a noite',
+          sub: 'Luz, horários e transição — encadeados para você sentir diferença sem virar fanatismo.',
+        },
+        {
+          Ico: Shield,
+          title: 'Sem promessa mágica',
+          sub: 'Método + consistência. Educação de sono, não substituto de avaliação clínica quando necessário.',
+        },
+      ]
+    : [
+        {
+          Ico: Brain,
+          title: 'Why your mind will not switch off',
+          sub: 'Sleep pressure, nighttime vigilance, and circadian timing — translated into daily moves.',
+        },
+        {
+          Ico: Zap,
+          title: 'What actually moves the needle',
+          sub: 'Small, repeatable steps aligned with what sleep science usually prioritizes first.',
+        },
+        {
+          Ico: Sunrise,
+          title: 'Morning shapes the night',
+          sub: 'Light, timing, and wind-down — chained so change feels realistic, not extreme.',
+        },
+        {
+          Ico: Shield,
+          title: 'No fairy-tale promises',
+          sub: 'Method + consistency. Sleep education — not a replacement for clinical care when needed.',
+        },
+      ];
+
+  const acts = [
+    { range: '1–7', title: 'Ato 1 · Mapear', desc: 'Entender ciclos, cronotipo, dívida de sono e o que fragmenta o seu descanso.' },
+    { range: '8–14', title: 'Ato 2 · Reconstruir', desc: 'Protocolos práticos — luz, temperatura, rotina e hábitos — um de cada vez.' },
+    { range: '15–21', title: 'Ato 3 · Consolidar', desc: 'Fechar o ciclo: manter ganhos, ajustar o que falha e fixar um ritmo sustentável.' },
+  ];
+
+  const benefitLines = [
+    'Menos fragmentação durante a noite',
+    'Rotina guiada dia a dia',
+    'Ciência aplicada ao que você faz em casa',
+    'Clareza para ajustar o que não funciona',
+  ];
+
+  const renderPriceBullets = () => {
+    const rows = [
+      { title: t('web.coach.price1.f1'), sub: t('web.coach.price1.f1sub') },
+      { title: t('web.coach.price1.f2'), sub: t('web.coach.price1.f2sub') },
+      { title: t('web.coach.price1.f3'), sub: t('web.coach.price1.f3sub') },
+      { title: t('web.coach.price1.f4'), sub: t('web.coach.price1.f4sub') },
+      { title: t('web.coach.price1.f5'), sub: t('web.coach.price1.f5sub') },
+    ];
+    return rows.map((row, idx) => (
+      <View key={idx} style={styles.priceRow}>
+        <View style={styles.bulletWrap}>
+          <Check size={16} color={GOLD} strokeWidth={2.5} />
+        </View>
+        <View style={{ flex: 1 }}>
+          <Text style={styles.priceLineTitle}>{row.title}</Text>
+          {row.sub?.trim() ? <Text style={styles.priceLineSub}>{row.sub}</Text> : null}
+        </View>
+      </View>
+    ));
+  };
+
+  return (
+    <>
+      <Head>
+        <title>{headTitle}</title>
+        <meta name="description" content={headDesc} />
+        <meta
+          name="keywords"
+          content={
+            isPt
+              ? 'programa sono 21 passos, insonia, dormir melhor, ciência do sono, gozzzz, sono plus opcional'
+              : '21 step sleep program, insomnia, sleep better, sleep science, gozzzz, optional sono plus'
+          }
+        />
+        <meta property="og:title" content={headTitle} />
+        <meta property="og:description" content={headDesc} />
+        <meta property="og:type" content="website" />
+        <meta property="og:url" content="https://gozzzz.app/web/sono-plus" />
+        <meta property="og:image" content={socialImageUrl} />
+        <meta property="og:image:alt" content="GoZzzz - Programa de sono em 21 passos" />
+        <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:title" content={headTitle} />
+        <meta name="twitter:description" content={headDesc} />
+        <meta name="twitter:image" content={socialImageUrl} />
+        <meta
+          name="robots"
+          content="index,follow,max-image-preview:large,max-snippet:-1,max-video-preview:-1"
+        />
+        <link rel="canonical" href="https://gozzzz.app/web/sono-plus" />
+        <link rel="alternate" hrefLang="pt-BR" href="https://gozzzz.app/web/sono-plus" />
+        <link rel="alternate" hrefLang="x-default" href="https://gozzzz.app/web/sono-plus" />
+        <script type="application/ld+json">{JSON.stringify(schemaFaq)}</script>
+        <script type="application/ld+json">{JSON.stringify(schemaService)}</script>
+        <script type="application/ld+json">{JSON.stringify(schemaWebPage)}</script>
+      </Head>
+
+      <ScrollView style={styles.page} showsVerticalScrollIndicator={false}>
+        {/* Nav — alinhado a /web/assinar */}
+        <LinearGradient colors={['#0f172a', '#1e293b']} style={styles.navGrad}>
+          <View style={styles.navInner}>
+            <TouchableOpacity onPress={() => router.push('/web')} style={styles.brand}>
+              <Moon size={22} color="#fbbf24" strokeWidth={2} />
+              <Text style={styles.brandText}>GoZzzz</Text>
+            </TouchableOpacity>
+            <View style={styles.navRight}>
+              <TouchableOpacity onPress={() => router.push('/web/programa')} style={styles.navGhost}>
+                <BookOpen size={16} color="#fbbf24" />
+                <Text style={styles.navGhostTxt}>{t('web.program.allLessons')}</Text>
+              </TouchableOpacity>
+              <TouchableOpacity onPress={() => router.push('/web/assinar')} style={styles.navGold}>
+                <Text style={styles.navGoldTxt}>{t('coach.ctaSubscribe')}</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        </LinearGradient>
+
+        {/* Hero — faixa igual ao header do checkout (slate + coroa) */}
+        <LinearGradient colors={['#1e293b', '#0f172a', '#07070f']} style={styles.heroGradTop}>
+          <View style={styles.heroGlow} />
+          <View style={[styles.heroInner, { paddingTop: 28, paddingBottom: 8 }]}>
+            <Crown size={52} color="#fbbf24" strokeWidth={1.75} />
+            <Text style={styles.heroH1}>{t('web.program.title')}</Text>
+            <Text style={styles.heroKicker}>{t('web.program.subtitle')}</Text>
+            <Text style={styles.heroLead}>
+              {isPt
+                ? 'Uma trilha em 21 passos para quem quer parar de adivinhar e começar a agir — com clareza, ritmo e base científica.'
+                : 'A 21-step path for people who want to stop guessing and start moving — with clarity, rhythm, and evidence-informed structure.'}
+            </Text>
+
+            <View style={styles.heroBtns}>
+              <TouchableOpacity style={styles.btnGoldFill} onPress={() => router.push('/web/assinar')}>
+                <Crown size={18} color="#0f172a" />
+                <Text style={styles.btnGoldFillTxt}>{isPt ? 'Desbloquear os 21 passos' : 'Unlock all 21 steps'}</Text>
+              </TouchableOpacity>
+              <TouchableOpacity style={styles.btnGhost} onPress={() => router.push('/web/programa')}>
+                <Text style={styles.btnGhostTxt}>{isPt ? 'Ver trilha completa' : 'See the full path'}</Text>
+                <ArrowRight size={18} color={GOLD} />
+              </TouchableOpacity>
+            </View>
+
+            <View style={styles.pillWrap}>
+              {heroProof.map((label, i) => (
+                <View key={i} style={styles.pill}>
+                  <Sparkles size={12} color={GOLD} />
+                  <Text style={styles.pillTxt}>{label}</Text>
+                </View>
+              ))}
+            </View>
+          </View>
+        </LinearGradient>
+
+        {/* Prévia horizontal — curiosidade */}
+        <View style={styles.previewSection}>
+          <View style={styles.previewHead}>
+            <Text style={styles.sectionKicker}>Antes de assinar</Text>
+            <Text style={styles.h2Tight}>Os primeiros tópicos da sua trilha</Text>
+            <Text style={styles.previewSub}>
+              Arraste para o lado — estes são títulos reais das lições.
+            </Text>
+          </View>
+          <ScrollView
+            horizontal
+            showsHorizontalScrollIndicator={false}
+            contentContainerStyle={styles.previewScroll}
+          >
+            {previewLessons.map((lesson) => (
+              <View key={lesson.id} style={styles.previewCard}>
+                <View style={styles.previewCardTop}>
+                  <Text style={styles.previewNum}>#{lesson.num}</Text>
+                  {lesson.free ? (
+                    <View style={styles.freePill}>
+                      <Text style={styles.freePillTxt}>{t('web.program.free')}</Text>
+                    </View>
+                  ) : (
+                    <View style={styles.lockPill}>
+                      <Crown size={10} color={GOLD} />
+                      <Text style={styles.lockPillTxt}>{t('web.program.premium')}</Text>
+                    </View>
+                  )}
+                </View>
+                <Text style={styles.previewTitle} numberOfLines={3}>
+                  {lesson.title}
+                </Text>
+                <TouchableOpacity onPress={() => router.push('/web/programa')} style={styles.previewLink}>
+                  <Text style={styles.previewLinkTxt}>{t('web.program.viewLesson')} →</Text>
+                </TouchableOpacity>
+              </View>
+            ))}
+          </ScrollView>
+        </View>
+
+        <View style={styles.researchStripe}>
+          <ResearcherTrustBlock variant="landing" />
+        </View>
+
+        <View style={styles.body}>
+          {/* Ganchos visuais */}
+          <View style={styles.block}>
+            <Text style={styles.sectionKicker}>Por que abrir o próximo bloco?</Text>
+            <Text style={styles.h2}>Feito para leitura curiosa, não enrolação</Text>
+            <View style={styles.bentoGrid}>
+              {curiosity.map((c, idx) => {
+                const { Ico } = c;
+                return (
+                  <View key={idx} style={styles.bentoCard}>
+                    <LinearGradient colors={['rgba(212,169,106,0.12)', 'rgba(255,255,255,0.02)']} style={styles.bentoIcon}>
+                      <Ico size={22} color={GOLD} strokeWidth={2} />
+                    </LinearGradient>
+                    <Text style={styles.bentoTitle}>{c.title}</Text>
+                    <Text style={styles.bentoSub}>{c.sub}</Text>
+                  </View>
+                );
+              })}
+            </View>
+          </View>
+
+          {/* Três atos */}
+          <LinearGradient colors={[BG_CARD, '#0a0a14']} style={styles.actsBand}>
+            <Text style={styles.sectionKicker}>Estrutura</Text>
+            <Text style={styles.h2}>21 passos em três movimentos</Text>
+            {acts.map((act, idx) => (
+              <View key={idx} style={styles.actRow}>
+                <View style={styles.actBullet}>
+                  <Text style={styles.actBulletTxt}>{idx + 1}</Text>
+                </View>
+                <View style={{ flex: 1 }}>
+                  <View style={styles.actMeta}>
+                    <Text style={styles.actRange}>{act.range}</Text>
+                    <Text style={styles.actTitle}>{act.title}</Text>
+                  </View>
+                  <Text style={styles.actDesc}>{act.desc}</Text>
+                </View>
+              </View>
+            ))}
+            <TouchableOpacity style={styles.btnGhostWideBand} onPress={() => router.push('/web/programa')}>
+              <BookOpen size={18} color={GOLD} />
+              <Text style={styles.btnGhostTxt}>Explorar todas as etapas</Text>
+            </TouchableOpacity>
+          </LinearGradient>
+
+          {/* Programa — textos próprios (evita misturar com passos da consultoria Sono+) */}
+          <View style={[styles.block, styles.sectionBand]}>
+            <Text style={styles.sectionKicker}>Na prática</Text>
+            <Text style={[styles.h2, { marginBottom: 22 }]}>{t('web.program.pathTitle')}</Text>
+            {programPathSteps.map((desc, idx) => (
+              <View key={idx} style={styles.stepRow}>
+                <View style={styles.stepNumWrap}>
+                  <Text style={styles.stepNum}>{idx + 1}</Text>
+                </View>
+                <View style={{ flex: 1 }}>
+                  <Text style={styles.stepDesc}>{desc}</Text>
+                </View>
+              </View>
+            ))}
+          </View>
+
+          {/* Stats + bridge */}
+          <View style={[styles.sectionBandMuted, styles.block]}>
+            <Text style={styles.sectionKicker}>{t('web.program.title')}</Text>
+            <Text style={[styles.h2, { marginBottom: 12 }]}>Números que definem o ritual</Text>
+            <Text style={[styles.para, { marginBottom: 20 }]}>{webProgramBridgePt}</Text>
+            <View style={styles.statRow}>
+              <View style={styles.stat}>
+                <Text style={styles.statNum}>21</Text>
+                <Text style={styles.statLbl}>{t('web.program.steps')}</Text>
+              </View>
+              <View style={styles.statDivider} />
+              <View style={styles.stat}>
+                <Text style={styles.statNum}>3</Text>
+                <Text style={styles.statLbl}>{t('web.program.freeLessons')}</Text>
+              </View>
+              <View style={styles.statDivider} />
+              <View style={styles.stat}>
+                <Text style={styles.statNum}>~5 min</Text>
+                <Text style={styles.statLbl}>{t('web.program.stat3')}</Text>
+              </View>
+            </View>
+          </View>
+
+          {/* Benefícios */}
+          <View style={[styles.block, styles.sectionBand]}>
+            <Text style={styles.sectionKicker}>Ao seguir os passos</Text>
+            <Text style={[styles.h2, { marginBottom: 16 }]}>O que você treina ao longo do programa</Text>
+            <View style={styles.benefGrid}>
+              {benefitLines.map((line, idx) => (
+                <View key={idx} style={styles.benefCard}>
+                  <Check size={16} color="#22c55e" />
+                  <Text style={styles.benefTxt}>{line}</Text>
+                </View>
+              ))}
+            </View>
+          </View>
+
+          {/* Checkout (layout espelho de /web/assinar, desktop — CTA leva ao Stripe na página certa) */}
+          <View style={[styles.block, styles.sectionBand, styles.checkoutSection]}>
+            <Text style={styles.sectionKicker}>{t('web.subscribe.headerTitle')}</Text>
+            <Text style={[styles.h2, { marginBottom: 8 }]}>{t('web.subscribe.headerSubtitle')}</Text>
+            <View style={styles.checkoutGrid}>
+              <View style={styles.checkoutCol}>
+                <View style={[styles.planCardCk, styles.planCardCkSelected]}>
+                  <Text style={styles.planTotalCk}>
+                    {pricing.annual.equiv} — {pricing.annual.note}
+                  </Text>
+                </View>
+                <TouchableOpacity
+                  style={styles.checkoutBtnL}
+                  activeOpacity={0.88}
+                  onPress={() => router.push('/web/assinar')}
+                >
+                  <Crown size={20} color="#0d0d16" />
+                  <Text style={styles.checkoutBtnLTxt}>{t('web.subscribe.subscribe')}</Text>
+                </TouchableOpacity>
+                <Text style={styles.disclaimerCk}>{t('web.subscribe.disclaimer')}</Text>
+                <View style={styles.securityBadgesCk}>
+                  <View style={styles.securityBadgeCk}>
+                    <Lock size={14} color="#10b981" />
+                    <Text style={styles.securityBadgeCkTxt}>{t('payment.ssl')}</Text>
+                  </View>
+                  <View style={styles.securityBadgeCk}>
+                    <Shield size={14} color="#3b82f6" />
+                    <Text style={styles.securityBadgeCkTxt}>Stripe Secure</Text>
+                  </View>
+                  <View style={styles.securityBadgeCk}>
+                    <BadgeCheck size={14} color="#f59e0b" />
+                    <Text style={styles.securityBadgeCkTxt}>{t('payment.pciDss')}</Text>
+                  </View>
+                </View>
+              </View>
+              <View style={styles.featuresColCk}>
+                <Text style={styles.colTitleCk}>{t('web.subscribe.included')}</Text>
+                <View style={styles.featuresCardCk}>
+                  {SUBSCRIBE_FEATURE_KEYS.map((key, i) => (
+                    <View key={key} style={styles.featureItemCk}>
+                      <View style={styles.featureCheckCk}>
+                        <Check size={14} color="#10b981" />
+                      </View>
+                      <Text style={styles.featureTextCk}>{t(key)}</Text>
+                    </View>
+                  ))}
+                </View>
+                <View style={styles.guaranteeCardCk}>
+                  <BadgeCheck size={28} color="#10b981" />
+                  <View style={{ flex: 1 }}>
+                    <Text style={styles.guaranteeTitleCk}>{t('web.subscribe.guaranteeTitle')}</Text>
+                    <Text style={styles.guaranteeDescCk}>{t('web.subscribe.guaranteeDesc')}</Text>
+                  </View>
+                </View>
+              </View>
+            </View>
+          </View>
+
+          {/* Sono+ — opcional, secundário */}
+          <LinearGradient colors={['#120f0a', '#1a1610']} style={styles.sonoPlusBand}>
+            <View style={styles.sonoPlusRow}>
+              <Crown size={28} color={GOLD} />
+              <View style={{ flex: 1 }}>
+                <Text style={styles.sonoPlusKicker}>Opcional · Sono+</Text>
+                <Text style={styles.sonoPlusTitle}>{t('coach.services.title')}</Text>
+                <Text style={styles.sonoPlusBody}>{t('coach.subtitle')}</Text>
+              </View>
+            </View>
+            <Text style={[styles.sectionKicker, { color: GOLD }]}>{t('coach.investment.title')}</Text>
+            <Text style={[styles.h2, { marginBottom: 14 }]}>{t('web.coach.pricingTitle')}</Text>
+            <View style={styles.priceCard}>
+              <View style={styles.priceHead}>
+                <View style={styles.onlineTag}>
+                  <Text style={styles.onlineTagTxt}>100% ONLINE</Text>
+                </View>
+                <Text style={styles.priceLabel}>{t('web.coach.price1.label')}</Text>
+              </View>
+              <View style={styles.tagLineStack}>
+                <Text style={styles.tagLine}>{t('web.coach.price1.tagline1')}</Text>
+                <Text style={styles.tagLine}>{t('web.coach.price1.tagline2')}</Text>
+                <Text style={styles.tagLine}>{t('web.coach.price1.tagline3')}</Text>
+              </View>
+              <View style={styles.priceAmtRow}>
+                <Text style={styles.priceAmt}>{t('web.coach.price1')}</Text>
+                <Text style={styles.priceSub}>{t('web.coach.price1Sub')}</Text>
+              </View>
+              <Text style={styles.priceFmt}>{t('web.coach.price1.desc')}</Text>
+              <View style={styles.divider} />
+              {renderPriceBullets()}
+              <TouchableOpacity style={styles.btnGoldFillWide} onPress={openWhatsApp}>
+                <MessageCircle size={18} color="#0f172a" />
+                <Text style={styles.btnGoldFillTxt}>{t('web.coach.price1.btn')}</Text>
+              </TouchableOpacity>
+            </View>
+          </LinearGradient>
+
+          {/* FAQ */}
+          <View style={styles.block}>
+            <Text style={styles.h2}>Perguntas frequentes</Text>
+            <View style={{ marginTop: 16 }}>
+              {faq.map((item, i) => (
+                <View key={i} style={styles.faqCard}>
+                  <Text style={styles.faqQ}>{item.question}</Text>
+                  <Text style={styles.faqA}>{item.answer}</Text>
+                </View>
+              ))}
+            </View>
+          </View>
+
+          {/* CTA final — programa primeiro */}
+          <View style={styles.ctaPanel}>
+            <Moon size={24} color={GOLD} />
+            <Text style={styles.ctaTitle}>Pronto para atravessar os 21 passos?</Text>
+            <Text style={styles.ctaSub}>
+              Comece pelas lições gratuitas ou desbloqueie o percurso completo. Sono+ fica disponível quando quiser refinamento ao vivo.
+            </Text>
+            <TouchableOpacity style={styles.btnGoldFillWide} onPress={() => router.push('/web/assinar')}>
+              <Crown size={20} color="#0f172a" />
+              <Text style={styles.btnGoldFillTxt}>{t('coach.ctaSubscribe')}</Text>
+            </TouchableOpacity>
+            <TouchableOpacity style={styles.btnOutlineGold} onPress={() => router.push('/web/programa')}>
+              <BookOpen size={20} color={GOLD} />
+              <Text style={styles.btnOutlineGoldTxt}>{t('web.program.allLessons')}</Text>
+            </TouchableOpacity>
+            <TouchableOpacity style={styles.btnGhostFinal} onPress={openWhatsApp}>
+              <Calendar size={18} color={TEXT_MUTED} />
+              <Text style={styles.btnGhostFinalTxt}>Falar sobre Sono+ (WhatsApp)</Text>
+            </TouchableOpacity>
+          </View>
+
+          <View style={styles.footer}>
+            <Text style={styles.footerCopy}>{t('web.footer.copyright')}</Text>
+            <Text style={styles.footerCo}>MORFEU SAÚDE E TECNOLOGIA LTDA</Text>
+            <Text style={styles.footerCn}>CNPJ: 66.059.212/0001-52</Text>
+          </View>
+        </View>
+      </ScrollView>
+    </>
+  );
+}
+
+const webProgramBridgePt =
+  'Cada etapa sintetiza o que a literatura de sono recomenda aplicar no dia seguinte — no mesmo formato em que já confia na app.';
+const webProgramBridgeEn =
+  'Each step condenses sleep-science protocols into moves you repeat the next day — aligned with how the app teaches.';
+
+const styles = StyleSheet.create({
+  page: { flex: 1, backgroundColor: BG },
+  navGrad: {
+    borderBottomWidth: StyleSheet.hairlineWidth,
+    borderBottomColor: 'rgba(255,255,255,0.08)',
+  },
+  navInner: {
+    maxWidth: 1100,
+    width: '100%',
+    alignSelf: 'center',
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    paddingHorizontal: 24,
+    minHeight: NAV_H,
+  },
+  brand: { flexDirection: 'row', gap: 10, alignItems: 'center' },
+  brandText: { fontSize: 20, fontWeight: '800', color: '#ffffff' },
+  navRight: { flexDirection: 'row', gap: 10, alignItems: 'center' },
+  navGhost: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+    paddingHorizontal: 12,
+    paddingVertical: 9,
+    borderRadius: 10,
+    borderWidth: 1,
+    borderColor: 'rgba(255,255,255,0.12)',
+    backgroundColor: 'rgba(255,255,255,0.06)',
+  },
+  navGhostTxt: { color: '#94a3b8', fontWeight: '600', fontSize: 13 },
+  navGold: { paddingHorizontal: 16, paddingVertical: 10, borderRadius: 10, backgroundColor: GOLD },
+  navGoldTxt: { color: '#0f172a', fontWeight: '800', fontSize: 13 },
+
+  heroGradTop: { width: '100%', paddingBottom: 40, overflow: 'hidden' },
+  heroGlow: {
+    position: 'absolute',
+    top: -120,
+    left: '20%',
+    right: '20%',
+    height: 280,
+    borderRadius: 200,
+    backgroundColor: 'rgba(212,169,106,0.08)',
+  },
+  heroInner: { maxWidth: 720, width: '100%', alignSelf: 'center', paddingHorizontal: 24, alignItems: 'center', zIndex: 1 },
+  heroH1: {
+    marginTop: 16,
+    fontSize: isWeb ? 34 : 28,
+    fontWeight: '800',
+    color: '#ffffff',
+    textAlign: 'center',
+    lineHeight: isWeb ? 40 : 34,
+    letterSpacing: -0.5,
+  },
+  heroKicker: {
+    marginTop: 10,
+    fontSize: 17,
+    fontWeight: '700',
+    color: GOLD,
+    textAlign: 'center',
+  },
+  heroLead: {
+    marginTop: 14,
+    fontSize: 16,
+    fontWeight: '500',
+    color: 'rgba(255,255,255,0.88)',
+    textAlign: 'center',
+    lineHeight: 24,
+    maxWidth: 560,
+    paddingHorizontal: 8,
+  },
+  heroBtns: {
+    marginTop: 24,
+    flexDirection: isWeb ? 'row' : 'column',
+    gap: 10,
+    width: '100%',
+    justifyContent: 'center',
+    flexWrap: 'wrap',
+    paddingHorizontal: 4,
+  },
+  btnGoldFill: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 8,
+    backgroundColor: GOLD,
+    paddingVertical: 15,
+    paddingHorizontal: 20,
+    borderRadius: 14,
+    minWidth: isWeb ? 220 : undefined,
+  },
+  btnGoldFillTxt: { color: '#0f172a', fontWeight: '800', fontSize: 15 },
+  btnGhost: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 8,
+    borderWidth: 2,
+    borderColor: GOLD,
+    paddingVertical: 13,
+    paddingHorizontal: 18,
+    borderRadius: 14,
+    backgroundColor: 'transparent',
+  },
+  btnGhostTxt: { color: GOLD, fontWeight: '700', fontSize: 15 },
+  pillWrap: { flexDirection: 'row', flexWrap: 'wrap', gap: 8, justifyContent: 'center', marginTop: 22 },
+  pill: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+    backgroundColor: 'rgba(255,255,255,0.06)',
+    borderWidth: 1,
+    borderColor: 'rgba(212,169,106,0.22)',
+    borderRadius: 999,
+    paddingHorizontal: 11,
+    paddingVertical: 7,
+  },
+  pillTxt: { color: TEXT_MUTED, fontSize: 11, fontWeight: '600', maxWidth: 240 },
+
+  researchStripe: {
+    width: '100%',
+    paddingHorizontal: 24,
+    paddingTop: 20,
+    paddingBottom: 4,
+    maxWidth: 1100,
+    alignSelf: 'center',
+    backgroundColor: BG,
+  },
+  previewSection: {
+    paddingTop: 28,
+    paddingBottom: 8,
+    backgroundColor: BG,
+    borderBottomWidth: 1,
+    borderBottomColor: 'rgba(212,169,106,0.06)',
+  },
+  previewHead: { paddingHorizontal: 24, maxWidth: 1100, width: '100%', alignSelf: 'center', marginBottom: 16 },
+  previewSub: { marginTop: 8, color: TEXT_MUTED, fontSize: 14, lineHeight: 21 },
+  previewScroll: { paddingHorizontal: 24, gap: 12, paddingBottom: 12 },
+  previewCard: {
+    width: 260,
+    backgroundColor: BG_CARD,
+    borderRadius: 18,
+    padding: 18,
+    borderWidth: 1,
+    borderColor: 'rgba(212,169,106,0.18)',
+    marginRight: 4,
+  },
+  previewCardTop: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 },
+  previewNum: { fontSize: 13, fontWeight: '800', color: GOLD },
+  freePill: { backgroundColor: 'rgba(34,197,94,0.15)', paddingHorizontal: 8, paddingVertical: 4, borderRadius: 8 },
+  freePillTxt: { color: '#86efac', fontSize: 10, fontWeight: '800' },
+  lockPill: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
+    backgroundColor: GOLD_DIM,
+    paddingHorizontal: 8,
+    paddingVertical: 4,
+    borderRadius: 8,
+  },
+  lockPillTxt: { color: GOLD, fontSize: 10, fontWeight: '800' },
+  previewTitle: { color: TEXT_MAIN, fontSize: 15, fontWeight: '700', lineHeight: 21, minHeight: 63 },
+  previewLink: { marginTop: 14 },
+  previewLinkTxt: { color: GOLD, fontSize: 13, fontWeight: '700' },
+
+  body: { maxWidth: 1100, width: '100%', alignSelf: 'center', paddingHorizontal: 24, paddingBottom: 48 },
+  block: { marginTop: 36 },
+  sectionBand: { paddingTop: 8, borderTopWidth: 1, borderTopColor: 'rgba(212,169,106,0.08)' },
+  sectionBandMuted: {
+    marginHorizontal: -24,
+    paddingHorizontal: 24,
+    paddingVertical: 28,
+    backgroundColor: '#0c0c16',
+    borderTopWidth: 1,
+    borderBottomWidth: 1,
+    borderColor: 'rgba(212,169,106,0.06)',
+  },
+  sectionKicker: { color: GOLD, fontSize: 11, fontWeight: '800', letterSpacing: 1.2, marginBottom: 8, textTransform: 'uppercase' },
+  h2: { color: TEXT_MAIN, fontSize: 22, fontWeight: '700', lineHeight: 28 },
+  h2Tight: { color: TEXT_MAIN, fontSize: 22, fontWeight: '700', lineHeight: 28 },
+  para: { marginTop: 14, color: TEXT_MUTED, fontSize: 15, lineHeight: 24 },
+
+  bentoGrid: {
+    marginTop: 18,
+    flexDirection: isWeb ? 'row' : 'column',
+    flexWrap: 'wrap',
+    gap: 12,
+  },
+  bentoCard: {
+    width: isWeb ? '48%' : '100%',
+    backgroundColor: BG_CARD,
+    borderRadius: 16,
+    padding: 18,
+    borderWidth: 1,
+    borderColor: 'rgba(255,255,255,0.06)',
+  },
+  bentoIcon: {
+    width: 48,
+    height: 48,
+    borderRadius: 14,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginBottom: 12,
+  },
+  bentoTitle: { color: TEXT_MAIN, fontSize: 15, fontWeight: '700', marginBottom: 6 },
+  bentoSub: { color: TEXT_MUTED, fontSize: 13, lineHeight: 20 },
+
+  actsBand: {
+    marginTop: 32,
+    marginHorizontal: -24,
+    paddingHorizontal: 24,
+    paddingVertical: 28,
+    borderTopWidth: 1,
+    borderBottomWidth: 1,
+    borderColor: 'rgba(212,169,106,0.06)',
+    position: 'relative',
+  },
+  actRow: { flexDirection: 'row', gap: 14, marginTop: 18, alignItems: 'flex-start' },
+  actBullet: {
+    width: 36,
+    height: 36,
+    borderRadius: 18,
+    backgroundColor: 'rgba(212,169,106,0.18)',
+    borderWidth: 1,
+    borderColor: GOLD,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  actBulletTxt: { color: GOLD, fontWeight: '900', fontSize: 14 },
+  actMeta: { flexDirection: 'row', alignItems: 'baseline', gap: 8, flexWrap: 'wrap', marginBottom: 6 },
+  actRange: { color: GOLD, fontSize: 12, fontWeight: '800' },
+  actTitle: { color: TEXT_MAIN, fontSize: 16, fontWeight: '700' },
+  actDesc: { color: TEXT_MUTED, fontSize: 14, lineHeight: 21 },
+  btnGhostWideBand: {
+    marginTop: 22,
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+    alignSelf: 'flex-start',
+    borderWidth: 1,
+    borderColor: 'rgba(212,169,106,0.35)',
+    paddingVertical: 12,
+    paddingHorizontal: 16,
+    borderRadius: 12,
+  },
+
+  stepRow: {
+    flexDirection: 'row',
+    gap: 14,
+    marginBottom: 14,
+    backgroundColor: BG_CARD,
+    padding: 18,
+    borderRadius: 16,
+    borderLeftWidth: 4,
+    borderLeftColor: GOLD,
+  },
+  stepNumWrap: {
+    width: 42,
+    height: 42,
+    borderRadius: 21,
+    backgroundColor: GOLD,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  stepNum: { fontSize: 18, fontWeight: '900', color: '#07070f' },
+  stepTitle: { color: TEXT_MAIN, fontSize: 15, fontWeight: '700', marginBottom: 5 },
+  stepDesc: { color: TEXT_MUTED, fontSize: 15, lineHeight: 23 },
+
+  statRow: {
+    flexDirection: isWeb ? 'row' : 'column',
+    gap: isWeb ? 0 : 10,
+    marginTop: 6,
+    backgroundColor: BG_CARD,
+    borderRadius: 16,
+    borderWidth: 1,
+    borderColor: 'rgba(212,169,106,0.12)',
+    paddingVertical: isWeb ? 18 : 14,
+    paddingHorizontal: 10,
+    alignItems: 'center',
+  },
+  stat: { flex: 1, alignItems: 'center', minWidth: isWeb ? 110 : undefined },
+  statDivider: {
+    width: isWeb ? StyleSheet.hairlineWidth : '80%',
+    height: isWeb ? undefined : StyleSheet.hairlineWidth,
+    backgroundColor: 'rgba(212,169,106,0.2)',
+    alignSelf: 'stretch',
+  },
+  statNum: { color: TEXT_MAIN, fontSize: 26, fontWeight: '800' },
+  statLbl: { color: TEXT_MUTED, fontSize: 11, marginTop: 4, textAlign: 'center' },
+
+  benefGrid: { flexDirection: isWeb ? 'row' : 'column', flexWrap: 'wrap', gap: 10, marginTop: 8 },
+  benefCard: {
+    width: isWeb ? '48%' : '100%',
+    flexDirection: 'row',
+    gap: 10,
+    alignItems: 'flex-start',
+    backgroundColor: BG_CARD,
+    padding: 15,
+    borderRadius: 12,
+    borderWidth: 1,
+    borderColor: 'rgba(255,255,255,0.05)',
+  },
+  benefTxt: { flex: 1, color: TEXT_MUTED, fontSize: 14, lineHeight: 21 },
+
+  checkoutSection: { marginTop: 8 },
+  checkoutGrid: {
+    flexDirection: isWeb ? 'row' : 'column',
+    gap: isWeb ? 36 : 24,
+    alignItems: 'flex-start',
+    marginTop: 20,
+    width: '100%',
+  },
+  checkoutCol: { flex: isWeb ? 1 : undefined, width: isWeb ? undefined : '100%' },
+  featuresColCk: { flex: isWeb ? 1 : undefined, width: isWeb ? undefined : '100%' },
+  planCardCk: {
+    backgroundColor: BG_CARD,
+    borderRadius: 16,
+    padding: 20,
+    marginBottom: 12,
+    borderWidth: 2,
+    borderColor: 'rgba(255,255,255,0.08)',
+  },
+  planCardCkSelected: {
+    borderColor: GOLD,
+    shadowColor: GOLD,
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.2,
+    shadowRadius: 10,
+    elevation: 4,
+  },
+  planTotalCk: { fontSize: 15, color: '#8892a4', fontWeight: '600', lineHeight: 22 },
+  checkoutBtnL: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 10,
+    backgroundColor: GOLD,
+    paddingVertical: 18,
+    borderRadius: 16,
+    marginBottom: 12,
+    shadowColor: GOLD,
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.35,
+    shadowRadius: 12,
+    elevation: 6,
+  },
+  checkoutBtnLTxt: { fontSize: 17, fontWeight: '800', color: '#0d0d16' },
+  disclaimerCk: { fontSize: 12, color: '#94a3b8', textAlign: 'center', lineHeight: 18, marginBottom: 16 },
+  securityBadgesCk: { flexDirection: 'row', gap: 8, justifyContent: 'center', flexWrap: 'wrap' },
+  securityBadgeCk: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+    backgroundColor: 'rgba(255,255,255,0.06)',
+    paddingHorizontal: 11,
+    paddingVertical: 7,
+    borderRadius: 20,
+    borderWidth: 1,
+    borderColor: 'rgba(255,255,255,0.1)',
+  },
+  securityBadgeCkTxt: { fontSize: 11, fontWeight: '700', color: '#8892a4' },
+  colTitleCk: { fontSize: 20, fontWeight: '800', color: '#e8d5b7', marginBottom: 16 },
+  featuresCardCk: {
+    backgroundColor: BG_CARD,
+    borderRadius: 16,
+    padding: 22,
+    gap: 13,
+    borderWidth: 1,
+    borderColor: 'rgba(255,255,255,0.06)',
+  },
+  featureItemCk: { flexDirection: 'row', alignItems: 'flex-start', gap: 12 },
+  featureCheckCk: {
+    width: 24,
+    height: 24,
+    borderRadius: 12,
+    backgroundColor: 'rgba(16,185,129,0.15)',
+    justifyContent: 'center',
+    alignItems: 'center',
+    flexShrink: 0,
+  },
+  featureTextCk: { fontSize: 14, color: '#94a3b8', flex: 1, lineHeight: 21 },
+  guaranteeCardCk: {
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+    gap: 14,
+    backgroundColor: 'rgba(16,185,129,0.08)',
+    borderRadius: 16,
+    padding: 18,
+    borderWidth: 1,
+    borderColor: 'rgba(16,185,129,0.2)',
+    marginTop: 20,
+  },
+  guaranteeTitleCk: { fontSize: 15, fontWeight: '700', color: '#e8d5b7', marginBottom: 6 },
+  guaranteeDescCk: { fontSize: 13, color: '#10b981', lineHeight: 20 },
+
+  sonoPlusBand: {
+    marginTop: 32,
+    marginHorizontal: -24,
+    paddingHorizontal: 24,
+    paddingVertical: 26,
+    borderTopWidth: 1,
+    borderBottomWidth: 1,
+    borderColor: 'rgba(212,169,106,0.14)',
+    borderRadius: 0,
+  },
+  sonoPlusRow: { flexDirection: 'row', gap: 16, alignItems: 'flex-start', marginBottom: 20 },
+  sonoPlusKicker: { color: GOLD, fontSize: 11, fontWeight: '800', letterSpacing: 1, marginBottom: 4 },
+  sonoPlusTitle: { color: TEXT_MAIN, fontSize: 17, fontWeight: '700', marginBottom: 8 },
+  sonoPlusBody: { color: TEXT_MUTED, fontSize: 14, lineHeight: 22 },
+  priceCard: {
+    marginTop: 6,
+    backgroundColor: 'rgba(0,0,0,0.25)',
+    borderRadius: 18,
+    padding: 20,
+    borderWidth: 1,
+    borderColor: 'rgba(212,169,106,0.28)',
+  },
+  priceHead: { marginBottom: 10 },
+  onlineTag: {
+    alignSelf: 'flex-start',
+    backgroundColor: 'rgba(212,169,106,0.15)',
+    paddingHorizontal: 9,
+    paddingVertical: 4,
+    borderRadius: 8,
+    marginBottom: 8,
+  },
+  onlineTagTxt: { color: GOLD, fontSize: 9, fontWeight: '800', letterSpacing: 0.6 },
+  priceLabel: { color: TEXT_MAIN, fontSize: 18, fontWeight: '800' },
+  tagLineStack: { marginVertical: 12, gap: 3 },
+  tagLine: { color: GOLD, fontSize: 13, fontWeight: '600' },
+  priceAmtRow: { flexDirection: 'row', alignItems: 'baseline', gap: 8, marginBottom: 6 },
+  priceAmt: { fontSize: 32, fontWeight: '900', color: GOLD },
+  priceSub: { color: TEXT_MUTED, fontSize: 13, fontWeight: '600' },
+  priceFmt: { color: TEXT_MUTED, fontSize: 13, marginBottom: 10 },
+  divider: { height: StyleSheet.hairlineWidth, backgroundColor: 'rgba(212,169,106,0.15)', marginVertical: 14 },
+  priceRow: { flexDirection: 'row', gap: 10, marginBottom: 12, alignItems: 'flex-start' },
+  bulletWrap: { paddingTop: 2 },
+  priceLineTitle: { color: TEXT_MAIN, fontSize: 13, fontWeight: '600', lineHeight: 20 },
+  priceLineSub: { color: TEXT_MUTED, fontSize: 12, marginTop: 2, lineHeight: 17 },
+  btnGoldFillWide: {
+    marginTop: 16,
+    flexDirection: 'row',
+    justifyContent: 'center',
+    alignItems: 'center',
+    gap: 8,
+    backgroundColor: GOLD,
+    paddingVertical: 15,
+    borderRadius: 14,
+  },
+
+  faqCard: {
+    backgroundColor: BG_CARD,
+    borderRadius: 14,
+    padding: 16,
+    borderWidth: 1,
+    borderColor: 'rgba(255,255,255,0.06)',
+    marginBottom: 10,
+  },
+  faqQ: { color: TEXT_MAIN, fontSize: 15, fontWeight: '700', marginBottom: 8 },
+  faqA: { color: TEXT_MUTED, fontSize: 13, lineHeight: 20 },
+
+  ctaPanel: {
+    marginTop: 36,
+    alignItems: 'center',
+    backgroundColor: '#0f1624',
+    borderRadius: 20,
+    padding: 24,
+    borderWidth: 1,
+    borderColor: 'rgba(212,169,106,0.22)',
+    gap: 10,
+  },
+  ctaTitle: { fontSize: 21, fontWeight: '800', color: TEXT_MAIN, textAlign: 'center', marginTop: 4 },
+  ctaSub: { fontSize: 14, lineHeight: 21, color: TEXT_MUTED, textAlign: 'center', marginBottom: 6, paddingHorizontal: 4 },
+
+  btnOutlineGold: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+    justifyContent: 'center',
+    width: '100%',
+    borderWidth: 2,
+    borderColor: GOLD,
+    paddingVertical: 14,
+    borderRadius: 14,
+    marginTop: 2,
+  },
+  btnOutlineGoldTxt: { color: GOLD, fontWeight: '800', fontSize: 15 },
+  btnGhostFinal: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+    marginTop: 6,
+    paddingVertical: 10,
+  },
+  btnGhostFinalTxt: { color: TEXT_MUTED, fontWeight: '600', fontSize: 14 },
+
+  footer: { marginTop: 36, paddingVertical: 22, alignItems: 'center', gap: 6 },
+  footerCopy: { fontSize: 12, color: TEXT_MUTED, textAlign: 'center', paddingHorizontal: 16 },
+  footerCo: { color: TEXT_MUTED, fontSize: 11, fontWeight: '600' },
+  footerCn: { color: TEXT_MUTED, fontSize: 10 },
+});

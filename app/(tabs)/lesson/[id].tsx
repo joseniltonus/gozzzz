@@ -175,9 +175,9 @@ export default function LessonDetailScreen() {
   if (!lesson) {
     return (
       <View style={[styles.errorContainer, { backgroundColor: tc.bg }]}>
-        <Text style={styles.errorText}>Not found</Text>
+        <Text style={styles.errorText}>{t('lesson.notFound')}</Text>
         <TouchableOpacity style={styles.backButtonError} onPress={() => router.back()}>
-          <Text style={styles.backButtonErrorText}>Go Back</Text>
+          <Text style={styles.backButtonErrorText}>{t('lesson.goBack')}</Text>
         </TouchableOpacity>
       </View>
     );

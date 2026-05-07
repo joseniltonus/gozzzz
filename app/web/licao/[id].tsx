@@ -38,7 +38,9 @@ const isWeb = Platform.OS === 'web';
 export default function WebLessonPage() {
   const { id } = useLocalSearchParams();
   const router = useRouter();
-  const { language, t } = useLanguage();
+  const { t: translate } = useLanguage();
+  const language: 'pt' = 'pt';
+  const t = (key: string) => translate(key, 'pt');
   const { user } = useAuth();
   const { profile, loading: profileLoading } = useUserProfile();
   const chronotype = useEffectiveChronotype();
