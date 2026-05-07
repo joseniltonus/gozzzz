@@ -2396,7 +2396,12 @@ export function LanguageProvider({ children }: { children: ReactNode }) {
 
   const t = (key: string, lang?: Language): string => {
     const loc = lang ?? language;
-    return (translations[loc] as Record<string, string>)[key] || key;
+    const dict = translations[loc] as Record<string, string>;
+    // Distinguish "missing key" (fallback to key for visibility during dev) from
+    // "explicitly empty value" (some entries are intentionally '' so consumers
+    // can opt-out via a length gate or render a blank slot). Using `||` would
+    // collapse both cases and leak the raw key into the UI for empty entries.
+    return Object.prototype.hasOwnProperty.call(dict, key) ? dict[key] : key;
   };
 
   useEffect(() => {
