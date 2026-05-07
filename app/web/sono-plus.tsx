@@ -9,7 +9,7 @@ import {
   Linking,
 } from 'react-native';
 import Head from 'expo-router/head';
-import { useRouter } from 'expo-router';
+import { useRouter, Link } from 'expo-router';
 import { LinearGradient } from 'expo-linear-gradient';
 import {
   ArrowRight,
@@ -67,17 +67,6 @@ const DEFAULT_WEB_PRICING: Record<'pt' | 'en', PricingData> = {
   },
 };
 
-const SUBSCRIBE_FEATURE_KEYS = [
-  'web.subscribe.feature1',
-  'web.subscribe.feature2',
-  'web.subscribe.feature3',
-  'web.subscribe.feature4',
-  'web.subscribe.feature5',
-  'web.subscribe.feature6',
-  'web.subscribe.feature7',
-  'web.subscribe.feature8',
-] as const;
-
 /** Landing web: programa 21 passos como produto principal; Sono+ como opcional premium. Sem depoimentos inventados. */
 export default function SonoPlusLandingPage() {
   const router = useRouter();
@@ -118,12 +107,20 @@ export default function SonoPlusLandingPage() {
   }, [language]);
 
   const headTitle = isPt
-    ? 'GoZzzz | Programa 21 passos — sono com método e evidência'
+    ? 'Programa de Sono em 21 Passos | GoZzzz — Baseado em Neurociência'
     : 'GoZzzz | 21-step sleep program — structured, evidence-guided';
 
   const headDesc = isPt
-    ? 'Trilha de 21 passos para reorganizar sono, ritmo e rotina — com 3 primeiras lições gratuitas. Sono+: consultoria opcional.'
+    ? 'Trilha de 21 passos para reorganizar sono, ritmo circadiano e rotina — com base em pesquisa de Walker, Huberman, Czeisler e Breus. 3 primeiras lições gratuitas. Acesso vitalício por R$ 147.'
     : 'A 21-step path to reorganize sleep, rhythm, and routine — start with 3 free lessons. Sono+: optional live consulting.';
+
+  const headOgDesc = isPt
+    ? '21 passos baseados em neurociência para quem quer parar de adivinhar e começar a dormir de verdade. 3 lições grátis. R$ 147 pagamento único.'
+    : 'A 21-step path to reorganize sleep, rhythm, and routine — 3 free lessons.';
+
+  const headTwitterDesc = isPt
+    ? '21 passos baseados em neurociência. 3 lições grátis. R$ 147 acesso vitalício.'
+    : '21-step program. 3 free lessons. Lifetime access.';
 
   const previewLessons = useMemo(() => {
     return [...LESSONS_DATA]
@@ -151,7 +148,7 @@ export default function SonoPlusLandingPage() {
     {
       question: 'O que é Sono+ em relação ao programa?',
       answer:
-        'O programa cobre o percurso completo na app/web. Sono+ é a linha opcional de acompanhamento ao vivo quando o seu caso beneficia de conversa e ajuste fino — combinamos pelo WhatsApp.',
+        'O programa cobre o percurso completo na app/web. Sono+ é a linha opcional de acompanhamento ao vivo — uma sessão de diagnóstico de 60 minutos com plano personalizado e relatório entregue em 72h.',
     },
     {
       question: 'Isso substitui acompanhamento médico?',
@@ -160,54 +157,61 @@ export default function SonoPlusLandingPage() {
     },
   ];
 
-  const schemaFaq = {
-    '@context': 'https://schema.org',
-    '@type': 'FAQPage',
-    mainEntity: faq.map((item) => ({
-      '@type': 'Question',
-      name: item.question,
-      acceptedAnswer: {
-        '@type': 'Answer',
-        text: item.answer,
-      },
-    })),
-  };
-
   const socialImageUrl = 'https://gozzzz.app/og/sono-plus.png';
 
-  const schemaService = {
+  // Combined @graph schema: Product (with offer + price), FAQPage, BreadcrumbList.
+  // priceValidUntil is required by Google's Merchant Listings; bumped yearly.
+  const schemaGraph = {
     '@context': 'https://schema.org',
-    '@type': 'Product',
-    name: 'GoZzzz programa de sono — 21 passos',
-    description: headDesc,
-    image: socialImageUrl,
-    brand: { '@type': 'Brand', name: 'GoZzzz' },
-    offers: {
-      '@type': 'Offer',
-      url: 'https://gozzzz.app/web/assinar',
-      availability: 'https://schema.org/InStock',
-    },
-  };
-  const schemaWebPage = {
-    '@context': 'https://schema.org',
-    '@type': 'WebPage',
-    name: headTitle,
-    description: headDesc,
-    url: 'https://gozzzz.app/web/sono-plus',
-    inLanguage: isPt ? 'pt-BR' : 'en-US',
-    image: socialImageUrl,
-    isPartOf: {
-      '@type': 'WebSite',
-      name: 'GoZzzz',
-      url: 'https://gozzzz.app',
-    },
+    '@graph': [
+      {
+        '@type': 'Product',
+        name: 'Programa de Sono em 21 Passos — GoZzzz',
+        description:
+          'Trilha de 21 passos para reorganizar sono, ritmo circadiano e rotina com base em neurociência do sono.',
+        url: 'https://gozzzz.app/web/sono-plus',
+        image: socialImageUrl,
+        brand: { '@type': 'Brand', name: 'GoZzzz' },
+        offers: {
+          '@type': 'Offer',
+          price: '147.00',
+          priceCurrency: 'BRL',
+          availability: 'https://schema.org/InStock',
+          priceValidUntil: '2026-12-31',
+          url: 'https://gozzzz.app/web/sono-plus',
+        },
+      },
+      {
+        '@type': 'FAQPage',
+        mainEntity: faq.map((item) => ({
+          '@type': 'Question',
+          name: item.question,
+          acceptedAnswer: {
+            '@type': 'Answer',
+            text: item.answer,
+          },
+        })),
+      },
+      {
+        '@type': 'BreadcrumbList',
+        itemListElement: [
+          { '@type': 'ListItem', position: 1, name: 'GoZzzz', item: 'https://gozzzz.app/web' },
+          {
+            '@type': 'ListItem',
+            position: 2,
+            name: 'Programa 21 Passos',
+            item: 'https://gozzzz.app/web/sono-plus',
+          },
+        ],
+      },
+    ],
   };
 
   const heroProof = [
     `21 ${t('web.program.steps')}`,
     `3 ${t('web.program.freeLessons')}`,
-    t('web.program.pillApproxStep'),
-    t('web.badge.scienceBased'),
+    isPt ? '~5 min por passo' : t('web.program.pillApproxStep'),
+    isPt ? 'R$ 147 acesso vitalício' : t('web.badge.scienceBased'),
   ];
 
   const programPathSteps = [
@@ -275,27 +279,6 @@ export default function SonoPlusLandingPage() {
     'Clareza para ajustar o que não funciona',
   ];
 
-  const renderPriceBullets = () => {
-    const rows = [
-      { title: t('web.coach.price1.f1'), sub: t('web.coach.price1.f1sub') },
-      { title: t('web.coach.price1.f2'), sub: t('web.coach.price1.f2sub') },
-      { title: t('web.coach.price1.f3'), sub: t('web.coach.price1.f3sub') },
-      { title: t('web.coach.price1.f4'), sub: t('web.coach.price1.f4sub') },
-      { title: t('web.coach.price1.f5'), sub: t('web.coach.price1.f5sub') },
-    ];
-    return rows.map((row, idx) => (
-      <View key={idx} style={styles.priceRow}>
-        <View style={styles.bulletWrap}>
-          <Check size={16} color={GOLD} strokeWidth={2.5} />
-        </View>
-        <View style={{ flex: 1 }}>
-          <Text style={styles.priceLineTitle}>{row.title}</Text>
-          {row.sub?.trim() ? <Text style={styles.priceLineSub}>{row.sub}</Text> : null}
-        </View>
-      </View>
-    ));
-  };
-
   return (
     <>
       <Head>
@@ -305,19 +288,20 @@ export default function SonoPlusLandingPage() {
           name="keywords"
           content={
             isPt
-              ? 'programa sono 21 passos, insonia, dormir melhor, ciência do sono, gozzzz, sono plus opcional'
+              ? 'programa sono 21 passos, como dormir melhor, insônia solução, ritmo circadiano, cronotipo, dívida de sono, neurociência do sono, sono profundo, GoZzzz'
               : '21 step sleep program, insomnia, sleep better, sleep science, gozzzz, optional sono plus'
           }
         />
-        <meta property="og:title" content={headTitle} />
-        <meta property="og:description" content={headDesc} />
+        <meta property="og:title" content={isPt ? 'Programa de Sono em 21 Passos | GoZzzz' : headTitle} />
+        <meta property="og:description" content={headOgDesc} />
         <meta property="og:type" content="website" />
         <meta property="og:url" content="https://gozzzz.app/web/sono-plus" />
         <meta property="og:image" content={socialImageUrl} />
-        <meta property="og:image:alt" content="GoZzzz - Programa de sono em 21 passos" />
+        <meta property="og:image:alt" content="GoZzzz - Programa de Sono em 21 Passos baseado em neurociência" />
+        <meta property="og:locale" content={isPt ? 'pt_BR' : 'en_US'} />
         <meta name="twitter:card" content="summary_large_image" />
-        <meta name="twitter:title" content={headTitle} />
-        <meta name="twitter:description" content={headDesc} />
+        <meta name="twitter:title" content={isPt ? 'Programa de Sono em 21 Passos | GoZzzz' : headTitle} />
+        <meta name="twitter:description" content={headTwitterDesc} />
         <meta name="twitter:image" content={socialImageUrl} />
         <meta
           name="robots"
@@ -326,27 +310,32 @@ export default function SonoPlusLandingPage() {
         <link rel="canonical" href="https://gozzzz.app/web/sono-plus" />
         <link rel="alternate" hrefLang="pt-BR" href="https://gozzzz.app/web/sono-plus" />
         <link rel="alternate" hrefLang="x-default" href="https://gozzzz.app/web/sono-plus" />
-        <script type="application/ld+json">{JSON.stringify(schemaFaq)}</script>
-        <script type="application/ld+json">{JSON.stringify(schemaService)}</script>
-        <script type="application/ld+json">{JSON.stringify(schemaWebPage)}</script>
+        <link rel="preconnect" href="https://js.stripe.com" />
+        <script type="application/ld+json">{JSON.stringify(schemaGraph)}</script>
       </Head>
 
       <ScrollView style={styles.page} showsVerticalScrollIndicator={false}>
         {/* Nav — alinhado a /web/assinar */}
         <LinearGradient colors={['#0f172a', '#1e293b']} style={styles.navGrad}>
           <View style={styles.navInner}>
-            <TouchableOpacity onPress={() => router.push('/web')} style={styles.brand}>
-              <Moon size={22} color="#fbbf24" strokeWidth={2} />
-              <Text style={styles.brandText}>GoZzzz</Text>
-            </TouchableOpacity>
+            <Link href="/web" asChild>
+              <TouchableOpacity style={styles.brand} accessibilityRole="link">
+                <Moon size={22} color="#fbbf24" strokeWidth={2} />
+                <Text style={styles.brandText}>GoZzzz</Text>
+              </TouchableOpacity>
+            </Link>
             <View style={styles.navRight}>
-              <TouchableOpacity onPress={() => router.push('/web/programa')} style={styles.navGhost}>
-                <BookOpen size={16} color="#fbbf24" />
-                <Text style={styles.navGhostTxt}>{t('web.program.allLessons')}</Text>
-              </TouchableOpacity>
-              <TouchableOpacity onPress={() => router.push('/web/assinar')} style={styles.navGold}>
-                <Text style={styles.navGoldTxt}>{t('coach.ctaSubscribe')}</Text>
-              </TouchableOpacity>
+              <Link href="/web/sono-plus" asChild>
+                <TouchableOpacity style={styles.navGhost} accessibilityRole="link">
+                  <BookOpen size={16} color="#fbbf24" />
+                  <Text style={styles.navGhostTxt}>Programa 21 Passos</Text>
+                </TouchableOpacity>
+              </Link>
+              <Link href="/web/assinar" asChild>
+                <TouchableOpacity style={styles.navGold} accessibilityRole="link">
+                  <Text style={styles.navGoldTxt}>{t('coach.ctaSubscribe')}</Text>
+                </TouchableOpacity>
+              </Link>
             </View>
           </View>
         </LinearGradient>
@@ -356,21 +345,29 @@ export default function SonoPlusLandingPage() {
           <View style={styles.heroGlow} />
           <View style={[styles.heroInner, { paddingTop: 28, paddingBottom: 8 }]}>
             <Crown size={52} color="#fbbf24" strokeWidth={1.75} />
-            <Text style={styles.heroH1}>{t('web.program.title')}</Text>
-            <Text style={styles.heroKicker}>{t('web.program.subtitle')}</Text>
+            <Text role="heading" aria-level={1} style={styles.heroH1}>
+              {isPt ? 'Programa de Sono em 21 Passos' : t('web.program.title')}
+            </Text>
+            <Text style={styles.heroKicker}>
+              {isPt ? 'Baseado em Neurociência' : t('web.program.subtitle')}
+            </Text>
             <Text style={styles.heroLead}>
               {isPt
-                ? 'Uma trilha em 21 passos para quem quer parar de adivinhar e começar a agir — com clareza, ritmo e base científica.'
+                ? 'Você dorme, mas não descansa. Essa trilha de 21 passos reorganiza seu sono, seu ritmo e sua rotina — com base em pesquisa real, sem promessa mágica.'
                 : 'A 21-step path for people who want to stop guessing and start moving — with clarity, rhythm, and evidence-informed structure.'}
             </Text>
 
             <View style={styles.heroBtns}>
-              <TouchableOpacity style={styles.btnGoldFill} onPress={() => router.push('/web/assinar')}>
-                <Crown size={18} color="#0f172a" />
-                <Text style={styles.btnGoldFillTxt}>{isPt ? 'Desbloquear os 21 passos' : 'Unlock all 21 steps'}</Text>
+              <TouchableOpacity style={styles.btnGoldFill} onPress={() => router.push('/web/programa')}>
+                <BookOpen size={18} color="#0f172a" />
+                <Text style={styles.btnGoldFillTxt}>
+                  {isPt ? 'Começar grátis → ver as 3 primeiras lições' : 'Start free → see the 3 first lessons'}
+                </Text>
               </TouchableOpacity>
-              <TouchableOpacity style={styles.btnGhost} onPress={() => router.push('/web/programa')}>
-                <Text style={styles.btnGhostTxt}>{isPt ? 'Ver trilha completa' : 'See the full path'}</Text>
+              <TouchableOpacity style={styles.btnGhost} onPress={() => router.push('/web/assinar')}>
+                <Text style={styles.btnGhostTxt}>
+                  {isPt ? 'Ou desbloqueie todos os 21 passos por R$ 147' : 'Unlock all 21 steps'}
+                </Text>
                 <ArrowRight size={18} color={GOLD} />
               </TouchableOpacity>
             </View>
@@ -386,11 +383,16 @@ export default function SonoPlusLandingPage() {
           </View>
         </LinearGradient>
 
-        {/* Prévia horizontal — curiosidade */}
+        {/* Âncoras científicas — promovidas para acima da dobra (Walker, Huberman, Czeisler, Breus) */}
+        <View style={styles.researchStripe}>
+          <ResearcherTrustBlock variant="landing" />
+        </View>
+
+        {/* Prévia horizontal — lições gratuitas */}
         <View style={styles.previewSection}>
           <View style={styles.previewHead}>
             <Text style={styles.sectionKicker}>Antes de assinar</Text>
-            <Text style={styles.h2Tight}>Os primeiros tópicos da sua trilha</Text>
+            <Text role="heading" aria-level={2} style={styles.h2Tight}>Os primeiros tópicos da sua trilha</Text>
             <Text style={styles.previewSub}>
               Arraste para o lado — estes são títulos reais das lições.
             </Text>
@@ -426,15 +428,11 @@ export default function SonoPlusLandingPage() {
           </ScrollView>
         </View>
 
-        <View style={styles.researchStripe}>
-          <ResearcherTrustBlock variant="landing" />
-        </View>
-
         <View style={styles.body}>
           {/* Ganchos visuais */}
           <View style={styles.block}>
             <Text style={styles.sectionKicker}>Por que abrir o próximo bloco?</Text>
-            <Text style={styles.h2}>Feito para leitura curiosa, não enrolação</Text>
+            <Text role="heading" aria-level={2} style={styles.h2}>Feito para leitura curiosa, não enrolação</Text>
             <View style={styles.bentoGrid}>
               {curiosity.map((c, idx) => {
                 const { Ico } = c;
@@ -454,7 +452,7 @@ export default function SonoPlusLandingPage() {
           {/* Três atos */}
           <LinearGradient colors={[BG_CARD, '#0a0a14']} style={styles.actsBand}>
             <Text style={styles.sectionKicker}>Estrutura</Text>
-            <Text style={styles.h2}>21 passos em três movimentos</Text>
+            <Text role="heading" aria-level={2} style={styles.h2}>21 passos em três movimentos</Text>
             {acts.map((act, idx) => (
               <View key={idx} style={styles.actRow}>
                 <View style={styles.actBullet}>
@@ -478,7 +476,7 @@ export default function SonoPlusLandingPage() {
           {/* Programa — textos próprios (evita misturar com passos da consultoria Sono+) */}
           <View style={[styles.block, styles.sectionBand]}>
             <Text style={styles.sectionKicker}>Na prática</Text>
-            <Text style={[styles.h2, { marginBottom: 22 }]}>{t('web.program.pathTitle')}</Text>
+            <Text role="heading" aria-level={2} style={[styles.h2, { marginBottom: 22 }]}>{t('web.program.pathTitle')}</Text>
             {programPathSteps.map((desc, idx) => (
               <View key={idx} style={styles.stepRow}>
                 <View style={styles.stepNumWrap}>
@@ -494,7 +492,7 @@ export default function SonoPlusLandingPage() {
           {/* Stats + bridge */}
           <View style={[styles.sectionBandMuted, styles.block]}>
             <Text style={styles.sectionKicker}>{t('web.program.title')}</Text>
-            <Text style={[styles.h2, { marginBottom: 12 }]}>Números que definem o ritual</Text>
+            <Text role="heading" aria-level={2} style={[styles.h2, { marginBottom: 12 }]}>Números que definem o ritual</Text>
             <Text style={[styles.para, { marginBottom: 20 }]}>{webProgramBridgePt}</Text>
             <View style={styles.statRow}>
               <View style={styles.stat}>
@@ -517,7 +515,7 @@ export default function SonoPlusLandingPage() {
           {/* Benefícios */}
           <View style={[styles.block, styles.sectionBand]}>
             <Text style={styles.sectionKicker}>Ao seguir os passos</Text>
-            <Text style={[styles.h2, { marginBottom: 16 }]}>O que você treina ao longo do programa</Text>
+            <Text role="heading" aria-level={2} style={[styles.h2, { marginBottom: 16 }]}>O que você treina ao longo do programa</Text>
             <View style={styles.benefGrid}>
               {benefitLines.map((line, idx) => (
                 <View key={idx} style={styles.benefCard}>
@@ -530,13 +528,16 @@ export default function SonoPlusLandingPage() {
 
           {/* Checkout (layout espelho de /web/assinar, desktop — CTA leva ao Stripe na página certa) */}
           <View style={[styles.block, styles.sectionBand, styles.checkoutSection]}>
-            <Text style={styles.sectionKicker}>{t('web.subscribe.headerTitle')}</Text>
-            <Text style={[styles.h2, { marginBottom: 8 }]}>{t('web.subscribe.headerSubtitle')}</Text>
+            <Text style={styles.sectionKicker}>Assinar Premium</Text>
+            <Text role="heading" aria-level={2} style={[styles.h2, { marginBottom: 8 }]}>
+              Acesse o programa completo
+            </Text>
             <View style={styles.checkoutGrid}>
               <View style={styles.checkoutCol}>
                 <View style={[styles.planCardCk, styles.planCardCkSelected]}>
-                  <Text style={styles.planTotalCk}>
-                    {pricing.annual.equiv} — {pricing.annual.note}
+                  <Text style={styles.priceHeadline}>{pricing.annual.label}</Text>
+                  <Text style={styles.priceCaption}>
+                    {pricing.annual.note} · {pricing.annual.equiv}
                   </Text>
                 </View>
                 <TouchableOpacity
@@ -547,7 +548,9 @@ export default function SonoPlusLandingPage() {
                   <Crown size={20} color="#0d0d16" />
                   <Text style={styles.checkoutBtnLTxt}>{t('web.subscribe.subscribe')}</Text>
                 </TouchableOpacity>
-                <Text style={styles.disclaimerCk}>{t('web.subscribe.disclaimer')}</Text>
+                <Text style={styles.disclaimerCk}>
+                  Pagamento único. Sem mensalidade. Sem renovação automática.
+                </Text>
                 <View style={styles.securityBadgesCk}>
                   <View style={styles.securityBadgeCk}>
                     <Lock size={14} color="#10b981" />
@@ -564,22 +567,31 @@ export default function SonoPlusLandingPage() {
                 </View>
               </View>
               <View style={styles.featuresColCk}>
-                <Text style={styles.colTitleCk}>{t('web.subscribe.included')}</Text>
+                <Text style={styles.colTitleCk}>O que está incluído</Text>
                 <View style={styles.featuresCardCk}>
-                  {SUBSCRIBE_FEATURE_KEYS.map((key, i) => (
-                    <View key={key} style={styles.featureItemCk}>
+                  {[
+                    '21 lições completas desbloqueadas imediatamente',
+                    'Cada passo com ação concreta para o dia seguinte',
+                    'Baseado em pesquisas de Walker, Huberman, Czeisler e Breus',
+                    'Neurociência do sono e medicina circadiana',
+                    'Atualizações gratuitas para sempre',
+                    'Acesso imediato após pagamento — sem app, sem download',
+                  ].map((feature, i) => (
+                    <View key={i} style={styles.featureItemCk}>
                       <View style={styles.featureCheckCk}>
                         <Check size={14} color="#10b981" />
                       </View>
-                      <Text style={styles.featureTextCk}>{t(key)}</Text>
+                      <Text style={styles.featureTextCk}>{feature}</Text>
                     </View>
                   ))}
                 </View>
                 <View style={styles.guaranteeCardCk}>
                   <BadgeCheck size={28} color="#10b981" />
                   <View style={{ flex: 1 }}>
-                    <Text style={styles.guaranteeTitleCk}>{t('web.subscribe.guaranteeTitle')}</Text>
-                    <Text style={styles.guaranteeDescCk}>{t('web.subscribe.guaranteeDesc')}</Text>
+                    <Text style={styles.guaranteeTitleCk}>Garantia de 7 dias por lei</Text>
+                    <Text style={styles.guaranteeDescCk}>
+                      Se não estiver satisfeito por qualquer motivo nos primeiros 7 dias, basta enviar um e-mail e devolvemos 100% — sem burocracia, sem questionamento. É seu direito pelo CDC.
+                    </Text>
                   </View>
                 </View>
               </View>
@@ -592,41 +604,53 @@ export default function SonoPlusLandingPage() {
               <Crown size={28} color={GOLD} />
               <View style={{ flex: 1 }}>
                 <Text style={styles.sonoPlusKicker}>Opcional · Sono+</Text>
-                <Text style={styles.sonoPlusTitle}>{t('coach.services.title')}</Text>
-                <Text style={styles.sonoPlusBody}>{t('coach.subtitle')}</Text>
+                <Text role="heading" aria-level={2} style={styles.sonoPlusTitle}>
+                  Coaching Individual
+                </Text>
+                <Text style={styles.sonoPlusBody}>
+                  Para quem quer resultado mais rápido com acompanhamento ao vivo. Uma sessão com especialista de sono custa entre R$ 400–800. Sono+ entrega diagnóstico + plano personalizado + 30 dias Premium por R$ 497 — sem lista de espera, de onde você estiver.
+                </Text>
               </View>
             </View>
-            <Text style={[styles.sectionKicker, { color: GOLD }]}>{t('coach.investment.title')}</Text>
-            <Text style={[styles.h2, { marginBottom: 14 }]}>{t('web.coach.pricingTitle')}</Text>
             <View style={styles.priceCard}>
               <View style={styles.priceHead}>
                 <View style={styles.onlineTag}>
-                  <Text style={styles.onlineTagTxt}>100% ONLINE</Text>
+                  <Text style={styles.onlineTagTxt}>100% online</Text>
                 </View>
-                <Text style={styles.priceLabel}>{t('web.coach.price1.label')}</Text>
-              </View>
-              <View style={styles.tagLineStack}>
-                <Text style={styles.tagLine}>{t('web.coach.price1.tagline1')}</Text>
-                <Text style={styles.tagLine}>{t('web.coach.price1.tagline2')}</Text>
-                <Text style={styles.tagLine}>{t('web.coach.price1.tagline3')}</Text>
+                <Text style={styles.priceLabel}>Coaching Individual de Sono</Text>
               </View>
               <View style={styles.priceAmtRow}>
-                <Text style={styles.priceAmt}>{t('web.coach.price1')}</Text>
-                <Text style={styles.priceSub}>{t('web.coach.price1Sub')}</Text>
+                <Text style={styles.priceAmt}>R$ 497</Text>
+                <Text style={styles.priceSub}>sessão única</Text>
               </View>
-              <Text style={styles.priceFmt}>{t('web.coach.price1.desc')}</Text>
+              <Text style={styles.priceFmt}>60 minutos online, de onde você estiver.</Text>
               <View style={styles.divider} />
-              {renderPriceBullets()}
+              {[
+                'Sessão online de 60 minutos — de onde você estiver',
+                'Mapeamento completo de hábitos, rotina e ambiente de sono',
+                'Relatório personalizado com diagnóstico e próximos passos — entregue em 72h',
+                'Suporte via WhatsApp por 30 dias — acesso direto, sem IA',
+                '30 dias de acesso Premium com todos os 21 passos desbloqueados',
+              ].map((feature, idx) => (
+                <View key={idx} style={styles.priceRow}>
+                  <View style={styles.bulletWrap}>
+                    <Check size={16} color={GOLD} strokeWidth={2.5} />
+                  </View>
+                  <View style={{ flex: 1 }}>
+                    <Text style={styles.priceLineTitle}>{feature}</Text>
+                  </View>
+                </View>
+              ))}
               <TouchableOpacity style={styles.btnGoldFillWide} onPress={openWhatsApp}>
                 <MessageCircle size={18} color="#0f172a" />
-                <Text style={styles.btnGoldFillTxt}>{t('web.coach.price1.btn')}</Text>
+                <Text style={styles.btnGoldFillTxt}>Agendar minha sessão →</Text>
               </TouchableOpacity>
             </View>
           </LinearGradient>
 
           {/* FAQ */}
           <View style={styles.block}>
-            <Text style={styles.h2}>Perguntas frequentes</Text>
+            <Text role="heading" aria-level={2} style={styles.h2}>Perguntas frequentes</Text>
             <View style={{ marginTop: 16 }}>
               {faq.map((item, i) => (
                 <View key={i} style={styles.faqCard}>
@@ -659,6 +683,32 @@ export default function SonoPlusLandingPage() {
           </View>
 
           <View style={styles.footer}>
+            {/* Internal linking para SEO — Google entende hierarquia entre as páginas */}
+            <View style={styles.footerNav}>
+              <Link href="/web" asChild>
+                <TouchableOpacity accessibilityRole="link">
+                  <Text style={styles.footerLink}>GoZzzz — Início</Text>
+                </TouchableOpacity>
+              </Link>
+              <Text style={styles.footerSep}>·</Text>
+              <Link href="/web/sono-plus" asChild>
+                <TouchableOpacity accessibilityRole="link">
+                  <Text style={styles.footerLink}>Programa 21 Passos</Text>
+                </TouchableOpacity>
+              </Link>
+              <Text style={styles.footerSep}>·</Text>
+              <Link href="/web/programa" asChild>
+                <TouchableOpacity accessibilityRole="link">
+                  <Text style={styles.footerLink}>Todas as lições</Text>
+                </TouchableOpacity>
+              </Link>
+              <Text style={styles.footerSep}>·</Text>
+              <Link href="/web/assinar" asChild>
+                <TouchableOpacity accessibilityRole="link">
+                  <Text style={styles.footerLink}>Assinar</Text>
+                </TouchableOpacity>
+              </Link>
+            </View>
             <Text style={styles.footerCopy}>{t('web.footer.copyright')}</Text>
             <Text style={styles.footerCo}>MORFEU SAÚDE E TECNOLOGIA LTDA</Text>
             <Text style={styles.footerCn}>CNPJ: 66.059.212/0001-52</Text>
@@ -1005,6 +1055,21 @@ const styles = StyleSheet.create({
     elevation: 4,
   },
   planTotalCk: { fontSize: 15, color: '#8892a4', fontWeight: '600', lineHeight: 22 },
+  priceHeadline: {
+    fontSize: isWeb ? 44 : 36,
+    fontWeight: '800',
+    color: '#ffffff',
+    textAlign: 'center',
+    letterSpacing: -1,
+    lineHeight: isWeb ? 50 : 42,
+  },
+  priceCaption: {
+    marginTop: 6,
+    fontSize: 14,
+    color: '#cbd1de',
+    fontWeight: '500',
+    textAlign: 'center',
+  },
   checkoutBtnL: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -1171,6 +1236,17 @@ const styles = StyleSheet.create({
   btnGhostFinalTxt: { color: TEXT_MUTED, fontWeight: '600', fontSize: 14 },
 
   footer: { marginTop: 36, paddingVertical: 22, alignItems: 'center', gap: 6 },
+  footerNav: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    justifyContent: 'center',
+    alignItems: 'center',
+    gap: 10,
+    marginBottom: 12,
+    paddingHorizontal: 16,
+  },
+  footerLink: { color: '#cbd1de', fontSize: 13, fontWeight: '600' },
+  footerSep: { color: 'rgba(203,209,222,0.4)', fontSize: 12 },
   footerCopy: { fontSize: 12, color: TEXT_MUTED, textAlign: 'center', paddingHorizontal: 16 },
   footerCo: { color: TEXT_MUTED, fontSize: 11, fontWeight: '600' },
   footerCn: { color: TEXT_MUTED, fontSize: 10 },
