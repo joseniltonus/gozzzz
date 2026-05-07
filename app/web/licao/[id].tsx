@@ -185,41 +185,57 @@ export default function WebLessonPage() {
   };
 
   const handleMarkComplete = async () => {
-    if (!user || !lesson || completingLesson) return;
+    // Lições 1–3 são abertas para visitantes sem login. Não guardamos por !user
+    // aqui — o botão precisa avançar mesmo sem sessão (caso contrário o clique
+    // some sem feedback). Para usuários logados, persistimos no Supabase + local;
+    // para anônimos, persistimos só no localStorage com chave "anonymous".
+    if (!lesson || completingLesson) return;
     setCompletingLesson(true);
+
     try {
-      await (supabase.from('user_progress') as any).upsert(
-        {
-          user_id: user.id,
-          lesson_id: lesson.id,
-          completed: true,
-          completed_at: new Date().toISOString(),
-        },
-        { onConflict: 'user_id,lesson_id' }
-      );
-      const localProgressKey = `user_progress_local_${user.id}`;
-      const existing = localStorage.getItem(localProgressKey);
-      const list: string[] = existing ? JSON.parse(existing) : [];
-      if (!list.includes(lesson.id)) {
-        localStorage.setItem(localProgressKey, JSON.stringify([...list, lesson.id]));
+      const localProgressKey = `user_progress_local_${user?.id ?? 'anonymous'}`;
+      if (typeof window !== 'undefined' && window.localStorage) {
+        const existing = window.localStorage.getItem(localProgressKey);
+        const list: string[] = existing ? JSON.parse(existing) : [];
+        if (!list.includes(lesson.id)) {
+          window.localStorage.setItem(localProgressKey, JSON.stringify([...list, lesson.id]));
+        }
       }
     } catch (error) {
-      console.warn('Progress write fallback (web):', error);
-    } finally {
-      await refreshProgress();
-      const nextLesson = LESSONS_DATA.find((l) => l.step_number === lesson.step_number + 1);
-      if (nextLesson) {
-        if (nextLesson.step_number > 3 && accessChecked && !hasPremiumAccess) {
-          router.push('/web/programa');
-          setCompletingLesson(false);
-          return;
-        }
-        router.push(`/web/licao/${nextLesson.id}`);
-      } else {
-        router.push('/web/programa');
-      }
-      setCompletingLesson(false);
+      console.warn('Local progress write failed (web):', error);
     }
+
+    if (user) {
+      try {
+        await (supabase.from('user_progress') as any).upsert(
+          {
+            user_id: user.id,
+            lesson_id: lesson.id,
+            completed: true,
+            completed_at: new Date().toISOString(),
+          },
+          { onConflict: 'user_id,lesson_id' }
+        );
+      } catch (error) {
+        console.warn('Server progress write fallback (web):', error);
+      }
+      // Fire-and-forget: não bloqueamos a navegação esperando o re-fetch.
+      void refreshProgress();
+    }
+
+    const nextLesson = LESSONS_DATA.find((l) => l.step_number === lesson.step_number + 1);
+    if (nextLesson) {
+      const nextIsPremiumAndLocked =
+        nextLesson.step_number > 3 && accessChecked && !hasPremiumAccess;
+      if (nextIsPremiumAndLocked) {
+        router.push('/web/programa');
+      } else {
+        router.push(`/web/licao/${nextLesson.id}`);
+      }
+    } else {
+      router.push('/web/programa');
+    }
+    setCompletingLesson(false);
   };
 
   if (!isLocked) {

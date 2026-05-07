@@ -136,24 +136,21 @@ export default function LessonDetailScreen() {
   };
 
   const handleMarkComplete = async () => {
-    if (!user || !lesson || completingLesson) return;
+    // O clique tem que avançar mesmo se a sessão estiver perdida (token
+    // expirado em background, deep-link de lição grátis sem login, etc.).
+    // Antes, !user causava o handler a sair em silêncio — botão "morto".
+    if (!lesson || completingLesson) return;
     setCompletingLesson(true);
+
     try {
-      await (supabase.from('user_progress') as any).upsert(
-        {
-          user_id: user.id,
-          lesson_id: lesson.id,
-          completed: true,
-          completed_at: new Date().toISOString(),
-        },
-        { onConflict: 'user_id,lesson_id' }
-      );
-      const localProgressKey = `user_progress_local_${user.id}`;
+      const localProgressKey = `user_progress_local_${user?.id ?? 'anonymous'}`;
       if (Platform.OS === 'web') {
-        const existing = localStorage.getItem(localProgressKey);
-        const list: string[] = existing ? JSON.parse(existing) : [];
-        if (!list.includes(lesson.id)) {
-          localStorage.setItem(localProgressKey, JSON.stringify([...list, lesson.id]));
+        if (typeof window !== 'undefined' && window.localStorage) {
+          const existing = window.localStorage.getItem(localProgressKey);
+          const list: string[] = existing ? JSON.parse(existing) : [];
+          if (!list.includes(lesson.id)) {
+            window.localStorage.setItem(localProgressKey, JSON.stringify([...list, lesson.id]));
+          }
         }
       } else {
         const existing = await SecureStore.getItemAsync(localProgressKey);
@@ -163,12 +160,28 @@ export default function LessonDetailScreen() {
         }
       }
     } catch (error) {
-      console.warn('Progress write fallback:', error);
-    } finally {
-      await refreshProgress();
-      setCompletingLesson(false);
-      navigateToNextLesson();
+      console.warn('Local progress write failed:', error);
     }
+
+    if (user) {
+      try {
+        await (supabase.from('user_progress') as any).upsert(
+          {
+            user_id: user.id,
+            lesson_id: lesson.id,
+            completed: true,
+            completed_at: new Date().toISOString(),
+          },
+          { onConflict: 'user_id,lesson_id' }
+        );
+      } catch (error) {
+        console.warn('Server progress write fallback:', error);
+      }
+      void refreshProgress();
+    }
+
+    setCompletingLesson(false);
+    navigateToNextLesson();
   };
   const enhancement = LESSON_ENHANCEMENTS.find((e) => e.lessonId === id);
 
