@@ -1,11 +1,11 @@
 name: Store Builds (EAS)
 
+# Manual-only: this workflow compiles a native binary via EAS and submits it
+# to App Store / Play Store. Auto-triggering on every push to `main` was
+# wasting CI minutes and EAS slots, and risked auto-submitting unintended
+# builds. Run it explicitly from Actions → "Run workflow" when you want a
+# new store binary release.
 on:
-  push:
-    branches:
-      - main
-    tags:
-      - "v*"
   workflow_dispatch:
     inputs:
       platform:
