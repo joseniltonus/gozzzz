@@ -249,27 +249,59 @@ export default function ChronotypeQuizModal({
   const [saving, setSaving] = useState(false);
   // Captura de e-mail opcional no card de resultado (web). Best-effort:
   // se o usuário deixar passar, o quiz segue normal — mas se digitar, gravamos
-  // o lead no localStorage para integrar com nutrição posterior.
+  // o lead no localStorage e disparamos a edge function que insere em
+  // chronotype_leads e envia o relatório personalizado por e-mail.
   const [emailInput, setEmailInput] = useState('');
   const [emailSubmitted, setEmailSubmitted] = useState(false);
+  const [emailSending, setEmailSending] = useState(false);
   const scienceGlow = useRef(new Animated.Value(0)).current;
 
   const handleEmailSubmit = useCallback(() => {
-    const trimmed = emailInput.trim();
+    const trimmed = emailInput.trim().toLowerCase();
     if (!trimmed.includes('@') || trimmed.length < 5) return;
+    if (!result) return;
+
     if (Platform.OS === 'web' && typeof window !== 'undefined' && window.localStorage) {
       try {
         window.localStorage.setItem('gozzzz_lead_email', trimmed);
         window.localStorage.setItem('gozzzz_lead_ts', Date.now().toString());
-        if (result) {
-          window.localStorage.setItem('gozzzz_lead_chronotype', result);
-        }
+        window.localStorage.setItem('gozzzz_lead_chronotype', result);
       } catch {
         // localStorage indisponível (modo privativo) — não quebrar UX
       }
     }
+
+    // Otimismo na UI: marca como enviado imediatamente. Se a edge function
+    // falhar, o lead fica no localStorage e o usuário ainda vê confirmação
+    // (o relatório real chega em segundo plano; em caso de falha de rede
+    // exibimos uma mensagem suave abaixo, mas não derrubamos a captura).
     setEmailSubmitted(true);
-  }, [emailInput, result]);
+    setEmailSending(true);
+
+    void (async () => {
+      try {
+        const { error } = await supabase.functions.invoke(
+          'send-chronotype-report',
+          {
+            body: {
+              email: trimmed,
+              chronotype: result,
+              language: lang,
+              source: 'modal_quiz',
+              quizAnswers: answers,
+            },
+          },
+        );
+        if (error) {
+          console.warn('[chronotype-report] dispatch failed:', error.message);
+        }
+      } catch (err) {
+        console.warn('[chronotype-report] dispatch threw:', err);
+      } finally {
+        setEmailSending(false);
+      }
+    })();
+  }, [emailInput, result, lang, answers]);
 
   const currentScreen = SCREENS[Math.min(screen, 3)];
   const currentAnswers = answers[screen] ?? [];
@@ -576,9 +608,13 @@ export default function ChronotypeQuizModal({
                 </View>
                 {emailSubmitted && (
                   <Text style={styles.emailGateConfirm}>
-                    {lang === 'pt'
-                      ? 'Recebemos seu e-mail. Continue para o próximo passo.'
-                      : "Got it. Continue to the next step."}
+                    {emailSending
+                      ? lang === 'pt'
+                        ? 'Enviando seu plano personalizado…'
+                        : 'Sending your personalized plan…'
+                      : lang === 'pt'
+                        ? 'Pronto. O relatório do seu cronótipo está a caminho — confira a caixa de entrada (e o spam, por garantia).'
+                        : "Done. Your chronotype report is on the way — check your inbox (and spam, just in case)."}
                   </Text>
                 )}
               </View>

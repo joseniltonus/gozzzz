@@ -204,6 +204,7 @@ export default function SonoPlusLandingPage() {
   const [quizResult, setQuizResult] = useState<QuizChronotype | null>(null);
   const [quizEmail, setQuizEmail] = useState('');
   const [quizEmailDone, setQuizEmailDone] = useState(false);
+  const [quizEmailSending, setQuizEmailSending] = useState(false);
 
   const currentQuizScreen = QUIZ_SCREENS[quizScreen];
   const currentQuizAnswers = quizAnswers[quizScreen] ?? [];
@@ -247,20 +248,51 @@ export default function SonoPlusLandingPage() {
   };
 
   const handleQuizEmail = () => {
-    const trimmed = quizEmail.trim();
+    const trimmed = quizEmail.trim().toLowerCase();
     if (!trimmed.includes('@') || trimmed.length < 5) return;
+    if (!quizResult) return;
+
     if (typeof window !== 'undefined' && window.localStorage) {
       try {
         window.localStorage.setItem('gozzzz_lead_email', trimmed);
         window.localStorage.setItem('gozzzz_lead_ts', Date.now().toString());
-        if (quizResult) {
-          window.localStorage.setItem('gozzzz_lead_chronotype', quizResult);
-        }
+        window.localStorage.setItem('gozzzz_lead_chronotype', quizResult);
       } catch {
         // ignora — captura é opcional
       }
     }
+
+    // UI otimista: confirma imediatamente. O envio real (Supabase Edge
+    // Function -> Resend) acontece em segundo plano. Falhas são logadas
+    // mas não derrubam a confirmação — o lead ficou no localStorage e
+    // será reconciliado pela equipe se necessário.
+    setQuizEmail(trimmed);
     setQuizEmailDone(true);
+    setQuizEmailSending(true);
+
+    void (async () => {
+      try {
+        const { error } = await supabase.functions.invoke(
+          'send-chronotype-report',
+          {
+            body: {
+              email: trimmed,
+              chronotype: quizResult,
+              language: 'pt',
+              source: 'web_quiz_inline',
+              quizAnswers: quizAnswers,
+            },
+          },
+        );
+        if (error) {
+          console.warn('[chronotype-report] dispatch failed:', error.message);
+        }
+      } catch (err) {
+        console.warn('[chronotype-report] dispatch threw:', err);
+      } finally {
+        setQuizEmailSending(false);
+      }
+    })();
   };
 
   const resetQuiz = () => {
@@ -270,6 +302,7 @@ export default function SonoPlusLandingPage() {
     setQuizResult(null);
     setQuizEmail('');
     setQuizEmailDone(false);
+    setQuizEmailSending(false);
   };
 
   const scrollToCheckout = () => {
@@ -785,7 +818,9 @@ export default function SonoPlusLandingPage() {
                 ) : (
                   <View style={styles.quizEmailDoneCard}>
                     <Text style={styles.quizEmailDoneTxt}>
-                      ✓ Plano enviado para {quizEmail}
+                      {quizEmailSending
+                        ? `Enviando seu relatório para ${quizEmail}…`
+                        : `✓ Pronto. Seu relatório do cronótipo está a caminho — confira ${quizEmail} (e a pasta de spam, por garantia).`}
                     </Text>
                   </View>
                 )}
