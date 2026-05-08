@@ -1,4 +1,21 @@
 User-agent: *
 Allow: /
+Allow: /web/
+Allow: /web/sono-plus
+Allow: /web/programa
+Allow: /web/coach
+Allow: /web/sobre
+Allow: /web/assinar
+
+# Rotas internas do app (auth e tabs autenticadas) não devem ser indexadas
+Disallow: /(auth)/
+Disallow: /(tabs)/
+Disallow: /lesson/
+Disallow: /payment
+Disallow: /checkout
+Disallow: /onboarding
+Disallow: /confirm-email
+Disallow: /forgot-password
+Disallow: /reset-password
 
 Sitemap: https://gozzzz.app/sitemap.xml

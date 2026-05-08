@@ -106,6 +106,46 @@ export default function SonoPlusLandingPage() {
     })();
   }, [language]);
 
+  // Banner de personalização exibido somente quando o visitante chega aqui
+  // depois do quiz; lemos a chave gravada por ChronotypeQuizModal. Best-effort:
+  // se o storage não existir, simplesmente não mostramos nada.
+  const [userChronotype, setUserChronotype] = useState<string | null>(null);
+  useEffect(() => {
+    if (typeof window === 'undefined' || !window.localStorage) return;
+    try {
+      const ct = window.localStorage.getItem('gozzzz_chronotype');
+      if (ct) setUserChronotype(ct);
+    } catch {
+      // localStorage indisponível — banner é opcional
+    }
+  }, []);
+
+  const chronotypeBannerData: Record<
+    string,
+    { emoji: string; name: string; tip: string }
+  > = {
+    dolphin: {
+      emoji: '🐬',
+      name: 'Golfinho',
+      tip: 'O passo 3 sobre dívida de sono foi feito para o seu perfil.',
+    },
+    lion: {
+      emoji: '🦁',
+      name: 'Leão',
+      tip: 'O passo 8 sobre luz matinal vai transformar seu rendimento.',
+    },
+    bear: {
+      emoji: '🐻',
+      name: 'Urso',
+      tip: 'O passo 2 sobre cronótipos explica exatamente seu ritmo.',
+    },
+    wolf: {
+      emoji: '🐺',
+      name: 'Lobo',
+      tip: 'O passo 5 sobre sono profundo foi pensado para o seu perfil.',
+    },
+  };
+
   const headTitle = isPt
     ? 'Programa de Sono em 21 Passos | GoZzzz — Baseado em Neurociência'
     : 'GoZzzz | 21-step sleep program — structured, evidence-guided';
@@ -340,6 +380,21 @@ export default function SonoPlusLandingPage() {
           </View>
         </LinearGradient>
 
+        {/* Banner de personalização — aparece se o visitante chegou aqui depois do quiz */}
+        {userChronotype && chronotypeBannerData[userChronotype] && (
+          <View style={styles.chronoBanner}>
+            <Text style={styles.chronoBannerEmoji}>{chronotypeBannerData[userChronotype].emoji}</Text>
+            <View style={{ flex: 1 }}>
+              <Text style={styles.chronoBannerKicker}>
+                SEU PLANO {chronotypeBannerData[userChronotype].name.toUpperCase()}
+              </Text>
+              <Text style={styles.chronoBannerTip}>
+                {chronotypeBannerData[userChronotype].tip}
+              </Text>
+            </View>
+          </View>
+        )}
+
         {/* Hero — faixa igual ao header do checkout (slate + coroa) */}
         <LinearGradient colors={['#1e293b', '#0f172a', '#07070f']} style={styles.heroGradTop}>
           <View style={styles.heroGlow} />
@@ -535,7 +590,10 @@ export default function SonoPlusLandingPage() {
             <View style={styles.checkoutGrid}>
               <View style={styles.checkoutCol}>
                 <View style={[styles.planCardCk, styles.planCardCkSelected]}>
-                  <Text style={styles.priceHeadline}>{pricing.annual.label}</Text>
+                  {/* Fallback defensivo: se o Supabase devolver label vazia, ainda
+                      assim mostramos R$ 147 — preço hardcoded da oferta atual. */}
+                  <Text style={styles.priceHeadline}>{pricing.annual.label || 'R$ 147'}</Text>
+                  <Text style={styles.priceLaunchTag}>Preço de lançamento</Text>
                   <Text style={styles.priceCaption}>
                     {pricing.annual.note} · {pricing.annual.equiv}
                   </Text>
@@ -1063,12 +1121,42 @@ const styles = StyleSheet.create({
     letterSpacing: -1,
     lineHeight: isWeb ? 50 : 42,
   },
+  priceLaunchTag: {
+    color: '#EF9F27',
+    fontSize: 13,
+    textAlign: 'center',
+    marginTop: 4,
+    fontWeight: '700',
+    letterSpacing: 0.6,
+  },
   priceCaption: {
     marginTop: 6,
     fontSize: 14,
     color: '#cbd1de',
     fontWeight: '500',
     textAlign: 'center',
+  },
+  chronoBanner: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 10,
+    paddingVertical: 12,
+    paddingHorizontal: 24,
+    backgroundColor: 'rgba(212,169,106,0.12)',
+    borderBottomWidth: 1,
+    borderBottomColor: 'rgba(212,169,106,0.2)',
+  },
+  chronoBannerEmoji: { fontSize: 22 },
+  chronoBannerKicker: {
+    color: '#d4a96a',
+    fontSize: 12,
+    fontWeight: '800',
+    letterSpacing: 0.4,
+  },
+  chronoBannerTip: {
+    color: '#94a3b8',
+    fontSize: 12,
+    marginTop: 1,
   },
   checkoutBtnL: {
     flexDirection: 'row',

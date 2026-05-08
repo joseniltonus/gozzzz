@@ -195,39 +195,62 @@ export default function WebLandingPage() {
   return (
     <>
       <Head>
-        <title>{t('web.meta.home.title')}</title>
-        <meta name="description" content={t('web.meta.home.description')} />
-        <meta name="keywords" content="sono, insônia, dormir melhor, sono profundo, ciência do sono, programa de sono, higiene do sono" />
-        <meta property="og:title" content={t('web.meta.home.title')} />
-        <meta property="og:description" content={t('web.meta.home.description')} />
+        {/* Snapshot SSR é canônico em pt-BR — a rota gozzzz.app/web é
+            pt-BR. O `t(key)` depende do state do LanguageProvider, que no SSR
+            (Node, sem navigator) cai em fallback. Forçando `'pt'` aqui evita
+            que o Google e bots de social previewers leiam o site em inglês. */}
+        <title>{t('web.meta.home.title', 'pt')}</title>
+        <meta name="description" content={t('web.meta.home.description', 'pt')} />
+        <meta
+          name="keywords"
+          content="cronótipo, teste de cronótipo, sono, insônia, dormir melhor, neurociência do sono, programa de sono, ritmo circadiano, GoZzzz"
+        />
+        <meta property="og:title" content={t('web.meta.home.ogTitle', 'pt')} />
+        <meta property="og:description" content={t('web.meta.home.ogDesc', 'pt')} />
         <meta property="og:type" content="website" />
-        <meta property="og:url" content="https://gozzzz.app" />
+        <meta property="og:url" content="https://gozzzz.app/web" />
+        <meta property="og:image" content="https://gozzzz.app/og/sono-plus.png" />
+        <meta property="og:image:alt" content="GoZzzz — Programa de Sono em 21 Passos baseado em neurociência" />
+        <meta property="og:locale" content="pt_BR" />
         <meta name="twitter:card" content="summary_large_image" />
-        <meta name="twitter:title" content={t('web.meta.home.title')} />
-        <meta name="twitter:description" content={t('web.meta.home.description')} />
-        <link rel="canonical" href="https://gozzzz.app" />
+        <meta name="twitter:title" content={t('web.meta.home.twitterTitle', 'pt')} />
+        <meta name="twitter:description" content={t('web.meta.home.twitterDesc', 'pt')} />
+        <meta name="twitter:image" content="https://gozzzz.app/og/sono-plus.png" />
+        <meta
+          name="robots"
+          content="index,follow,max-image-preview:large,max-snippet:-1,max-video-preview:-1"
+        />
+        <link rel="canonical" href="https://gozzzz.app/web" />
+        <link rel="preconnect" href="https://js.stripe.com" />
         <script type="application/ld+json">{JSON.stringify({
           "@context": "https://schema.org",
-          "@type": "WebSite",
-          "name": "GoZzzz",
-          "url": "https://gozzzz.app",
-          "description": t('web.meta.home.description'),
-          "potentialAction": {
-            "@type": "SearchAction",
-            "target": "https://gozzzz.app/web/programa"
-          }
-        })}</script>
-        <script type="application/ld+json">{JSON.stringify({
-          "@context": "https://schema.org",
-          "@type": "Course",
-          "name": t('web.meta.home.title'),
-          "description": t('web.meta.home.description'),
-          "provider": {
-            "@type": "Organization",
-            "name": "GoZzzz",
-            "url": "https://gozzzz.app"
-          },
-          "numberOfCredits": "21"
+          "@graph": [
+            {
+              "@type": "WebSite",
+              "name": "GoZzzz",
+              "url": "https://gozzzz.app",
+              "description": t('web.meta.home.description', 'pt'),
+              "inLanguage": "pt-BR"
+            },
+            {
+              "@type": "BreadcrumbList",
+              "itemListElement": [
+                { "@type": "ListItem", "position": 1, "name": "GoZzzz", "item": "https://gozzzz.app/web" },
+                { "@type": "ListItem", "position": 2, "name": "Programa 21 Passos", "item": "https://gozzzz.app/web/sono-plus" }
+              ]
+            },
+            {
+              "@type": "Course",
+              "name": t('web.meta.home.title', 'pt'),
+              "description": t('web.meta.home.description', 'pt'),
+              "provider": {
+                "@type": "Organization",
+                "name": "GoZzzz",
+                "url": "https://gozzzz.app"
+              },
+              "numberOfCredits": "21"
+            }
+          ]
         })}</script>
       </Head>
       <ScrollView
@@ -401,7 +424,7 @@ export default function WebLandingPage() {
                 } : {})}
               >
                 <Text style={styles.pricingFilledBtnText}>
-                  {t('web.hero.startNow')}
+                  {t('web.pricing.ctaSubscribe', 'pt')}
                 </Text>
               </TouchableOpacity>
             </View>

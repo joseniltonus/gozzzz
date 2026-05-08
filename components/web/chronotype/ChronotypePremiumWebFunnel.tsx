@@ -96,8 +96,15 @@ export default function ChronotypePremiumWebFunnel({ scrollY }: Props) {
     [scrollY],
   );
 
-  const goQuiz = () => router.push('/(auth)/signup');
-  const goProgram = () => router.push('/web/programa');
+  // Antes: goQuiz pulava o quiz e mandava direto para /(auth)/signup —
+  // perdia a oportunidade de identificar o cronótipo (que é o gancho da landing).
+  // Agora: vai para o quiz fullscreen; quando o quiz termina, o `ChronotypeQuizModal`
+  // grava o cronótipo no localStorage e captura e-mail antes do redirecionamento
+  // final, enriquecendo o lead sem bloquear o usuário.
+  const goQuiz = () => router.push('/(auth)/quiz');
+  // Antes: secundário levava ao programa cru (lições). Agora vai para a oferta
+  // /web/sono-plus, onde o preço R$ 147 e a prova social ficam acessíveis.
+  const goProgram = () => router.push('/web/sono-plus');
 
   const cardBasis = width >= 640 ? '48%' : '100%';
   const maxCardW = width >= 900 ? 200 : 180;

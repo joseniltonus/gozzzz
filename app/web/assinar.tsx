@@ -240,16 +240,13 @@ export default function WebAssinarPage() {
             <View style={styles.grid}>
               <View style={styles.checkoutCol}>
                 <View style={[styles.planCard, styles.planCardSelected]}>
-                  <View style={styles.planRow}>
-                    <View style={styles.planInfo}>
-                      <View style={styles.planPriceRow}>
-                        <Text style={[styles.planPrice, styles.planPriceActive, { display: 'none' }]}>
-                          {p.annual.label}
-                        </Text>
-                      </View>
-                      <Text style={styles.planTotal}>{p.annual.equiv} - {p.annual.note}</Text>
-                    </View>
-                  </View>
+                  {/* Preço prominente: antes ficava com display:none — visitantes
+                      não viam quanto custava antes do botão. Agora R$ 147 lidera
+                      o card e o caption resume o modelo (one-time / lifetime). */}
+                  <Text style={styles.planPriceHero}>{p.annual.label || 'R$ 147'}</Text>
+                  <Text style={styles.planPriceCaption}>
+                    {p.annual.note} · {p.annual.equiv}
+                  </Text>
                 </View>
 
 
@@ -451,6 +448,20 @@ const styles = StyleSheet.create({
   planPriceActive: { color: '#d4a96a' },
   planPer: { fontSize: 15, color: '#8892a4', fontWeight: '500' },
   planTotal: { fontSize: 13, color: '#5a5a72' },
+  planPriceHero: {
+    fontSize: 52,
+    fontWeight: '800',
+    color: '#ffffff',
+    textAlign: 'center',
+    letterSpacing: -1,
+    marginBottom: 4,
+  },
+  planPriceCaption: {
+    fontSize: 14,
+    color: '#d4a96a',
+    textAlign: 'center',
+    fontWeight: '600',
+  },
   radio: {
     width: 24, height: 24, borderRadius: 12,
     borderWidth: 2, borderColor: 'rgba(255,255,255,0.2)',

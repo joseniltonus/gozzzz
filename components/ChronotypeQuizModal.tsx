@@ -4,6 +4,7 @@ import {
   Text,
   StyleSheet,
   TouchableOpacity,
+  TextInput,
   Modal,
   ScrollView,
   Platform,
@@ -246,7 +247,29 @@ export default function ChronotypeQuizModal({
   const [answers, setAnswers] = useState<string[][]>([[], [], [], []]);
   const [result, setResult] = useState<Chronotype | null>(null);
   const [saving, setSaving] = useState(false);
+  // Captura de e-mail opcional no card de resultado (web). Best-effort:
+  // se o usuário deixar passar, o quiz segue normal — mas se digitar, gravamos
+  // o lead no localStorage para integrar com nutrição posterior.
+  const [emailInput, setEmailInput] = useState('');
+  const [emailSubmitted, setEmailSubmitted] = useState(false);
   const scienceGlow = useRef(new Animated.Value(0)).current;
+
+  const handleEmailSubmit = useCallback(() => {
+    const trimmed = emailInput.trim();
+    if (!trimmed.includes('@') || trimmed.length < 5) return;
+    if (Platform.OS === 'web' && typeof window !== 'undefined' && window.localStorage) {
+      try {
+        window.localStorage.setItem('gozzzz_lead_email', trimmed);
+        window.localStorage.setItem('gozzzz_lead_ts', Date.now().toString());
+        if (result) {
+          window.localStorage.setItem('gozzzz_lead_chronotype', result);
+        }
+      } catch {
+        // localStorage indisponível (modo privativo) — não quebrar UX
+      }
+    }
+    setEmailSubmitted(true);
+  }, [emailInput, result]);
 
   const currentScreen = SCREENS[Math.min(screen, 3)];
   const currentAnswers = answers[screen] ?? [];
@@ -319,6 +342,18 @@ export default function ChronotypeQuizModal({
 
     // Persist before navigation so post-signup home sees quiz + chronotype.
     await persistLatestChronotype(finalizedChronotype, user?.id);
+
+    // Chave dedicada que /web/sono-plus lê para mostrar o banner de
+    // personalização (independente da chave interna `quiz_latest_chronotype`,
+    // que é consumida pelo app autenticado).
+    if (Platform.OS === 'web' && typeof window !== 'undefined' && window.localStorage) {
+      try {
+        window.localStorage.setItem('gozzzz_chronotype', finalizedChronotype);
+      } catch {
+        // ignore — banner de personalização é best-effort
+      }
+    }
+
     if (!user) {
       await savePreRegistrationQuizDone();
     }
@@ -505,6 +540,49 @@ export default function ChronotypeQuizModal({
                 {lang === 'pt' ? scienceNote?.pt ?? '' : scienceNote?.en ?? ''}
               </Text>
             </Animated.View>
+
+            {Platform.OS === 'web' && (
+              <View style={styles.emailGate}>
+                <Text style={styles.emailGateLabel}>
+                  {lang === 'pt'
+                    ? 'Receba seu plano personalizado por e-mail'
+                    : 'Get your personalized plan by email'}
+                </Text>
+                <View style={styles.emailGateRow}>
+                  <TextInput
+                    value={emailInput}
+                    onChangeText={setEmailInput}
+                    placeholder={lang === 'pt' ? 'seu@email.com' : 'your@email.com'}
+                    placeholderTextColor="rgba(148,163,184,0.5)"
+                    keyboardType="email-address"
+                    autoCapitalize="none"
+                    editable={!emailSubmitted}
+                    style={styles.emailGateInput}
+                    onSubmitEditing={handleEmailSubmit}
+                  />
+                  <TouchableOpacity
+                    onPress={handleEmailSubmit}
+                    activeOpacity={0.85}
+                    disabled={emailSubmitted}
+                    style={[
+                      styles.emailGateBtn,
+                      emailSubmitted && styles.emailGateBtnDone,
+                    ]}
+                  >
+                    <Text style={styles.emailGateBtnText}>
+                      {emailSubmitted ? '✓' : lang === 'pt' ? 'Enviar' : 'Send'}
+                    </Text>
+                  </TouchableOpacity>
+                </View>
+                {emailSubmitted && (
+                  <Text style={styles.emailGateConfirm}>
+                    {lang === 'pt'
+                      ? 'Recebemos seu e-mail. Continue para o próximo passo.'
+                      : "Got it. Continue to the next step."}
+                  </Text>
+                )}
+              </View>
+            )}
 
             <ShareableCard
               chronotypeName=""
@@ -761,5 +839,56 @@ const styles = StyleSheet.create({
     lineHeight: 20,
     color: '#d5deed',
     letterSpacing: 0.1,
+  },
+  emailGate: {
+    width: '100%',
+    backgroundColor: 'rgba(99,102,241,0.10)',
+    borderRadius: 14,
+    borderWidth: 1,
+    borderColor: 'rgba(99,102,241,0.3)',
+    padding: 16,
+    marginBottom: 14,
+  },
+  emailGateLabel: {
+    color: '#c4b5fd',
+    fontSize: 13,
+    fontWeight: '700',
+    marginBottom: 10,
+  },
+  emailGateRow: {
+    flexDirection: 'row',
+    gap: 8,
+  },
+  emailGateInput: {
+    flex: 1,
+    backgroundColor: 'rgba(255,255,255,0.06)',
+    borderRadius: 10,
+    borderWidth: 1,
+    borderColor: 'rgba(255,255,255,0.12)',
+    color: '#ffffff',
+    fontSize: 14,
+    paddingHorizontal: 12,
+    paddingVertical: 10,
+  },
+  emailGateBtn: {
+    backgroundColor: '#6366f1',
+    borderRadius: 10,
+    paddingHorizontal: 16,
+    justifyContent: 'center',
+    minWidth: 64,
+    alignItems: 'center',
+  },
+  emailGateBtnDone: {
+    backgroundColor: '#22c55e',
+  },
+  emailGateBtnText: {
+    color: '#ffffff',
+    fontWeight: '700',
+    fontSize: 13,
+  },
+  emailGateConfirm: {
+    color: 'rgba(196,181,253,0.85)',
+    fontSize: 12,
+    marginTop: 8,
   },
 });
