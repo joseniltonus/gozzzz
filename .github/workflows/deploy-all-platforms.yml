@@ -74,22 +74,44 @@ jobs:
           fi
           npm run vercel:verify-project
 
-      - name: Validate web build secrets
+      # Resolve Supabase web env: prefer GitHub Secrets, fall back to the canonical
+      # public values for project ref `virxgaxsnxdqjwyvqqme` (GoZzzzz). The anon key
+      # is intentionally public — Expo exposes any `EXPO_PUBLIC_*` var in the bundle
+      # that ships to the browser anyway. Hardcoding it as a fallback avoids prod
+      # outages when a Secret gets accidentally cleared or holds a stale value.
+      - name: Resolve web build env
+        id: web_env
         env:
-          EXPO_PUBLIC_SUPABASE_URL: ${{ secrets.EXPO_PUBLIC_SUPABASE_URL }}
-          EXPO_PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.EXPO_PUBLIC_SUPABASE_ANON_KEY }}
+          SECRET_SUPABASE_URL: ${{ secrets.EXPO_PUBLIC_SUPABASE_URL }}
+          SECRET_SUPABASE_ANON_KEY: ${{ secrets.EXPO_PUBLIC_SUPABASE_ANON_KEY }}
         run: |
-          if [ -z "$EXPO_PUBLIC_SUPABASE_URL" ] || [ -z "$EXPO_PUBLIC_SUPABASE_ANON_KEY" ]; then
-            echo "Missing required web build secrets: EXPO_PUBLIC_SUPABASE_URL, EXPO_PUBLIC_SUPABASE_ANON_KEY"
-            exit 1
+          DEFAULT_URL="https://virxgaxsnxdqjwyvqqme.supabase.co"
+          DEFAULT_ANON="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZpcnhnYXhzbnhkcWp3eXZxcW1lIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzc0MjUyNjQsImV4cCI6MjA5MzAwMTI2NH0.9UNNeP5TH3tkLWHJH0nKUTXj6wghjlM4qSnx-vByJEY"
+
+          RESOLVED_URL="${SECRET_SUPABASE_URL:-$DEFAULT_URL}"
+          RESOLVED_ANON="${SECRET_SUPABASE_ANON_KEY:-$DEFAULT_ANON}"
+
+          # Reject obvious legacy values (old project ref) so a stale secret can't
+          # silently override the canonical one and ship a broken bundle.
+          if echo "$RESOLVED_URL" | grep -q "cmekyhdkenoymfftwjod"; then
+            echo "::warning::Stale Supabase URL secret detected; using canonical fallback."
+            RESOLVED_URL="$DEFAULT_URL"
+            RESOLVED_ANON="$DEFAULT_ANON"
           fi
+
+          echo "Using Supabase URL: $RESOLVED_URL"
+          echo "EXPO_PUBLIC_SUPABASE_URL=$RESOLVED_URL" >> "$GITHUB_ENV"
+          echo "EXPO_PUBLIC_SUPABASE_ANON_KEY=$RESOLVED_ANON" >> "$GITHUB_ENV"
 
       - name: Build web bundle
         env:
-          EXPO_PUBLIC_SUPABASE_URL: ${{ secrets.EXPO_PUBLIC_SUPABASE_URL }}
-          EXPO_PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.EXPO_PUBLIC_SUPABASE_ANON_KEY }}
           EXPO_PUBLIC_STRIPE_PUBLISHABLE_KEY: ${{ secrets.EXPO_PUBLIC_STRIPE_PUBLISHABLE_KEY }}
-        run: npm run build:web
+        run: |
+          if [ -z "$EXPO_PUBLIC_SUPABASE_URL" ] || [ -z "$EXPO_PUBLIC_SUPABASE_ANON_KEY" ]; then
+            echo "Resolved web build env is empty (this should not happen)."
+            exit 1
+          fi
+          npm run build:web
 
       # `dist/` está no .gitignore — o Vercel CLI não envia essa pasta. Um `vercel deploy`
       # na raiz força rebuild na nuvem (sem as EXPO_PUBLIC_* do GitHub) → produção desatualizada.
