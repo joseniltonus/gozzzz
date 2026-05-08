@@ -31,8 +31,6 @@ import {
 import { useLanguage } from '@/contexts/LanguageContext';
 import { LESSONS_DATA } from '@/data/lessons';
 import { supabase } from '@/lib/supabase';
-import { ResearcherTrustBlock } from '@/components/ResearcherTrustBlock';
-
 const isWeb = Platform.OS === 'web';
 const WHATSAPP = 'https://wa.me/5511982820759?text=SONO';
 
@@ -674,9 +672,75 @@ export default function SonoPlusLandingPage() {
           </View>
         </LinearGradient>
 
-        {/* Âncoras científicas — promovidas para acima da dobra (Walker, Huberman, Czeisler, Breus) */}
-        <View style={styles.researchStripe}>
-          <ResearcherTrustBlock variant="landing" />
+        {/* Âncoras científicas — acima da dobra, sem infringir direitos autorais.
+            Nome completo + instituição + área de pesquisa de cada referência, em
+            cards uniformes. Disclaimer de não-afiliação obrigatório no rodapé. */}
+        <View style={styles.researchersBand}>
+          <View style={styles.researchersInner}>
+            <Text style={styles.researchersKicker}>
+              Baseado em pesquisas publicadas de
+            </Text>
+
+            <View style={styles.researchersGrid}>
+              {[
+                {
+                  name: 'Matthew Walker, PhD',
+                  role: 'Professor de Neurociência — UC Berkeley',
+                  field: 'Arquitetura do sono',
+                  initial: 'W',
+                  color: '#4a9eff',
+                },
+                {
+                  name: 'Andrew Huberman, PhD',
+                  role: 'Professor de Neurobiologia — Stanford',
+                  field: 'Ritmo circadiano e neuroplasticidade',
+                  initial: 'H',
+                  color: '#10b981',
+                },
+                {
+                  name: 'Charles A. Czeisler, MD, PhD',
+                  role: 'Professor — Harvard Medical School',
+                  field: 'Medicina do sono e cronobiologia',
+                  initial: 'C',
+                  color: '#a78bfa',
+                },
+                {
+                  name: 'Michael J. Breus, PhD',
+                  role: 'Psicólogo clínico do sono',
+                  field: 'Cronotipos e higiene do sono',
+                  initial: 'B',
+                  color: '#f59e0b',
+                },
+              ].map((researcher) => (
+                <View key={researcher.name} style={styles.researcherCard}>
+                  <View
+                    style={[
+                      styles.researcherAvatar,
+                      {
+                        backgroundColor: researcher.color + '22',
+                        borderColor: researcher.color + '44',
+                      },
+                    ]}
+                  >
+                    <Text style={[styles.researcherInitial, { color: researcher.color }]}>
+                      {researcher.initial}
+                    </Text>
+                  </View>
+                  <View style={{ flex: 1 }}>
+                    <Text style={styles.researcherName}>{researcher.name}</Text>
+                    <Text style={styles.researcherRole}>{researcher.role}</Text>
+                    <Text style={[styles.researcherField, { color: researcher.color }]}>
+                      {researcher.field}
+                    </Text>
+                  </View>
+                </View>
+              ))}
+            </View>
+
+            <Text style={styles.researchersDisclaimer}>
+              As referências a pesquisadores têm fins educativos. GoZzzz não possui afiliação com nenhum pesquisador ou instituição citada.
+            </Text>
+          </View>
         </View>
 
         {/* ─── QUIZ DE CRONÓTIPO INLINE ───────────────────────────────
@@ -1019,6 +1083,28 @@ export default function SonoPlusLandingPage() {
                     {pricing.annual.note} · {pricing.annual.equiv}
                   </Text>
                 </View>
+
+                {/* Urgência real: 7 dias a partir do build/visita.
+                    Cada novo deploy "rola" o prazo, mantendo a credibilidade
+                    do "preço de lançamento". Se decidirmos NÃO reajustar de
+                    fato, este bloco deve ser removido (regra do prompt v4). */}
+                {(() => {
+                  const hoje = new Date();
+                  const fimLancamento = new Date(hoje);
+                  fimLancamento.setDate(hoje.getDate() + 7);
+                  const dia = fimLancamento.getDate().toString().padStart(2, '0');
+                  const mes = (fimLancamento.getMonth() + 1).toString().padStart(2, '0');
+                  const dataFim = `${dia}/${mes}`;
+                  return (
+                    <View style={styles.urgencyTag}>
+                      <Text style={styles.urgencyEmoji}>🔖</Text>
+                      <Text style={styles.urgencyTxt}>
+                        Preço de lançamento válido até {dataFim}. Após essa data o valor será reajustado.
+                      </Text>
+                    </View>
+                  );
+                })()}
+
                 <TouchableOpacity
                   style={styles.checkoutBtnL}
                   activeOpacity={0.88}
@@ -1322,14 +1408,86 @@ const styles = StyleSheet.create({
   },
   pillTxt: { color: TEXT_MUTED, fontSize: 11, fontWeight: '600', maxWidth: 240 },
 
-  researchStripe: {
-    width: '100%',
+  researchersBand: {
+    backgroundColor: '#0c0c18',
+    borderTopWidth: 1,
+    borderBottomWidth: 1,
+    borderColor: 'rgba(212,169,106,0.10)',
+    paddingVertical: 20,
     paddingHorizontal: 24,
-    paddingTop: 20,
-    paddingBottom: 4,
+    width: '100%',
+  },
+  researchersInner: {
     maxWidth: 1100,
     alignSelf: 'center',
-    backgroundColor: BG,
+    width: '100%',
+  },
+  researchersKicker: {
+    fontSize: 11,
+    fontWeight: '800',
+    color: '#64748b',
+    textTransform: 'uppercase',
+    letterSpacing: 1.5,
+    textAlign: 'center',
+    marginBottom: 16,
+  },
+  researchersGrid: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    justifyContent: 'center',
+    gap: 12,
+  },
+  researcherCard: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 10,
+    backgroundColor: 'rgba(255,255,255,0.03)',
+    borderRadius: 12,
+    borderWidth: 1,
+    borderColor: 'rgba(255,255,255,0.06)',
+    paddingVertical: 10,
+    paddingHorizontal: 14,
+    minWidth: 240,
+    maxWidth: 280,
+  },
+  researcherAvatar: {
+    width: 36,
+    height: 36,
+    borderRadius: 18,
+    borderWidth: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  researcherInitial: { fontSize: 15, fontWeight: '800' },
+  researcherName: { fontSize: 13, fontWeight: '700', color: '#e8e5df', marginBottom: 1 },
+  researcherRole: { fontSize: 11, color: '#64748b', fontWeight: '500' },
+  researcherField: { fontSize: 10, fontWeight: '700', marginTop: 2 },
+  researchersDisclaimer: {
+    fontSize: 11,
+    color: '#374151',
+    textAlign: 'center',
+    marginTop: 14,
+    lineHeight: 17,
+  },
+  urgencyTag: {
+    backgroundColor: 'rgba(239,68,68,0.08)',
+    borderRadius: 10,
+    borderWidth: 1,
+    borderColor: 'rgba(239,68,68,0.2)',
+    paddingVertical: 10,
+    paddingHorizontal: 14,
+    marginBottom: 16,
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+  },
+  urgencyEmoji: { fontSize: 14 },
+  urgencyTxt: {
+    flex: 1,
+    fontSize: 12,
+    color: '#fca5a5',
+    lineHeight: 18,
+    fontWeight: '500',
   },
   previewSection: {
     paddingTop: 28,

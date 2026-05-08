@@ -79,19 +79,6 @@ export default function WebCoachPage() {
     { num: '03', title: t('web.coach.step3.title'), desc: t('web.coach.step3.desc'), detail: t('web.coach.step3.detail') },
   ];
 
-  const testimonials = [
-    {
-      quote: t('web.coach.testimonial1'),
-      author: t('web.coach.testimonial1Author'),
-      result: 'Dormindo 8+ horas',
-    },
-    {
-      quote: t('web.coach.testimonial2'),
-      author: t('web.coach.testimonial2Author'),
-      result: 'Mais foco no trabalho',
-    },
-  ];
-
   return (
     <>
       <Head>
@@ -345,31 +332,6 @@ export default function WebCoachPage() {
               </TouchableOpacity>
             </View>
 
-          </View>
-        </View>
-      </View>
-
-      {/* TESTIMONIALS */}
-      <View style={styles.section}>
-        <View style={styles.container}>
-          <Text style={styles.sectionLabel}>{t('web.coach.trustLabel')}</Text>
-          <Text style={styles.sectionTitle}>{t('web.coach.trustTitle')}</Text>
-          <View style={styles.testimonialsGrid}>
-            {testimonials.map((item, i) => (
-              <View key={i} style={styles.testimonialCard}>
-                <View style={styles.testimonialQuoteRow}>
-                  <Text style={styles.testimonialBigQuote}>&quot;</Text>
-                </View>
-                <Text style={styles.testimonialText}>{item.quote.replace(/^"|"$/g, '')}</Text>
-                <View style={styles.testimonialDivider} />
-                <View style={styles.testimonialFooter}>
-                  <Text style={styles.testimonialAuthor}>{item.author}</Text>
-                  <View style={styles.testimonialResultBadge}>
-                    <Text style={styles.testimonialResultText}>{item.result}</Text>
-                  </View>
-                </View>
-              </View>
-            ))}
           </View>
         </View>
       </View>
@@ -828,59 +790,6 @@ const styles = StyleSheet.create({
     transform: [{ scale: 1.02 }],
   },
   priceBtnGoldText: { fontSize: 15, fontWeight: '700', color: BG },
-
-  testimonialsGrid: {
-    flexDirection: isWeb ? 'row' : 'column',
-    gap: 24,
-  },
-  testimonialCard: {
-    flex: 1,
-    backgroundColor: BG3,
-    borderRadius: 16,
-    padding: 32,
-    borderWidth: 1,
-    borderColor: 'rgba(212,169,106,0.15)',
-  },
-  testimonialQuoteRow: {
-    marginBottom: 4,
-  },
-  testimonialBigQuote: {
-    fontSize: 72,
-    color: GOLD,
-    lineHeight: 56,
-    fontWeight: '800',
-    opacity: 0.5,
-  },
-  testimonialText: {
-    fontSize: isWeb ? 18 : 16,
-    color: TEXT_PRIMARY,
-    lineHeight: 30,
-    fontStyle: 'italic',
-    marginBottom: 24,
-    fontFamily: isWeb ? 'Georgia, "Times New Roman", serif' : undefined,
-  } as any,
-  testimonialDivider: {
-    height: 1,
-    backgroundColor: 'rgba(212,169,106,0.15)',
-    marginBottom: 16,
-  },
-  testimonialFooter: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    flexWrap: 'wrap',
-    gap: 10,
-  },
-  testimonialAuthor: { fontSize: 14, color: GOLD, fontWeight: '700' },
-  testimonialResultBadge: {
-    backgroundColor: 'rgba(212,169,106,0.1)',
-    borderWidth: 1,
-    borderColor: 'rgba(212,169,106,0.25)',
-    paddingHorizontal: 10,
-    paddingVertical: 4,
-    borderRadius: 20,
-  },
-  testimonialResultText: { fontSize: 12, color: GOLD_LIGHT, fontWeight: '600' },
 
   ctaSection: {
     paddingVertical: isWeb ? 100 : 72,

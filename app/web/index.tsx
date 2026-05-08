@@ -101,23 +101,6 @@ export default function WebLandingPage() {
   const isDesktop = windowWidth >= 1024;
   const isTablet = windowWidth >= 768 && windowWidth < 1024;
 
-  const testimonials = [
-    {
-      name: 'Ana Paula M.',
-      role: t('web.testimonial.ana.role'),
-      text: t('web.testimonial.ana.text'),
-      result: t('web.testimonial.ana.result'),
-      stars: 5,
-    },
-    {
-      name: 'Carlos R.',
-      role: t('web.testimonial.carlos.role'),
-      text: t('web.testimonial.carlos.text'),
-      result: t('web.testimonial.carlos.result'),
-      stars: 5,
-    },
-  ];
-
   const steps = language === 'pt'
     ? [
         { num: 1, icon: Brain, color: '#d4a96a', bg: 'rgba(212,169,106,0.12)', title: 'Entenda Sua Biologia', desc: 'Aprenda como o ritmo circadiano funciona e por que o sono importa' },
@@ -362,37 +345,6 @@ export default function WebLandingPage() {
           </TouchableOpacity>
         </View>
       </View>
-
-      {/* TESTIMONIALS */}
-      <LinearGradient colors={['#0a0a12', '#0f0f1a']} style={styles.testimonialsSection}>
-        <View style={styles.container}>
-          <Text style={styles.testimonialsSectionLabel}>{t('web.testimonials.label')}</Text>
-          <Text style={styles.testimonialsSectionTitle}>{t('web.testimonials.title')}</Text>
-          <View style={[styles.testimonialsGrid, !isDesktop && !isTablet && { flexDirection: 'column' as const }]}>
-            {testimonials.map((item, i) => (
-              <View key={i} style={styles.testimonialCard}>
-                <Text style={styles.testimonialBigQuote}>&quot;</Text>
-                <Text style={styles.testimonialText}>{item.text}</Text>
-                <View style={styles.testimonialDivider} />
-                <View style={styles.testimonialFooter}>
-                  <View style={styles.testimonialAuthorBlock}>
-                    <View style={styles.testimonialAvatar}>
-                      <Text style={styles.testimonialAvatarText}>{item.name[0]}</Text>
-                    </View>
-                    <View>
-                      <Text style={styles.testimonialName}>{item.name}</Text>
-                      <Text style={styles.testimonialRole}>{item.role}</Text>
-                    </View>
-                  </View>
-                  <View style={styles.testimonialResultBadge}>
-                    <Text style={styles.testimonialResultText}>{item.result}</Text>
-                  </View>
-                </View>
-              </View>
-            ))}
-          </View>
-        </View>
-      </LinearGradient>
 
       {/* PRICING */}
       <View style={styles.pricingSection}>
@@ -766,89 +718,6 @@ const styles = StyleSheet.create({
   },
   expertName: { fontSize: 16, fontWeight: '700', color: '#e8d5b7', textAlign: 'center', marginBottom: 6 },
   expertRole: { fontSize: 13, color: '#8892a4', textAlign: 'center', lineHeight: 18 },
-
-  testimonialsSection: { paddingVertical: 88 },
-  testimonialsSectionLabel: {
-    fontSize: 13,
-    fontWeight: '700',
-    color: GOLD,
-    textTransform: 'uppercase',
-    letterSpacing: 1.5,
-    marginBottom: 12,
-    textAlign: 'center',
-  },
-  testimonialsSectionTitle: {
-    fontSize: isWeb ? 40 : 28,
-    fontWeight: '800',
-    color: '#ffffff',
-    textAlign: 'center',
-    marginBottom: 48,
-    lineHeight: isWeb ? 50 : 36,
-  },
-  testimonialsGrid: {
-    flexDirection: 'row',
-    gap: 24,
-    maxWidth: 1100,
-    alignSelf: 'center',
-    width: '100%',
-  },
-  testimonialCard: {
-    flex: 1,
-    backgroundColor: 'rgba(255,255,255,0.05)',
-    borderRadius: 20,
-    padding: 36,
-    borderWidth: 1,
-    borderColor: `rgba(212,169,106,0.18)`,
-    transition: isWeb ? 'border-color 0.3s ease, transform 0.3s ease' : undefined,
-  } as any,
-  testimonialBigQuote: {
-    fontSize: 80,
-    color: GOLD,
-    lineHeight: 60,
-    fontWeight: '800',
-    opacity: 0.45,
-    marginBottom: 8,
-  },
-  testimonialText: {
-    fontSize: isWeb ? 18 : 16,
-    color: '#c8b89a',
-    lineHeight: 30,
-    fontStyle: 'italic',
-    marginBottom: 28,
-    fontFamily: isWeb ? 'Georgia, "Times New Roman", serif' : undefined,
-  } as any,
-  testimonialDivider: {
-    height: 1,
-    backgroundColor: 'rgba(212,169,106,0.2)',
-    marginBottom: 20,
-  },
-  testimonialFooter: {
-    flexDirection: isWeb ? 'row' : 'column',
-    alignItems: isWeb ? 'center' : 'flex-start',
-    justifyContent: 'space-between',
-    gap: 12,
-  } as any,
-  testimonialAuthorBlock: { flexDirection: 'row', alignItems: 'center', gap: 12 },
-  testimonialAvatar: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
-    backgroundColor: GOLD,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  testimonialAvatarText: { fontSize: 18, fontWeight: '800', color: '#07070f' },
-  testimonialName: { fontSize: 15, fontWeight: '700', color: '#ffffff' },
-  testimonialRole: { fontSize: 13, color: '#8892a4' },
-  testimonialResultBadge: {
-    backgroundColor: 'rgba(212,169,106,0.12)',
-    borderWidth: 1,
-    borderColor: 'rgba(212,169,106,0.28)',
-    paddingHorizontal: 12,
-    paddingVertical: 5,
-    borderRadius: 20,
-  },
-  testimonialResultText: { fontSize: 12, color: GOLD_LIGHT, fontWeight: '600' },
 
   pricingSection: { paddingVertical: 80 },
   pricingGrid: {

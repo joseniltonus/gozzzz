@@ -12,7 +12,7 @@ import { useRouter } from 'expo-router';
 import Head from 'expo-router/head';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { LinearGradient } from 'expo-linear-gradient';
-import { Moon, ArrowLeft, Crown, Check, Shield, Lock, BadgeCheck, Star, CircleAlert as AlertCircle } from 'lucide-react-native';
+import { Moon, ArrowLeft, Crown, Check, Shield, Lock, BadgeCheck, CircleAlert as AlertCircle } from 'lucide-react-native';
 import { supabase, SUPABASE_URL, SUPABASE_ANON_KEY } from '@/lib/supabase';
 const isWeb = Platform.OS === 'web';
 
@@ -58,7 +58,6 @@ const CONTENT = {
   perMonth: 'web.subscribe.perMonth',
   disclaimer: 'web.subscribe.disclaimer',
   included: 'web.subscribe.included',
-  testimonials: 'web.subscribe.testimonials',
   successTitle: 'web.subscribe.successTitle',
   successDesc: 'web.subscribe.successDesc',
   successBtn: 'web.subscribe.successBtn',
@@ -76,11 +75,6 @@ const CONTENT = {
     'web.subscribe.feature6',
     'web.subscribe.feature7',
     'web.subscribe.feature8',
-  ],
-  testimonialData: [
-    { name: 'web.subscribe.testimonial1Name', text: 'web.subscribe.testimonial1Text', stars: 5 },
-    { name: 'web.subscribe.testimonial2Name', text: 'web.subscribe.testimonial2Text', stars: 5 },
-    { name: 'web.subscribe.testimonial3Name', text: 'web.subscribe.testimonial3Text', stars: 5 },
   ],
   localeBadge: 'web.subscribe.localeBadge',
 };
@@ -309,22 +303,18 @@ export default function WebAssinarPage() {
                   ))}
                 </View>
 
-                <Text style={[styles.colTitle, { marginTop: 32 }]}>{t(c.testimonials)}</Text>
-                {[
-                  { name: t(c.testimonialData[0].name), text: t(c.testimonialData[0].text), stars: 5 },
-                  { name: t(c.testimonialData[1].name), text: t(c.testimonialData[1].text), stars: 5 },
-                  { name: t(c.testimonialData[2].name), text: t(c.testimonialData[2].text), stars: 5 },
-                ].map((testimonial, i) => (
-                  <View key={i} style={styles.testimonialCard}>
-                    <View style={styles.testimonialStars}>
-                      {Array.from({ length: testimonial.stars }).map((_, s) => (
-                        <Star key={s} size={13} color="#fbbf24" fill="#fbbf24" />
-                      ))}
-                    </View>
-                    <Text style={styles.testimonialText}>&quot;{t(testimonial.text)}&quot;</Text>
-                    <Text style={styles.testimonialName}>— {t(testimonial.name)}</Text>
-                  </View>
-                ))}
+                {/* Garantia CDC (substitui depoimentos fabricados — política
+                    do prompt v4: zero prova social fabricada). É a mesma
+                    proteção legal já citada na guaranteeCard abaixo, mas em
+                    formato de selo destacado. */}
+                <View style={styles.cdcGuarantee}>
+                  <Text style={styles.cdcGuaranteeKicker}>
+                    GARANTIA DE SATISFAÇÃO — 7 DIAS
+                  </Text>
+                  <Text style={styles.cdcGuaranteeBody}>
+                    Se você não estiver satisfeito por qualquer motivo nos primeiros 7 dias, devolvemos 100% do valor — sem burocracia, sem questionamento. É seu direito garantido pelo Código de Defesa do Consumidor (CDC, Art. 49).
+                  </Text>
+                </View>
 
                 <View style={styles.guaranteeCard}>
                   <BadgeCheck size={32} color="#10b981" />
@@ -541,17 +531,27 @@ const styles = StyleSheet.create({
   },
   featureText: { fontSize: 15, color: '#8892a4', flex: 1 },
 
-  testimonialCard: {
-    backgroundColor: '#12121e',
-    borderRadius: 14,
-    padding: 20,
-    marginBottom: 12,
+  cdcGuarantee: {
+    backgroundColor: 'rgba(212,169,106,0.06)',
+    borderRadius: 16,
     borderWidth: 1,
-    borderColor: 'rgba(255,255,255,0.06)',
+    borderColor: 'rgba(212,169,106,0.15)',
+    padding: 20,
+    marginTop: 32,
+    marginBottom: 8,
   },
-  testimonialStars: { flexDirection: 'row', gap: 3, marginBottom: 10 },
-  testimonialText: { fontSize: 14, color: '#8892a4', lineHeight: 22, fontStyle: 'italic', marginBottom: 8 },
-  testimonialName: { fontSize: 13, color: '#5a5a72', fontWeight: '600' },
+  cdcGuaranteeKicker: {
+    color: '#d4a96a',
+    fontSize: 12,
+    fontWeight: '800',
+    letterSpacing: 1,
+    marginBottom: 8,
+  },
+  cdcGuaranteeBody: {
+    color: '#94a3b8',
+    fontSize: 13,
+    lineHeight: 21,
+  },
 
   guaranteeCard: {
     flexDirection: 'row',
