@@ -6,14 +6,16 @@ import {
   TouchableOpacity,
   Platform,
   ActivityIndicator,
+  Linking,
 } from 'react-native';
 import { useState, useEffect } from 'react';
 import { useRouter } from 'expo-router';
 import Head from 'expo-router/head';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { LinearGradient } from 'expo-linear-gradient';
-import { Moon, ArrowLeft, Crown, Check, Shield, Lock, BadgeCheck, CircleAlert as AlertCircle } from 'lucide-react-native';
+import { Moon, ArrowLeft, Crown, Check, Shield, Lock, BadgeCheck, CreditCard, CircleAlert as AlertCircle } from 'lucide-react-native';
 import { supabase, SUPABASE_URL, SUPABASE_ANON_KEY } from '@/lib/supabase';
+import { KIWIFY_PARCELADO_URL } from '@/lib/payment-links';
 const isWeb = Platform.OS === 'web';
 
 interface PricingData {
@@ -251,26 +253,75 @@ export default function WebAssinarPage() {
                   </View>
                 )}
 
-                <TouchableOpacity
-                  style={[styles.checkoutBtn, loading && styles.checkoutBtnDisabled]}
-                  onPress={handleAssinar}
-                  activeOpacity={0.85}
-                  disabled={loading}
-                >
-                  {loading ? (
-                    <>
-                      <ActivityIndicator size="small" color="#0d0d16" />
-                      <Text style={styles.checkoutBtnText}>{t(c.redirecting)}</Text>
-                    </>
-                  ) : (
-                    <>
-                      <Crown size={20} color="#0d0d16" />
+                {/* Modelo híbrido com hierarquia invertida: parcelado Kiwify
+                    como primário + à vista Stripe como secundário. Quando
+                    KIWIFY_PARCELADO_URL está vazio, cai pro layout antigo
+                    (Stripe primário, sem Kiwify). */}
+                {KIWIFY_PARCELADO_URL ? (
+                  <>
+                    <TouchableOpacity
+                      style={styles.checkoutBtn}
+                      onPress={() => Linking.openURL(KIWIFY_PARCELADO_URL)}
+                      activeOpacity={0.85}
+                    >
+                      <CreditCard size={20} color="#0d0d16" />
                       <Text style={styles.checkoutBtnText}>
-                        {t('web.subscribe.subscribe')}
+                        Parcelar em 6x — R$ 24,50/mês
                       </Text>
-                    </>
-                  )}
-                </TouchableOpacity>
+                    </TouchableOpacity>
+                    <Text style={styles.kiwifyNote}>
+                      via Kiwify · juros do cartão por conta do banco
+                    </Text>
+
+                    <View style={styles.payDivider}>
+                      <View style={styles.payDividerLine} />
+                      <Text style={styles.payDividerTxt}>ou</Text>
+                      <View style={styles.payDividerLine} />
+                    </View>
+
+                    <TouchableOpacity
+                      style={[styles.checkoutBtnAlt, loading && styles.checkoutBtnDisabled]}
+                      onPress={handleAssinar}
+                      activeOpacity={0.85}
+                      disabled={loading}
+                    >
+                      {loading ? (
+                        <>
+                          <ActivityIndicator size="small" color="#d4a96a" />
+                          <Text style={styles.checkoutBtnAltText}>{t(c.redirecting)}</Text>
+                        </>
+                      ) : (
+                        <>
+                          <Crown size={18} color="#d4a96a" />
+                          <Text style={styles.checkoutBtnAltText}>
+                            Pagar à vista — R$ 147
+                          </Text>
+                        </>
+                      )}
+                    </TouchableOpacity>
+                  </>
+                ) : (
+                  <TouchableOpacity
+                    style={[styles.checkoutBtn, loading && styles.checkoutBtnDisabled]}
+                    onPress={handleAssinar}
+                    activeOpacity={0.85}
+                    disabled={loading}
+                  >
+                    {loading ? (
+                      <>
+                        <ActivityIndicator size="small" color="#0d0d16" />
+                        <Text style={styles.checkoutBtnText}>{t(c.redirecting)}</Text>
+                      </>
+                    ) : (
+                      <>
+                        <Crown size={20} color="#0d0d16" />
+                        <Text style={styles.checkoutBtnText}>
+                          Pagar à vista — R$ 147
+                        </Text>
+                      </>
+                    )}
+                  </TouchableOpacity>
+                )}
 
                 <Text style={styles.disclaimer}>{t(c.disclaimer)}</Text>
 
@@ -491,6 +542,44 @@ const styles = StyleSheet.create({
   },
   checkoutBtnDisabled: { opacity: 0.7 },
   checkoutBtnText: { fontSize: 18, fontWeight: '800', color: '#0d0d16' },
+
+  payDivider: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 12,
+    marginTop: 14,
+    marginBottom: 12,
+  },
+  payDividerLine: { flex: 1, height: 1, backgroundColor: 'rgba(148,163,184,0.18)' },
+  payDividerTxt: {
+    fontSize: 11,
+    color: '#94a3b8',
+    fontWeight: '700',
+    textTransform: 'uppercase',
+    letterSpacing: 1.2,
+  },
+  checkoutBtnAlt: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 8,
+    paddingVertical: 16,
+    paddingHorizontal: 24,
+    borderRadius: 16,
+    borderWidth: 1.5,
+    borderColor: '#d4a96a',
+    backgroundColor: 'rgba(212,169,106,0.06)',
+  },
+  checkoutBtnAltText: { fontSize: 16, fontWeight: '700', color: '#d4a96a' },
+  kiwifyNote: {
+    fontSize: 11,
+    color: '#94a3b8',
+    textAlign: 'center',
+    marginTop: 6,
+    marginBottom: 8,
+    fontStyle: 'italic',
+  },
+
   disclaimer: { fontSize: 12, color: '#94a3b8', textAlign: 'center', lineHeight: 18, marginBottom: 16 },
 
   securityBadges: {

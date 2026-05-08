@@ -69,6 +69,25 @@ function buildCheckoutParams(
   });
   params.append("payment_method_types[]", "card");
 
+  // Pix só funciona em transações BRL — habilitado automaticamente quando o
+  // checkout é em reais. Para clientes com cartão internacional / USD, Stripe
+  // não oferece Pix, então mantemos só `card` nesses casos.
+  // Stripe BR suporta Pix nativo em Checkout Sessions desde 2022.
+  // Docs: https://stripe.com/docs/payments/pix
+  if (priceConfig.currency === "brl") {
+    params.append("payment_method_types[]", "pix");
+
+    // QR code do Pix expira em 30 minutos.
+    // Padrão Stripe é 24h, mas pra compra de impulso (sono/saúde, ticket
+    // baixo) janela curta cria urgência saudável e libera capital de giro
+    // mais rápido. Se o usuário fechar a aba antes de pagar, o QR continua
+    // válido nesse intervalo — o webhook vai capturar a confirmação.
+    params.append(
+      "payment_method_options[pix][expires_after_seconds]",
+      "1800"
+    );
+  }
+
   return params;
 }
 

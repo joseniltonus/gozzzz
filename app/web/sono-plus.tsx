@@ -18,6 +18,7 @@ import {
   Brain,
   Calendar,
   Check,
+  CreditCard,
   Crown,
   MessageCircle,
   Moon,
@@ -31,6 +32,7 @@ import {
 import { useLanguage } from '@/contexts/LanguageContext';
 import { LESSONS_DATA } from '@/data/lessons';
 import { supabase } from '@/lib/supabase';
+import { KIWIFY_PARCELADO_URL } from '@/lib/payment-links';
 const isWeb = Platform.OS === 'web';
 const WHATSAPP = 'https://wa.me/5511982820759?text=SONO';
 
@@ -1105,14 +1107,58 @@ export default function SonoPlusLandingPage() {
                   );
                 })()}
 
-                <TouchableOpacity
-                  style={styles.checkoutBtnL}
-                  activeOpacity={0.88}
-                  onPress={() => router.push('/web/assinar')}
-                >
-                  <Crown size={20} color="#0d0d16" />
-                  <Text style={styles.checkoutBtnLTxt}>{t('web.subscribe.subscribe')}</Text>
-                </TouchableOpacity>
+                {/* Modelo híbrido com hierarquia invertida: parcelado Kiwify
+                    como primário (botão dourado cheio) + à vista Stripe como
+                    secundário (outline). Reduz barreira psicológica do "R$
+                    147" inicial — público BR converte melhor com "6x R$ 24,50"
+                    em destaque. Quando KIWIFY_PARCELADO_URL está vazio,
+                    o fluxo cai pra Stripe primário (estado de antes). */}
+                {KIWIFY_PARCELADO_URL ? (
+                  <>
+                    <TouchableOpacity
+                      style={styles.checkoutBtnL}
+                      activeOpacity={0.88}
+                      onPress={() => Linking.openURL(KIWIFY_PARCELADO_URL)}
+                    >
+                      <CreditCard size={20} color="#0d0d16" />
+                      <Text style={styles.checkoutBtnLTxt}>
+                        Parcelar em 6x — R$ 24,50/mês
+                      </Text>
+                    </TouchableOpacity>
+                    <Text style={styles.kiwifyNote}>
+                      via Kiwify · juros do cartão por conta do banco
+                    </Text>
+
+                    <View style={styles.payDivider}>
+                      <View style={styles.payDividerLine} />
+                      <Text style={styles.payDividerTxt}>ou</Text>
+                      <View style={styles.payDividerLine} />
+                    </View>
+
+                    <TouchableOpacity
+                      style={styles.checkoutBtnAlt}
+                      activeOpacity={0.88}
+                      onPress={() => router.push('/web/assinar')}
+                    >
+                      <Crown size={18} color={GOLD} />
+                      <Text style={styles.checkoutBtnAltTxt}>
+                        Pagar à vista — R$ 147
+                      </Text>
+                    </TouchableOpacity>
+                  </>
+                ) : (
+                  <TouchableOpacity
+                    style={styles.checkoutBtnL}
+                    activeOpacity={0.88}
+                    onPress={() => router.push('/web/assinar')}
+                  >
+                    <Crown size={20} color="#0d0d16" />
+                    <Text style={styles.checkoutBtnLTxt}>
+                      Pagar à vista — R$ 147
+                    </Text>
+                  </TouchableOpacity>
+                )}
+
                 <Text style={styles.disclaimerCk}>
                   Pagamento único. Sem mensalidade. Sem renovação automática.
                 </Text>
@@ -1753,6 +1799,42 @@ const styles = StyleSheet.create({
     elevation: 6,
   },
   checkoutBtnLTxt: { fontSize: 17, fontWeight: '800', color: '#0d0d16' },
+  payDivider: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 12,
+    marginTop: 14,
+    marginBottom: 12,
+  },
+  payDividerLine: { flex: 1, height: 1, backgroundColor: 'rgba(148,163,184,0.18)' },
+  payDividerTxt: {
+    fontSize: 11,
+    color: TEXT_MUTED,
+    fontWeight: '700',
+    textTransform: 'uppercase',
+    letterSpacing: 1.2,
+  },
+  checkoutBtnAlt: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 8,
+    paddingVertical: 14,
+    paddingHorizontal: 24,
+    borderRadius: 12,
+    borderWidth: 1.5,
+    borderColor: GOLD,
+    backgroundColor: 'rgba(212,169,106,0.06)',
+  },
+  checkoutBtnAltTxt: { fontSize: 15, fontWeight: '700', color: GOLD },
+  kiwifyNote: {
+    fontSize: 11,
+    color: TEXT_MUTED,
+    textAlign: 'center',
+    marginTop: 6,
+    marginBottom: 8,
+    fontStyle: 'italic',
+  },
   disclaimerCk: { fontSize: 12, color: '#94a3b8', textAlign: 'center', lineHeight: 18, marginBottom: 16 },
   securityBadgesCk: { flexDirection: 'row', gap: 8, justifyContent: 'center', flexWrap: 'wrap' },
   securityBadgeCk: {
