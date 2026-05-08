@@ -1,0 +1,816 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>GoZzzz · E-mails por cronótipo · v2</title>
+<style>
+  :root {
+    --gold: #b88a4a;
+    --gold-soft: #f7efe1;
+    --gold-line: #ead7b3;
+    --bg: #f3f3f5;
+    --paper: #ffffff;
+    --ink: #0b1220;
+    --ink-soft: #1f2937;
+    --muted: #6b7280;
+    --muted-soft: #94a3b8;
+    --line: #e5e7eb;
+    --line-soft: #f1f3f5;
+    --wa: #25d366;
+    --wa-dark: #128c7e;
+    --accent-dolphin: #2563eb;
+    --accent-lion: #c2620e;
+    --accent-bear: #7c3aed;
+    --accent-wolf: #475569;
+  }
+  * { box-sizing: border-box; }
+  html, body {
+    margin: 0;
+    padding: 0;
+    background: var(--bg);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Inter", Helvetica, Arial, sans-serif;
+    color: var(--ink);
+    -webkit-font-smoothing: antialiased;
+    line-height: 1.55;
+  }
+  a { color: var(--ink); }
+
+  /* ─── Toolbar ─── */
+  .toolbar {
+    position: sticky; top: 0; z-index: 20;
+    background: #0b1220; color: #fff;
+    padding: 14px 28px;
+    border-bottom: 1px solid #1e293b;
+  }
+  .toolbar .row1 {
+    display: flex; flex-wrap: wrap; gap: 10px; align-items: center;
+  }
+  .brand {
+    font-weight: 700;
+    font-size: 14px;
+    letter-spacing: 0.02em;
+    color: #fff;
+    margin-right: 6px;
+  }
+  .brand .dot { color: var(--gold); }
+  .toolbar small {
+    color: #94a3b8; font-size: 12px;
+  }
+  .toolbar .tabs {
+    display: flex; gap: 6px; flex-wrap: wrap; margin-top: 10px;
+  }
+  .toolbar a.tab {
+    text-decoration: none;
+    background: #1e293b; color: #e2e8f0;
+    padding: 7px 14px; border-radius: 999px;
+    font-size: 13px; font-weight: 500;
+    border: 1px solid transparent;
+    transition: all 0.12s;
+  }
+  .toolbar a.tab:hover {
+    background: #334155;
+    border-color: #475569;
+  }
+  .toolbar a.tab .pop {
+    color: #94a3b8;
+    font-weight: 400;
+    margin-left: 6px;
+  }
+
+  /* ─── Page ─── */
+  .page {
+    max-width: 760px;
+    margin: 0 auto;
+    padding: 36px 24px 80px;
+  }
+  .intro {
+    color: var(--muted);
+    font-size: 14px;
+    text-align: center;
+    margin: 0 0 28px;
+  }
+  .intro b { color: var(--ink-soft); font-weight: 600; }
+
+  /* ─── Cards genéricos ─── */
+  .card {
+    background: var(--paper);
+    border: 1px solid var(--line);
+    border-radius: 14px;
+    overflow: hidden;
+  }
+
+  /* ─── Inbox preview (header de cliente de e-mail) ─── */
+  .inbox {
+    margin-top: 56px;
+    padding: 18px 22px;
+    background: #fafafa;
+    border: 1px solid var(--line);
+    border-bottom: none;
+    border-radius: 14px 14px 0 0;
+    display: flex; flex-wrap: wrap; gap: 12px; align-items: flex-start;
+    font-size: 13px;
+  }
+  .inbox .avatar {
+    width: 38px; height: 38px;
+    border-radius: 50%;
+    background: var(--ink);
+    color: var(--gold);
+    display: flex; align-items: center; justify-content: center;
+    font-weight: 700; font-size: 13px;
+    flex-shrink: 0;
+  }
+  .inbox .meta {
+    flex: 1; min-width: 0;
+  }
+  .inbox .from {
+    font-weight: 600; color: var(--ink); font-size: 14px;
+  }
+  .inbox .from .email {
+    color: var(--muted); font-weight: 400; font-size: 13px; margin-left: 6px;
+  }
+  .inbox .to { color: var(--muted); font-size: 12px; margin-top: 2px; }
+  .inbox .subject {
+    font-weight: 600; color: var(--ink);
+    font-size: 16px; margin-top: 10px;
+  }
+  .inbox .preheader {
+    color: var(--muted); font-size: 13px; margin-top: 4px;
+  }
+  .inbox .when {
+    color: var(--muted-soft); font-size: 12px; white-space: nowrap;
+  }
+
+  /* ─── Email body (corpo) ─── */
+  .email {
+    background: var(--paper);
+    border: 1px solid var(--line);
+    border-top: none;
+    border-radius: 0 0 14px 14px;
+    padding: 0;
+    overflow: hidden;
+  }
+
+  /* hero por cronótipo */
+  .hero {
+    padding: 36px 36px 28px;
+    border-bottom: 1px solid var(--line-soft);
+  }
+  .hero .kicker {
+    font-size: 11px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--muted);
+    font-weight: 600;
+    margin-bottom: 10px;
+  }
+  .hero h1 {
+    font-size: 30px;
+    line-height: 1.15;
+    margin: 0 0 6px;
+    letter-spacing: -0.01em;
+  }
+  .hero .subtitle {
+    color: var(--muted);
+    font-size: 14px;
+    margin: 0;
+  }
+  .hero[data-ct="dolphin"] .kicker { color: var(--accent-dolphin); }
+  .hero[data-ct="lion"]    .kicker { color: var(--accent-lion); }
+  .hero[data-ct="bear"]    .kicker { color: var(--accent-bear); }
+  .hero[data-ct="wolf"]    .kicker { color: var(--accent-wolf); }
+
+  /* corpo de seções */
+  .body { padding: 28px 36px 36px; }
+  .body p { margin: 0 0 16px; font-size: 15.5px; color: var(--ink-soft); }
+  .body p.lead {
+    border-left: 3px solid var(--line);
+    padding: 4px 0 4px 18px;
+    margin: 0 0 22px;
+    color: var(--ink);
+    font-style: italic;
+    font-size: 17px;
+    line-height: 1.5;
+  }
+
+  h2.section {
+    font-size: 18px;
+    margin: 28px 0 12px;
+    letter-spacing: -0.005em;
+  }
+
+  /* callout (ciência) */
+  .callout {
+    background: #f7faff;
+    border: 1px solid #dbe7fb;
+    border-left: 3px solid #2563eb;
+    border-radius: 10px;
+    padding: 18px 20px;
+    margin: 6px 0 20px;
+  }
+  .callout .label {
+    font-size: 11px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: #2563eb;
+    font-weight: 700;
+    margin: 0 0 6px;
+  }
+  .callout h3 {
+    font-size: 16px;
+    margin: 0 0 8px;
+    color: var(--ink);
+  }
+  .callout p { margin: 0 0 10px; font-size: 14.5px; color: var(--ink-soft); }
+  .callout p:last-child { margin-bottom: 0; }
+
+  /* researcher card (NOVO) */
+  .researcher {
+    background: var(--gold-soft);
+    border: 1px solid var(--gold-line);
+    border-radius: 10px;
+    padding: 18px 20px;
+    margin: 6px 0 24px;
+  }
+  .researcher .label {
+    font-size: 11px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--gold);
+    font-weight: 700;
+    margin: 0 0 8px;
+  }
+  .researcher .name {
+    font-size: 17px;
+    font-weight: 700;
+    color: var(--ink);
+    margin: 0 0 3px;
+  }
+  .researcher .role {
+    font-size: 13px;
+    color: var(--muted);
+    margin: 0 0 12px;
+  }
+  .researcher .why {
+    font-size: 14.5px;
+    color: var(--ink-soft);
+    margin: 0 0 12px;
+    line-height: 1.55;
+  }
+  .researcher .disclaimer {
+    font-size: 11.5px;
+    color: var(--muted);
+    font-style: italic;
+    margin: 0;
+    line-height: 1.5;
+  }
+
+  /* daily list */
+  .daily {
+    list-style: none;
+    padding: 0;
+    margin: 4px 0 24px;
+    border-top: 1px solid var(--line-soft);
+  }
+  .daily li {
+    display: flex;
+    gap: 14px;
+    padding: 12px 0;
+    border-bottom: 1px solid var(--line-soft);
+    font-size: 14.5px;
+    color: var(--ink-soft);
+  }
+  .daily li .num {
+    color: var(--muted-soft);
+    font-weight: 700;
+    font-size: 12.5px;
+    flex-shrink: 0;
+    width: 28px;
+  }
+
+  /* steps table */
+  .steps {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 4px 0 28px;
+    font-size: 14.5px;
+  }
+  .steps th, .steps td {
+    text-align: left;
+    padding: 12px 14px;
+    border-bottom: 1px solid var(--line-soft);
+    vertical-align: top;
+  }
+  .steps thead th {
+    background: #fafafa;
+    font-size: 11px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--muted);
+    font-weight: 700;
+    border-bottom: 1px solid var(--line);
+  }
+  .steps td.n {
+    width: 56px;
+    text-align: center;
+    color: var(--gold);
+    font-weight: 700;
+    font-size: 13px;
+  }
+  .steps td.title { font-weight: 600; color: var(--ink); width: 32%; }
+  .steps td.desc  { color: var(--ink-soft); }
+
+  /* upsell (Sono+ → WhatsApp) */
+  .upsell {
+    background: #f8fafc;
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    padding: 20px 22px;
+    margin: 6px 0 24px;
+  }
+  .upsell .label {
+    font-size: 11px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--muted);
+    font-weight: 700;
+    margin: 0 0 6px;
+  }
+  .upsell h3 {
+    font-size: 16px;
+    margin: 0 0 10px;
+    color: var(--ink);
+  }
+  .upsell p { font-size: 14.5px; color: var(--ink-soft); margin: 0 0 14px; }
+  .upsell .meta { font-size: 12.5px; color: var(--muted); margin: 0 0 14px; }
+  .btn-wa {
+    display: inline-block;
+    background: var(--wa);
+    color: #fff;
+    text-decoration: none;
+    font-weight: 700;
+    font-size: 14px;
+    padding: 11px 18px;
+    border-radius: 8px;
+    transition: background 0.12s;
+  }
+  .btn-wa:hover { background: var(--wa-dark); }
+  .btn-wa::before {
+    content: "";
+    display: inline-block;
+    width: 8px; height: 8px;
+    border-radius: 50%;
+    background: #fff;
+    margin-right: 8px;
+    vertical-align: middle;
+  }
+
+  /* CTA principal (R$ 147) */
+  .cta {
+    background: var(--ink);
+    color: #fff;
+    border-radius: 12px;
+    padding: 28px 26px;
+    margin: 6px 0 28px;
+    text-align: left;
+  }
+  .cta .label {
+    font-size: 11px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--gold);
+    font-weight: 700;
+    margin: 0 0 8px;
+  }
+  .cta h3 {
+    font-size: 19px;
+    margin: 0 0 6px;
+    color: #fff;
+    line-height: 1.3;
+  }
+  .cta p {
+    font-size: 13.5px;
+    color: #cbd5e1;
+    margin: 0 0 16px;
+  }
+  .btn-primary {
+    display: inline-block;
+    background: var(--gold);
+    color: var(--ink) !important;
+    text-decoration: none;
+    font-weight: 700;
+    font-size: 14.5px;
+    padding: 12px 20px;
+    border-radius: 8px;
+  }
+  .btn-primary:hover { background: #c9a26d; }
+
+  /* signature */
+  .signature {
+    margin: 8px 0 0;
+    padding-top: 20px;
+    border-top: 1px solid var(--line-soft);
+  }
+  .signature p { margin: 0 0 14px; font-size: 14.5px; color: var(--ink-soft); }
+  .signature .sign-name { font-weight: 700; color: var(--ink); margin: 0 0 2px; font-size: 15px; }
+  .signature .sign-role { font-size: 12.5px; color: var(--muted); margin: 0; }
+
+  /* footer LGPD */
+  .footer {
+    padding: 18px 36px 28px;
+    background: #fafafa;
+    color: var(--muted);
+    font-size: 11.5px;
+    text-align: center;
+    border-top: 1px solid var(--line-soft);
+    line-height: 1.6;
+  }
+  .footer a { color: var(--muted); }
+
+  @media (max-width: 640px) {
+    .hero { padding: 28px 22px 22px; }
+    .hero h1 { font-size: 24px; }
+    .body { padding: 22px 22px 28px; }
+    .footer { padding: 18px 22px 24px; }
+    .steps td.n { width: 40px; }
+    .steps td.title { width: auto; }
+    .steps th:nth-child(3), .steps td.desc { display: none; } /* mobile: simplifica */
+  }
+</style>
+</head>
+<body>
+
+<div class="toolbar">
+  <div class="row1">
+    <span class="brand">GoZzzz<span class="dot">.</span></span>
+    <small>4 templates de e-mail · 1 por cronótipo · disparo após o quiz · v2 (com pesquisador + WhatsApp)</small>
+  </div>
+  <div class="tabs">
+    <a class="tab" href="#dolphin">Golfinho<span class="pop">~10%</span></a>
+    <a class="tab" href="#lion">Leão<span class="pop">~15%</span></a>
+    <a class="tab" href="#bear">Urso<span class="pop">~55%</span></a>
+    <a class="tab" href="#wolf">Lobo<span class="pop">~15-20%</span></a>
+  </div>
+</div>
+
+<div class="page">
+
+  <p class="intro">
+    Visualização dos 4 e-mails enviados após o visitante completar o quiz inline em
+    <b>/web/sono-plus</b> e digitar o e-mail. Dois caminhos de conversão:
+    <b>programa R$ 147</b> (CTA principal) e <b>Sono+ R$ 497</b> (link direto para o WhatsApp,
+    pré-preenchido com o cronótipo).
+  </p>
+
+  <!-- ═══════════════════ GOLFINHO ═══════════════════ -->
+  <div id="dolphin" class="inbox">
+    <div class="avatar">G</div>
+    <div class="meta">
+      <div class="from">GoZzzz <span class="email">&lt;noreply@support.gozzzz.app&gt;</span></div>
+      <div class="to">para você</div>
+      <div class="subject">Seu plano Golfinho — entender por que sua mente não desliga</div>
+      <div class="preheader">Não é defeito de personalidade. É um padrão circadiano específico, e tem caminho.</div>
+    </div>
+    <div class="when">agora</div>
+  </div>
+  <div class="email">
+    <div class="hero" data-ct="dolphin">
+      <div class="kicker">Cronótipo identificado · Golfinho</div>
+      <h1>Você é Golfinho. Faz sentido.</h1>
+      <p class="subtitle">~10% das pessoas · sono leve · alta sensibilidade · mente ativa à noite</p>
+    </div>
+
+    <div class="body">
+
+      <p class="lead">"Eu durmo. Mas é como se nunca descansasse de verdade."</p>
+
+      <p>Você completou o quiz e o seu perfil é <b>Golfinho</b> — o cronótipo mais sensível dos quatro. Antes de qualquer estratégia: isso não é falha sua, e não tem nada a ver com força de vontade. É uma configuração biológica específica, e ela pode ser muito bem trabalhada.</p>
+
+      <div class="callout">
+        <p class="label">A ciência</p>
+        <h3>Por que seu sono é tão leve</h3>
+        <p>A pesquisa em cronobiologia identifica que pessoas do perfil Golfinho tendem a apresentar três traços simultâneos: maior reatividade do sistema nervoso autônomo durante a noite, ciclos de sono mais fragmentados (com mais despertares breves entre os estágios) e uma resposta mais intensa a estímulos externos — luz, som, temperatura. Em termos práticos, o seu cérebro entra em modo vigia mais facilmente do que o de um Urso ou um Leão.</p>
+      </div>
+
+      <p>Some-se a isso um traço comum de personalidade: o Golfinho costuma ter mente analítica, pensamento ruminativo e tendência a resolver problemas deitando — o que ativa o eixo cortisol exatamente quando ele deveria estar baixo. Resultado: você deita cansado, mas a mente liga.</p>
+
+      <div class="researcher">
+        <p class="label">Pesquisador de referência</p>
+        <p class="name">Michael Breus, PhD</p>
+        <p class="role">Psicólogo clínico do sono · Diplomado pela American Board of Sleep Medicine</p>
+        <p class="why">Pesquisador que organizou e popularizou o modelo dos quatro cronótipos animais (Golfinho, Leão, Urso, Lobo) em literatura clínica e divulgação científica internacional. O perfil Golfinho é descrito a partir do trabalho dele com pacientes de insônia primária.</p>
+        <p class="disclaimer">Citação para fins didáticos. Atribuição de autoria pública (nome, cargo, instituição). Sem reprodução de obras protegidas.</p>
+      </div>
+
+      <h2 class="section">No dia-a-dia</h2>
+      <ul class="daily">
+        <li><span class="num">01</span><span>Demora mais de 30 minutos para pegar no sono, mesmo cansado.</span></li>
+        <li><span class="num">02</span><span>Acorda durante a madrugada (geralmente entre 3h e 5h) e a mente liga sozinha.</span></li>
+        <li><span class="num">03</span><span>Ruído, luz fraca ou troca de cama atrapalham seu sono mais do que deveriam.</span></li>
+        <li><span class="num">04</span><span>Tem o pico cognitivo mais claro no fim da manhã ou meio da tarde.</span></li>
+        <li><span class="num">05</span><span>Já tentou várias soluções (apps, melatonina, chás) com resultado morno.</span></li>
+      </ul>
+
+      <h2 class="section">3 passos do programa pensados para o seu perfil</h2>
+      <table class="steps">
+        <thead><tr><th>Passo</th><th>Título</th><th>O que cobre</th></tr></thead>
+        <tbody>
+          <tr><td class="n">3</td><td class="title">Dívida de sono e sistema nervoso reativo</td><td class="desc">Por que tentar compensar no fim de semana intensifica a ansiedade noturna em vez de resolver, e o protocolo gradual de 14 dias para zerar a dívida sem forçar.</td></tr>
+          <tr><td class="n">7</td><td class="title">Janela de desaceleração circadiana</td><td class="desc">Os 90 minutos que antecedem o sono. Aqui o Golfinho ganha ou perde a noite — e a maioria nem percebe que está perdendo.</td></tr>
+          <tr><td class="n">12</td><td class="title">Reentrada no sono interrompido</td><td class="desc">O que fazer quando você acorda na madrugada e a mente engata. Técnicas estruturadas, sem melatonina e sem tela.</td></tr>
+        </tbody>
+      </table>
+
+      <div class="upsell">
+        <p class="label">Atalho premium · Sono+ (R$ 497)</p>
+        <h3>Quer pular a auto-implementação?</h3>
+        <p>Se prefere ir direto ao ponto, o Sono+ é uma <b>consultoria 100% online</b> de diagnóstico aprofundado + plano personalizado para o perfil Golfinho + 30 dias de Premium do programa.</p>
+        <p class="meta">Atendimento com José Nilton · agendamento direto pelo WhatsApp.</p>
+        <a class="btn-wa" href="https://wa.me/5511982820759?text=Oi%21%20Fiz%20o%20quiz%20e%20sou%20Golfinho.%20Quero%20saber%20mais%20sobre%20o%20Sono%2B.">Falar no WhatsApp sobre o Sono+</a>
+      </div>
+
+      <div class="cta">
+        <p class="label">Caminho recomendado</p>
+        <h3>Programa completo · 21 passos pensados para o Golfinho</h3>
+        <p>Pagamento único · sem mensalidade · sem renovação automática · acesso vitalício.</p>
+        <a class="btn-primary" href="https://gozzzz.app/web/sono-plus?ct=dolphin#checkout-section">Acessar o programa — R$ 147 →</a>
+      </div>
+
+      <div class="signature">
+        <p>Se quiser conversar antes de decidir, é só responder este e-mail. Quem responde sou eu mesmo.</p>
+        <p class="sign-name">José Nilton</p>
+        <p class="sign-role">Fundador do GoZzzz · suporte@gozzzz.app</p>
+      </div>
+
+    </div>
+    <div class="footer">
+      GoZzzz · São Paulo, BR · Em conformidade com a LGPD: dados usados apenas para entrega do relatório.<br>
+      <a href="mailto:unsubscribe@support.gozzzz.app?subject=unsubscribe">Cancelar inscrição</a>
+    </div>
+  </div>
+
+  <!-- ═══════════════════ LEÃO ═══════════════════ -->
+  <div id="lion" class="inbox">
+    <div class="avatar">L</div>
+    <div class="meta">
+      <div class="from">GoZzzz <span class="email">&lt;noreply@support.gozzzz.app&gt;</span></div>
+      <div class="to">para você</div>
+      <div class="subject">Seu plano Leão — proteja a manhã, blinde a noite</div>
+      <div class="preheader">Você acorda cedo de boa. O problema é o que acontece depois das 21h.</div>
+    </div>
+    <div class="when">agora</div>
+  </div>
+  <div class="email">
+    <div class="hero" data-ct="lion">
+      <div class="kicker">Cronótipo identificado · Leão</div>
+      <h1>Você é Leão. A manhã é seu ativo.</h1>
+      <p class="subtitle">~15% das pessoas · pico matinal · queda precoce à noite</p>
+    </div>
+
+    <div class="body">
+
+      <p class="lead">"Antes das 9h da manhã eu rendo o que outros rendem o dia inteiro."</p>
+
+      <p>Seu perfil é <b>Leão</b> — o cronótipo madrugador clássico. A maior parte do mundo é desenhada por Leões e para Leões: reuniões cedo, expediente das 8h, produtividade matinal. Você está alinhado com isso, mas existe um custo silencioso — e é ele que o programa endereça.</p>
+
+      <div class="callout">
+        <p class="label">A ciência</p>
+        <h3>Por que sua manhã é poderosa e sua noite é frágil</h3>
+        <p>Pessoas do perfil Leão apresentam um pico de cortisol matinal mais precoce e mais intenso do que a média. O cortisol não é vilão — é o hormônio que te tira da cama com clareza mental e foco. O reverso disso é igualmente programado: sua melatonina noturna costuma subir mais cedo (em torno de 20h–21h) e seu sono profundo é mais frágil quando você fica acordado contra essa onda. Em outras palavras: seu corpo paga caro por noitadas, e isso é arquitetura biológica, não fraqueza.</p>
+      </div>
+
+      <p>Detalhe que poucos Leões sabem: o pico matinal só se mantém saudável ao longo dos anos se for alimentado por luz natural certa nas duas primeiras horas após acordar. Sem isso, o Leão envelhece o cronótipo, fica achatado — perde a manhã sem ganhar a noite.</p>
+
+      <div class="researcher">
+        <p class="label">Pesquisador de referência</p>
+        <p class="name">Andrew Huberman, PhD</p>
+        <p class="role">Professor de Neurobiologia e Oftalmologia · Stanford University School of Medicine</p>
+        <p class="why">Pesquisador da neurobiologia da visão e dos circuitos circadianos. Trabalho amplamente referenciado sobre o papel da luz natural matinal no disparo saudável do cortisol e na manutenção da fase precoce — exatamente o motor do cronótipo Leão.</p>
+        <p class="disclaimer">Citação para fins didáticos. Atribuição de autoria pública (nome, cargo, instituição). Sem reprodução de obras protegidas.</p>
+      </div>
+
+      <h2 class="section">No dia-a-dia</h2>
+      <ul class="daily">
+        <li><span class="num">01</span><span>Acorda naturalmente entre 5h e 6h30, mesmo sem alarme.</span></li>
+        <li><span class="num">02</span><span>Rende muito nas 3 primeiras horas do dia, depois cai mais cedo do que os colegas.</span></li>
+        <li><span class="num">03</span><span>Sente-se morto depois das 21h e dorme rápido se a luz for baixa.</span></li>
+        <li><span class="num">04</span><span>Café depois das 14h prejudica seu sono mesmo que você não sinta.</span></li>
+        <li><span class="num">05</span><span>Fins de semana com sono deslocado custam 2 ou 3 dias para reorganizar.</span></li>
+      </ul>
+
+      <h2 class="section">3 passos do programa pensados para o seu perfil</h2>
+      <table class="steps">
+        <thead><tr><th>Passo</th><th>Título</th><th>O que cobre</th></tr></thead>
+        <tbody>
+          <tr><td class="n">8</td><td class="title">Luz matinal estratégica</td><td class="desc">Como usar os primeiros 12 minutos de luz natural após acordar para reforçar o cortisol matinal sem queimá-lo. Detalhe da intensidade, da janela e da posição do corpo.</td></tr>
+          <tr><td class="n">4</td><td class="title">Janela de cafeína para Leões</td><td class="desc">Por que o café inocente das 15h adia seu sono em 30–40 minutos sem você perceber, e como recalibrar a janela.</td></tr>
+          <tr><td class="n">15</td><td class="title">Proteção da janela curta de sono</td><td class="desc">Blindagem das três horas antes de deitar — o que comer, o que evitar, como negociar compromissos sociais sem sabotar a manhã seguinte.</td></tr>
+        </tbody>
+      </table>
+
+      <div class="upsell">
+        <p class="label">Atalho premium · Sono+ (R$ 497)</p>
+        <h3>Quer turbinar o pico matinal de forma estruturada?</h3>
+        <p>O Sono+ é uma <b>consultoria 100% online</b>: diagnóstico aprofundado + plano de luz, cafeína e janela de sono específico para Leões + 30 dias Premium do programa.</p>
+        <p class="meta">Atendimento com José Nilton · agendamento direto pelo WhatsApp.</p>
+        <a class="btn-wa" href="https://wa.me/5511982820759?text=Oi%21%20Fiz%20o%20quiz%20e%20sou%20Le%C3%A3o.%20Quero%20saber%20mais%20sobre%20o%20Sono%2B.">Falar no WhatsApp sobre o Sono+</a>
+      </div>
+
+      <div class="cta">
+        <p class="label">Caminho recomendado</p>
+        <h3>Programa completo · 21 passos pensados para o Leão</h3>
+        <p>Pagamento único · sem mensalidade · sem renovação automática · acesso vitalício.</p>
+        <a class="btn-primary" href="https://gozzzz.app/web/sono-plus?ct=lion#checkout-section">Acessar o programa — R$ 147 →</a>
+      </div>
+
+      <div class="signature">
+        <p>Qualquer dúvida, é só responder este e-mail. Eu leio.</p>
+        <p class="sign-name">José Nilton</p>
+        <p class="sign-role">Fundador do GoZzzz · suporte@gozzzz.app</p>
+      </div>
+
+    </div>
+    <div class="footer">
+      GoZzzz · São Paulo, BR · Em conformidade com a LGPD: dados usados apenas para entrega do relatório.<br>
+      <a href="mailto:unsubscribe@support.gozzzz.app?subject=unsubscribe">Cancelar inscrição</a>
+    </div>
+  </div>
+
+  <!-- ═══════════════════ URSO ═══════════════════ -->
+  <div id="bear" class="inbox">
+    <div class="avatar">U</div>
+    <div class="meta">
+      <div class="from">GoZzzz <span class="email">&lt;noreply@support.gozzzz.app&gt;</span></div>
+      <div class="to">para você</div>
+      <div class="subject">Seu plano Urso — consistência é seu ativo, não sua jaula</div>
+      <div class="preheader">A maioria do mundo é Urso. A maioria dorme mal mesmo assim. Aqui está o porquê.</div>
+    </div>
+    <div class="when">agora</div>
+  </div>
+  <div class="email">
+    <div class="hero" data-ct="bear">
+      <div class="kicker">Cronótipo identificado · Urso</div>
+      <h1>Você é Urso. Você é a maioria.</h1>
+      <p class="subtitle">~55% das pessoas · alinhado com o ciclo claro-escuro · cronótipo mais comum</p>
+    </div>
+
+    <div class="body">
+
+      <p class="lead">"Eu durmo bem quando a vida deixa. O problema é que a vida quase nunca deixa."</p>
+
+      <p>Você é <b>Urso</b> — o cronótipo mais comum, e também o mais facilmente sabotado pela rotina urbana moderna. A boa notícia: como sua biologia segue o ciclo claro-escuro de perto, o Urso é o perfil que responde mais rápido a ajustes simples. Você não precisa reescrever sua vida — precisa parar de fazer 4 ou 5 coisas que estão drenando o seu sono profundo.</p>
+
+      <div class="callout">
+        <p class="label">A ciência</p>
+        <h3>Por que sua maior força é a regularidade</h3>
+        <p>O perfil Urso apresenta um padrão circadiano fortemente sincronizado com luz e temperatura ambiente. Quando você dorme em horários consistentes, o eixo melatonina-cortisol funciona como um relógio: melatonina sobe pouco antes de deitar, cortisol sobe pouco antes de acordar, temperatura corporal central cai durante a noite e sobe pela manhã. Quando esse padrão é quebrado por horários irregulares, telas tarde da noite ou viagens, o Urso perde sono profundo (estágio N3) primeiro — exatamente o estágio que faz reparo físico e consolidação de memória.</p>
+      </div>
+
+      <p>Outro detalhe pouco conhecido: a queda de energia que você sente entre 13h e 15h não é problema seu, e nem é o almoço. É uma queda fisiológica programada da temperatura corporal, e existe protocolo para usar isso a favor (em vez de lutar com café e açúcar).</p>
+
+      <div class="researcher">
+        <p class="label">Pesquisador de referência</p>
+        <p class="name">Charles A. Czeisler, MD, PhD</p>
+        <p class="role">Diretor da Divisão de Medicina do Sono e Distúrbios Circadianos · Harvard Medical School / Brigham and Women's Hospital</p>
+        <p class="why">Uma das maiores referências mundiais em ritmos circadianos populacionais. Estudos clínicos clássicos sobre o impacto da regularidade de horários na arquitetura do sono profundo — exatamente o ponto que define a saúde do cronótipo Urso.</p>
+        <p class="disclaimer">Citação para fins didáticos. Atribuição de autoria pública (nome, cargo, instituição). Sem reprodução de obras protegidas.</p>
+      </div>
+
+      <h2 class="section">No dia-a-dia</h2>
+      <ul class="daily">
+        <li><span class="num">01</span><span>Acorda bem entre 6h30 e 8h, com alarme tranquilo.</span></li>
+        <li><span class="num">02</span><span>Tem queda real de energia entre 13h e 15h, todos os dias.</span></li>
+        <li><span class="num">03</span><span>Dorme melhor quando os horários da semana são parecidos.</span></li>
+        <li><span class="num">04</span><span>Fim de semana com sono deslocado leva 1 ou 2 dias para voltar.</span></li>
+        <li><span class="num">05</span><span>Acorda à noite ocasionalmente, mas o que mais incomoda é dormir e não descansar.</span></li>
+      </ul>
+
+      <h2 class="section">3 passos do programa pensados para o seu perfil</h2>
+      <table class="steps">
+        <thead><tr><th>Passo</th><th>Título</th><th>O que cobre</th></tr></thead>
+        <tbody>
+          <tr><td class="n">2</td><td class="title">Cronótipos e ritmo circadiano na prática</td><td class="desc">Como seu relógio biológico funciona, por que a queda das 14h não é falta de produtividade, e como aproveitar — em vez de combater — os ciclos do dia.</td></tr>
+          <tr><td class="n">9</td><td class="title">Janela ideal de sono profundo</td><td class="desc">Por que dormir 7h45 das 23h às 6h45 não equivale a 7h45 das 1h às 8h45 — apesar da mesma duração.</td></tr>
+          <tr><td class="n">14</td><td class="title">Regularidade negociada (sem virar prisão)</td><td class="desc">A regra das 2 horas: até onde você pode estender o sono no fim de semana sem desregular a próxima segunda-feira.</td></tr>
+        </tbody>
+      </table>
+
+      <div class="upsell">
+        <p class="label">Atalho premium · Sono+ (R$ 497)</p>
+        <h3>Quer resultado mensurável rápido?</h3>
+        <p>O Urso responde rápido — então uma <b>consultoria 100% online</b> identifica em 60 minutos os 3 ou 4 pontos que estão drenando seu sono profundo, monta um plano de 4 semanas e entrega 30 dias Premium do programa.</p>
+        <p class="meta">Atendimento com José Nilton · agendamento direto pelo WhatsApp.</p>
+        <a class="btn-wa" href="https://wa.me/5511982820759?text=Oi%21%20Fiz%20o%20quiz%20e%20sou%20Urso.%20Quero%20saber%20mais%20sobre%20o%20Sono%2B.">Falar no WhatsApp sobre o Sono+</a>
+      </div>
+
+      <div class="cta">
+        <p class="label">Caminho recomendado</p>
+        <h3>Programa completo · 21 passos pensados para o Urso</h3>
+        <p>Pagamento único · sem mensalidade · sem renovação automática · acesso vitalício.</p>
+        <a class="btn-primary" href="https://gozzzz.app/web/sono-plus?ct=bear#checkout-section">Acessar o programa — R$ 147 →</a>
+      </div>
+
+      <div class="signature">
+        <p>Se quiser tirar dúvida específica antes de decidir, é só responder este e-mail.</p>
+        <p class="sign-name">José Nilton</p>
+        <p class="sign-role">Fundador do GoZzzz · suporte@gozzzz.app</p>
+      </div>
+
+    </div>
+    <div class="footer">
+      GoZzzz · São Paulo, BR · Em conformidade com a LGPD: dados usados apenas para entrega do relatório.<br>
+      <a href="mailto:unsubscribe@support.gozzzz.app?subject=unsubscribe">Cancelar inscrição</a>
+    </div>
+  </div>
+
+  <!-- ═══════════════════ LOBO ═══════════════════ -->
+  <div id="wolf" class="inbox">
+    <div class="avatar">W</div>
+    <div class="meta">
+      <div class="from">GoZzzz <span class="email">&lt;noreply@support.gozzzz.app&gt;</span></div>
+      <div class="to">para você</div>
+      <div class="subject">Seu plano Lobo — você não é preguiçoso, é tardio (e tem solução)</div>
+      <div class="preheader">Acordar cedo dói porque é genética, não falta de força de vontade.</div>
+    </div>
+    <div class="when">agora</div>
+  </div>
+  <div class="email">
+    <div class="hero" data-ct="wolf">
+      <div class="kicker">Cronótipo identificado · Lobo</div>
+      <h1>Você é Lobo. Você é tardio, não preguiçoso.</h1>
+      <p class="subtitle">~15-20% das pessoas · fase circadiana tardia · pico cognitivo à noite</p>
+    </div>
+
+    <div class="body">
+
+      <p class="lead">"Acordo cansado todo dia. À noite, finalmente, viro outra pessoa."</p>
+
+      <p>Seu perfil é <b>Lobo</b> — fase circadiana tardia. Antes de qualquer estratégia: a maior parte do que você ouviu a vida inteira sobre disciplina de sono foi escrito por e para Leões e Ursos. Para Lobos, o jogo é outro. Você não é indisciplinado, você é simplesmente tardio — e a literatura científica é cada vez mais clara sobre isso.</p>
+
+      <div class="callout">
+        <p class="label">A ciência</p>
+        <h3>Por que acordar cedo realmente dói</h3>
+        <p>O perfil Lobo apresenta um padrão circadiano com fase atrasada em relação ao horário social: a melatonina sobe mais tarde (perto de meia-noite, às vezes depois), o pico de cortisol matinal acontece mais tarde também, e a temperatura corporal central só atinge o ponto baixo de fato no fim da madrugada. Conclusão prática: quando você é forçado a acordar às 7h, seu corpo está fisiologicamente no que seria, para um Urso, as 4h da manhã. Por isso dói. Não é falta de hábito — é jet lag crônico contra a sua biologia.</p>
+      </div>
+
+      <p>A boa notícia: o cronótipo é parcialmente plástico. Existe um caminho para antecipar a sua fase em até 2 horas de forma sustentada, sem melatonina, sem sofrimento, em torno de 14 dias. Mas a abordagem precisa respeitar a sua biologia — forçar despertador cedo sem o resto do plano só piora.</p>
+
+      <div class="researcher">
+        <p class="label">Pesquisador de referência</p>
+        <p class="name">Matthew Walker, PhD</p>
+        <p class="role">Professor de Neurociência e Psicologia · University of California, Berkeley · Diretor do Center for Human Sleep Science</p>
+        <p class="why">Pesquisador de referência sobre arquitetura do sono e fases circadianas tardias. Trabalho público amplo descrevendo o custo cognitivo, metabólico e emocional do desalinhamento entre o relógio biológico tardio e o horário social — base de evidência do plano para Lobos.</p>
+        <p class="disclaimer">Citação para fins didáticos. Atribuição de autoria pública (nome, cargo, instituição). Sem reprodução de obras protegidas.</p>
+      </div>
+
+      <h2 class="section">No dia-a-dia</h2>
+      <ul class="daily">
+        <li><span class="num">01</span><span>Se deixarem, dorme depois da meia-noite e acorda perto das 9h ou mais tarde.</span></li>
+        <li><span class="num">02</span><span>Manhã é nebulosa: leva 2 horas até ligar de verdade.</span></li>
+        <li><span class="num">03</span><span>Tem o pico cognitivo mais nítido depois das 17h ou à noite.</span></li>
+        <li><span class="num">04</span><span>Já se sentiu culpado por ser preguiçoso várias vezes na vida — e nunca foi.</span></li>
+        <li><span class="num">05</span><span>Mesmo dormindo 8 horas, acorda pesado se for cedo demais.</span></li>
+      </ul>
+
+      <h2 class="section">3 passos do programa pensados para o seu perfil</h2>
+      <table class="steps">
+        <thead><tr><th>Passo</th><th>Título</th><th>O que cobre</th></tr></thead>
+        <tbody>
+          <tr><td class="n">5</td><td class="title">Sono profundo do Lobo</td><td class="desc">Por que sua arquitetura empilha REM e sono profundo de forma diferente, e como isso explica acordar pesado mesmo com 8 horas na cama.</td></tr>
+          <tr><td class="n">11</td><td class="title">Avanço de fase progressivo</td><td class="desc">Protocolo de 14 dias para mover seu horário de dormir entre 60 e 90 minutos para trás de forma sustentada — sem melatonina como muleta diária.</td></tr>
+          <tr><td class="n">17</td><td class="title">Negociar a manhã sem destruir a noite</td><td class="desc">Como sobreviver a reuniões cedo sem pagar com fadiga: sequência de luz, primeira refeição, hidratação, janela de cafeína.</td></tr>
+        </tbody>
+      </table>
+
+      <div class="upsell">
+        <p class="label">Atalho premium · Sono+ (R$ 497)</p>
+        <h3>Precisa de resposta agora?</h3>
+        <p>Se a sua rotina exige despertar cedo e você está exausto há tempo demais, o Sono+ é uma <b>consultoria 100% online</b>: desenha um avanço de fase específico para o seu caso, com plano de 4 semanas + 30 dias Premium do programa.</p>
+        <p class="meta">Atendimento com José Nilton · agendamento direto pelo WhatsApp.</p>
+        <a class="btn-wa" href="https://wa.me/5511982820759?text=Oi%21%20Fiz%20o%20quiz%20e%20sou%20Lobo.%20Quero%20saber%20mais%20sobre%20o%20Sono%2B.">Falar no WhatsApp sobre o Sono+</a>
+      </div>
+
+      <div class="cta">
+        <p class="label">Caminho recomendado</p>
+        <h3>Programa completo · 21 passos pensados para o Lobo</h3>
+        <p>Pagamento único · sem mensalidade · sem renovação automática · acesso vitalício.</p>
+        <a class="btn-primary" href="https://gozzzz.app/web/sono-plus?ct=wolf#checkout-section">Acessar o programa — R$ 147 →</a>
+      </div>
+
+      <div class="signature">
+        <p>Lobos costumam ter mais perguntas — é normal. Se quiser, responde este e-mail antes de decidir.</p>
+        <p class="sign-name">José Nilton</p>
+        <p class="sign-role">Fundador do GoZzzz · suporte@gozzzz.app</p>
+      </div>
+
+    </div>
+    <div class="footer">
+      GoZzzz · São Paulo, BR · Em conformidade com a LGPD: dados usados apenas para entrega do relatório.<br>
+      <a href="mailto:unsubscribe@support.gozzzz.app?subject=unsubscribe">Cancelar inscrição</a>
+    </div>
+  </div>
+
+</div>
+
+</body>
+</html>

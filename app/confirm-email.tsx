@@ -4,6 +4,7 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { CircleCheck as CheckCircle, CircleAlert as AlertCircle, ArrowRight } from 'lucide-react-native';
 import { useRouter, useLocalSearchParams } from 'expo-router';
 import { useLanguage } from '@/contexts/LanguageContext';
+import { SUPABASE_URL, SUPABASE_ANON_KEY } from '@/lib/supabase';
 
 export default function ConfirmEmailScreen() {
   const router = useRouter();
@@ -20,13 +21,10 @@ export default function ConfirmEmailScreen() {
         return;
       }
 
-      const supabaseUrl = process.env.EXPO_PUBLIC_SUPABASE_URL;
-      const supabaseKey = process.env.EXPO_PUBLIC_SUPABASE_ANON_KEY;
-
-      const response = await fetch(`${supabaseUrl}/functions/v1/confirm-email`, {
+      const response = await fetch(`${SUPABASE_URL}/functions/v1/confirm-email`, {
         method: 'POST',
         headers: {
-          'Authorization': `Bearer ${supabaseKey}`,
+          'Authorization': `Bearer ${SUPABASE_ANON_KEY}`,
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({ token }),

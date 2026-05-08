@@ -4,7 +4,7 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { Moon, Lock, CircleCheck as CheckCircle, TriangleAlert, Eye, EyeOff } from 'lucide-react-native';
 import { useRouter, useLocalSearchParams } from 'expo-router';
 import { useLanguage } from '@/contexts/LanguageContext';
-import { supabase } from '@/lib/supabase';
+import { supabase, SUPABASE_URL, SUPABASE_ANON_KEY } from '@/lib/supabase';
 
 export default function ResetPasswordScreen() {
   const pickParam = (value?: string | string[]) =>
@@ -142,12 +142,11 @@ export default function ResetPasswordScreen() {
     try {
       if (legacyToken) {
         // Backward compatibility for old reset links.
-        const supabaseUrl = process.env.EXPO_PUBLIC_SUPABASE_URL!;
-        const res = await fetch(`${supabaseUrl}/functions/v1/reset-password`, {
+        const res = await fetch(`${SUPABASE_URL}/functions/v1/reset-password`, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
-            'Authorization': `Bearer ${process.env.EXPO_PUBLIC_SUPABASE_ANON_KEY}`,
+            'Authorization': `Bearer ${SUPABASE_ANON_KEY}`,
           },
           body: JSON.stringify({ token: legacyToken, password }),
         });

@@ -2,20 +2,47 @@ import { createClient, SupabaseClient } from '@supabase/supabase-js';
 import 'react-native-url-polyfill/auto';
 import { Profile, UserProgress, Lesson, DailyTip } from '@/types/database';
 
-const supabaseUrl =
+// Canonical project (GoZzzzz). The anon key is public by design — Expo inlines
+// any EXPO_PUBLIC_* var into the browser bundle anyway, and Supabase anon keys
+// are intended to be shipped to clients (RLS protects data). Keeping a safe
+// canonical fallback in source guarantees production never points at a stale
+// project ref even if a build env var is missing or cached with old value.
+const CANONICAL_SUPABASE_URL = 'https://virxgaxsnxdqjwyvqqme.supabase.co';
+const CANONICAL_SUPABASE_ANON_KEY =
+  'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZpcnhnYXhzbnhkcWp3eXZxcW1lIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzc0MjUyNjQsImV4cCI6MjA5MzAwMTI2NH0.9UNNeP5TH3tkLWHJH0nKUTXj6wghjlM4qSnx-vByJEY';
+
+// Legacy/orphaned project ref that previously leaked into builds via stale env.
+// If we ever see it, swap to the canonical project so prod stays healthy.
+const LEGACY_PROJECT_REFS = ['cmekyhdkenoymfftwjod'];
+
+const rawSupabaseUrl =
   process.env.EXPO_PUBLIC_SUPABASE_URL ||
   process.env.NEXT_PUBLIC_SUPABASE_URL ||
   '';
-const supabaseAnonKey =
+const rawSupabaseAnonKey =
   process.env.EXPO_PUBLIC_SUPABASE_ANON_KEY ||
   process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY ||
   process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY ||
   '';
 
-// Safe placeholders keep bundling alive when CI env is missing.
-const FALLBACK_SUPABASE_URL = 'https://placeholder.supabase.co';
-const FALLBACK_SUPABASE_ANON_KEY =
-  'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJwbGFjZWhvbGRlciIsInJlZiI6InBsYWNlaG9sZGVyIiwicm9sZSI6ImFub24iLCJpYXQiOjE1MTYyMzkwMjJ9.placeholder-signature';
+const isLegacyOrEmpty =
+  !rawSupabaseUrl.trim() ||
+  LEGACY_PROJECT_REFS.some((ref) => rawSupabaseUrl.includes(ref)) ||
+  LEGACY_PROJECT_REFS.some((ref) => rawSupabaseAnonKey.includes(ref));
+
+const supabaseUrl = isLegacyOrEmpty ? CANONICAL_SUPABASE_URL : rawSupabaseUrl;
+const supabaseAnonKey = isLegacyOrEmpty ? CANONICAL_SUPABASE_ANON_KEY : rawSupabaseAnonKey;
+
+// Safe placeholders keep bundling alive when CI env is missing AND the fallback
+// is somehow not applied. Production should never hit these.
+const FALLBACK_SUPABASE_URL = CANONICAL_SUPABASE_URL;
+const FALLBACK_SUPABASE_ANON_KEY = CANONICAL_SUPABASE_ANON_KEY;
+
+/** Public Supabase URL resolved with legacy-ref protection. Prefer this over reading
+ *  `process.env.EXPO_PUBLIC_SUPABASE_URL` directly so stale build env can't ship a
+ *  bundle pointing at the old project. */
+export const SUPABASE_URL = supabaseUrl;
+export const SUPABASE_ANON_KEY = supabaseAnonKey;
 
 /** Expo inlines EXPO_PUBLIC_* at build time — placeholder values break auth in production. */
 export const AUTH_CONFIG_INCOMPLETE = 'AUTH_CONFIG_INCOMPLETE';

@@ -1,8 +1,6 @@
 import { Platform } from 'react-native';
 import { storage } from './storage';
-
-const SUPABASE_URL = process.env.EXPO_PUBLIC_SUPABASE_URL!;
-const SUPABASE_ANON_KEY = process.env.EXPO_PUBLIC_SUPABASE_ANON_KEY!;
+import { SUPABASE_URL, SUPABASE_ANON_KEY } from './supabase';
 
 function urlBase64ToUint8Array(base64String: string): ArrayBuffer {
   const padding = '='.repeat((4 - (base64String.length % 4)) % 4);

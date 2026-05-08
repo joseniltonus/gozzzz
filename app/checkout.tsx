@@ -2,6 +2,7 @@ import { Platform, Linking } from 'react-native';
 import { useRouter } from 'expo-router';
 import { useLanguage } from '@/contexts/LanguageContext';
 import PaywallScreen from '@/components/PaywallScreen';
+import { SUPABASE_URL, SUPABASE_ANON_KEY } from '@/lib/supabase';
 
 export default function CheckoutScreen() {
   const router = useRouter();
@@ -16,11 +17,11 @@ export default function CheckoutScreen() {
     const cancelUrl = `${origin}/web/assinar`;
 
     const response = await fetch(
-      `${process.env.EXPO_PUBLIC_SUPABASE_URL}/functions/v1/process-payment`,
+      `${SUPABASE_URL}/functions/v1/process-payment`,
       {
         method: 'POST',
         headers: {
-          Authorization: `Bearer ${process.env.EXPO_PUBLIC_SUPABASE_ANON_KEY}`,
+          Authorization: `Bearer ${SUPABASE_ANON_KEY}`,
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({ plan, language, successUrl, cancelUrl }),

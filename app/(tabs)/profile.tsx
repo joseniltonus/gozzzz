@@ -103,8 +103,9 @@ function ProfileContent() {
         return;
       }
 
+      const { SUPABASE_URL: supabaseUrl } = await import('@/lib/supabase');
       const response = await fetch(
-        `${process.env.EXPO_PUBLIC_SUPABASE_URL}/functions/v1/redeem-gift-code`,
+        `${supabaseUrl}/functions/v1/redeem-gift-code`,
         {
           method: 'POST',
           headers: {

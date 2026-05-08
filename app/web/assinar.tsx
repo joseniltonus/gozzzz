@@ -13,7 +13,7 @@ import Head from 'expo-router/head';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Moon, ArrowLeft, Crown, Check, Shield, Lock, BadgeCheck, Star, CircleAlert as AlertCircle } from 'lucide-react-native';
-import { supabase } from '@/lib/supabase';
+import { supabase, SUPABASE_URL, SUPABASE_ANON_KEY } from '@/lib/supabase';
 const isWeb = Platform.OS === 'web';
 
 interface PricingData {
@@ -149,11 +149,11 @@ export default function WebAssinarPage() {
       const cancelUrl = `${origin}/web/assinar`;
 
       const response = await fetch(
-        `${process.env.EXPO_PUBLIC_SUPABASE_URL}/functions/v1/process-payment`,
+        `${SUPABASE_URL}/functions/v1/process-payment`,
         {
           method: 'POST',
           headers: {
-            'Authorization': `Bearer ${process.env.EXPO_PUBLIC_SUPABASE_ANON_KEY}`,
+            'Authorization': `Bearer ${SUPABASE_ANON_KEY}`,
             'Content-Type': 'application/json',
           },
           body: JSON.stringify({
