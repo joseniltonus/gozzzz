@@ -312,6 +312,37 @@ export default function SonoPlusLandingPage() {
   };
   // ─── Fim quiz inline ────────────────────────────────────────────
 
+  // Auto-start do quiz quando a URL chega com hash #quiz (links externos:
+  // e-mail de boas-vindas, e-mail do relatório, posts/share). Pula o estado
+  // idle (DNA + título + botão "Fazer o teste grátis →") direto pra primeira
+  // pergunta — economiza um clique e melhora conversão de quem já decidiu
+  // fazer o teste antes de chegar na página.
+  //
+  // Não dispara em visitas orgânicas (sem hash) — quem rola até o quiz
+  // continua vendo o card idle com a explicação do que esperar.
+  //
+  // Mantemos initial state = 'idle' (em vez de inicializar via função do
+  // useState) pra não quebrar a hidratação do export estático: o servidor
+  // não conhece `window.location.hash`, então só o client decide.
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    if (window.location.hash !== '#quiz') return;
+    if (quizStep !== 'idle') return;
+    setQuizStep('answering');
+    // Scroll suave depois que o estado mudou — o bloco answering tem altura
+    // diferente do idle, então o scroll nativo do hash pode parar no lugar
+    // errado se acionado antes da re-renderização.
+    requestAnimationFrame(() => {
+      const el = document.getElementById('quiz');
+      if (el && typeof el.scrollIntoView === 'function') {
+        el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
+    });
+    // Linter desabilitado de propósito: queremos rodar UMA vez no mount.
+    // Dependências [] aqui é intencional, não bug.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
   const openWhatsApp = () => Linking.openURL(WHATSAPP);
 
   useEffect(() => {
