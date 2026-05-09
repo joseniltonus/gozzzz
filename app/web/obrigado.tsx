@@ -21,7 +21,10 @@ import {
   Clock,
   ExternalLink,
 } from 'lucide-react-native';
-import { KIWIFY_MEMBER_AREA_URL } from '@/lib/payment-links';
+import {
+  getProgramCompletoPath,
+  isProgramAccessConfigured,
+} from '@/lib/program-access';
 
 const isWeb = Platform.OS === 'web';
 
@@ -89,14 +92,24 @@ export default function WebObrigadoPage() {
           <TouchableOpacity
             style={styles.heroCta}
             activeOpacity={0.88}
-            onPress={() => Linking.openURL(KIWIFY_MEMBER_AREA_URL)}
+            onPress={() => {
+              if (isProgramAccessConfigured()) {
+                router.push(getProgramCompletoPath());
+              } else {
+                Linking.openURL(
+                  `mailto:${SUPPORT_EMAIL}?subject=GoZzzz%20-%20link%20do%20programa`,
+                );
+              }
+            }}
           >
             <BookOpen size={20} color="#0d0d16" />
-            <Text style={styles.heroCtaTxt}>Acessar primeira lição agora</Text>
+            <Text style={styles.heroCtaTxt}>Abrir as 21 lições agora</Text>
             <ExternalLink size={16} color="#0d0d16" />
           </TouchableOpacity>
           <Text style={styles.heroCtaHint}>
-            Faça login na área de membros usando o e-mail da compra.
+            {isProgramAccessConfigured()
+              ? 'Guarde esta página nos favoritos — é o seu acesso vitalício ao texto completo.'
+              : `Peça para configurarem EXPO_PUBLIC_PROGRAM_ACCESS_KEY na Vercel — ou escreva ${SUPPORT_EMAIL}.`}
           </Text>
 
           <View style={styles.steps}>
@@ -107,7 +120,7 @@ export default function WebObrigadoPage() {
               <View style={styles.stepBody}>
                 <Text style={styles.stepTitle}>1. Verifique o seu e-mail</Text>
                 <Text style={styles.stepDesc}>
-                  Você também recebeu um e-mail com o link direto de acesso e a senha temporária da sua conta. Confirme a caixa de spam se não chegar.
+                  Você receberá o recibo da compra por e-mail (Kiwify). O texto completo das 21 lições está no botão dourado acima — salve esse link.
                 </Text>
               </View>
             </View>

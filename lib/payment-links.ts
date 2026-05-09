@@ -15,9 +15,8 @@
 // Vendedor: MORFEU SAUDE E TECNOLOGIA LTDA
 export const KIWIFY_PARCELADO_URL = 'https://pay.kiwify.com.br/Q3Cl5P4';
 
-// Área de membros do Kiwify (cliente faz login com o e-mail da compra). Esse
-// é o link que o /web/obrigado mostra como CTA principal pós-pagamento.
-// Kiwify também envia esse link automaticamente no e-mail de confirmação.
+// Área de membros Kiwify (login alternativo). Fluxo principal de conteúdo em
+// texto está em /web/programa-completo?key=… — configure EXPO_PUBLIC_PROGRAM_ACCESS_KEY.
 export const KIWIFY_MEMBER_AREA_URL = 'https://dashboard.kiwify.com.br/login';
 
 // Feature flag: enquanto false, esconde todos os botões "Pagar à vista"
