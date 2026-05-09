@@ -1354,10 +1354,24 @@ export default function SonoPlusLandingPage() {
                   <Text style={styles.footerLink}>Assinar</Text>
                 </TouchableOpacity>
               </Link>
+              <Text style={styles.footerSep}>·</Text>
+              <TouchableOpacity
+                accessibilityRole="link"
+                onPress={() => Linking.openURL('mailto:suporte@gozzzz.app?subject=Suporte%20GoZzzz')}
+              >
+                <Text style={styles.footerLink}>Suporte</Text>
+              </TouchableOpacity>
             </View>
             <Text style={styles.footerCopy}>{t('web.footer.copyright')}</Text>
-            <Text style={styles.footerCo}>MORFEU SAÚDE E TECNOLOGIA LTDA</Text>
-            <Text style={styles.footerCn}>CNPJ: 66.059.212/0001-52</Text>
+            <Text style={styles.footerSupport}>
+              Dúvidas? Escreva pra{' '}
+              <Text
+                style={styles.footerSupportEmail}
+                onPress={() => Linking.openURL('mailto:suporte@gozzzz.app?subject=Suporte%20GoZzzz')}
+              >
+                suporte@gozzzz.app
+              </Text>
+            </Text>
           </View>
         </View>
       </ScrollView>
@@ -2032,8 +2046,8 @@ const styles = StyleSheet.create({
   footerLink: { color: '#cbd1de', fontSize: 13, fontWeight: '600' },
   footerSep: { color: 'rgba(203,209,222,0.4)', fontSize: 12 },
   footerCopy: { fontSize: 12, color: TEXT_MUTED, textAlign: 'center', paddingHorizontal: 16 },
-  footerCo: { color: TEXT_MUTED, fontSize: 11, fontWeight: '600' },
-  footerCn: { color: TEXT_MUTED, fontSize: 10 },
+  footerSupport: { fontSize: 12, color: TEXT_MUTED, textAlign: 'center', paddingHorizontal: 16, marginTop: 2 },
+  footerSupportEmail: { color: '#d4a96a', fontWeight: '600' },
 
   // ─── Quiz inline ──────────────────────────────────────────────
   quizSection: {
