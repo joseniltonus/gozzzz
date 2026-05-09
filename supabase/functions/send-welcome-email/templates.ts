@@ -130,24 +130,40 @@ function chronotypeBlockHtml(c: Chronotype): string {
 function quizPromoHtml(): string {
   return `
   <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="margin-top:24px;background:#fafaf6;border:1px solid #e8e3d4;border-radius:10px;">
-    <tr><td style="padding:20px 22px;">
+    <tr><td style="padding:22px 24px;">
       <p style="margin:0 0 6px;font-size:11px;font-weight:700;letter-spacing:1.5px;color:#9a7836;text-transform:uppercase;">
         Antes de começar · 60 segundos
       </p>
-      <p style="margin:0 0 10px;font-size:18px;font-weight:700;color:#1a1814;line-height:1.3;">
-        Você ainda não fez o teste de cronótipo.
+      <p style="margin:0 0 10px;font-size:19px;font-weight:700;color:#1a1814;line-height:1.3;">
+        Faça o teste de cronótipo antes da Lição 1.
       </p>
-      <p style="margin:0 0 14px;font-size:14px;color:#3f3a30;line-height:1.55;">
-        Cada pessoa pertence a um dos quatro perfis biológicos — <strong>Lobo</strong>,
-        <strong>Leão</strong>, <strong>Urso</strong> ou <strong>Golfinho</strong>.
-        Cada perfil tem janelas de sono diferentes e responde melhor a lições
-        diferentes. O teste leva 60 segundos e ajusta toda a sequência das 21
-        lições pra sua biologia.
+      <p style="margin:0 0 14px;font-size:14px;color:#3f3a30;line-height:1.6;">
+        Sua janela ideal de sono pode estar entre 21:30 e 22:30 — ou entre
+        00:00 e 01:00. Depende do seu perfil biológico, e a diferença muda
+        tudo. O programa tem ajustes específicos pra cada um dos quatro perfis
+        (<strong>Lobo</strong>, <strong>Leão</strong>, <strong>Urso</strong>,
+        <strong>Golfinho</strong>) e o teste leva 60 segundos.
       </p>
-      <p style="margin:0;">
-        <a href="${QUIZ_URL}" style="display:inline-block;padding:10px 18px;background:#1a1814;color:#fafaf6;font-size:13px;font-weight:700;text-decoration:none;border-radius:6px;">
-          Fazer o teste agora →
+
+      <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="margin:6px 0 16px;background:#ffffff;border:1px solid #e8e3d4;border-radius:8px;">
+        <tr>
+          <td style="padding:12px 14px;font-size:12px;color:#3f3a30;line-height:1.55;">
+            <strong style="color:#1a1814;">Por que vale fazer agora:</strong>
+            descobrindo seu cronótipo antes da primeira lição, você começa
+            pelos exercícios certos pra sua biologia — e poupa de 1 a 2
+            semanas de tentativa e erro.
+          </td>
+        </tr>
+      </table>
+
+      <p style="margin:0 0 8px;">
+        <a href="${QUIZ_URL}" style="display:inline-block;padding:12px 22px;background:#1a1814;color:#fafaf6;font-size:14px;font-weight:700;text-decoration:none;border-radius:8px;letter-spacing:0.2px;">
+          Fazer o teste agora (60 segundos) →
         </a>
+      </p>
+      <p style="margin:8px 0 0;font-size:11px;color:#7a6a4a;line-height:1.5;">
+        Gratuito · 4 perguntas · sem cadastro · resultado na hora.<br/>
+        Ou cole no navegador: <a href="${QUIZ_URL}" style="color:#9a7836;">${QUIZ_URL}</a>
       </p>
     </td></tr>
   </table>`;
@@ -321,7 +337,7 @@ export function buildWelcomeEmail(input: WelcomeEmailInput): {
   // ham/spam baseado no equilíbrio HTML/texto.
   const chronoLineText = input.chronotype
     ? `Vi que você fez o teste — seu cronótipo é ${CHRONOTYPE_BLOCKS[input.chronotype].name}. ${CHRONOTYPE_BLOCKS[input.chronotype].startWith}\n\nJanela ideal: ${CHRONOTYPE_BLOCKS[input.chronotype].bedtimeWindow}.\n\n`
-    : `Você ainda não fez o teste de cronótipo. Faça em 60 segundos: ${QUIZ_URL}\n\n`;
+    : `Antes da Lição 1: faça o teste de cronótipo (60 segundos, sem cadastro). Saber seu perfil biológico antes de começar evita 1-2 semanas de tentativa e erro.\n\nFazer agora: ${QUIZ_URL}\n\n`;
 
   const text =
     `${firstName ? `Olá, ${firstName}.` : "Olá."} Bem-vindo ao Sono+.\n\n` +

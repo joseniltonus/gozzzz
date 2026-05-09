@@ -748,8 +748,12 @@ export default function SonoPlusLandingPage() {
         {/* ─── QUIZ DE CRONÓTIPO INLINE ───────────────────────────────
              Funil completo dentro da própria página: idle → 4 perguntas →
              resultado personalizado → captura de e-mail → CTA com scroll
-             para o checkout. Sem redirect, sem nova URL. */}
-        <View style={styles.quizSection}>
+             para o checkout. Sem redirect, sem nova URL.
+
+             nativeID="quiz" expõe a âncora `#quiz` para deep-linking — o
+             e-mail de boas-vindas (send-welcome-email) usa essa âncora para
+             estimular quem ainda não fez o teste a abrir direto na seção. */}
+        <View nativeID="quiz" style={styles.quizSection}>
           {quizStep === 'idle' && (
             <View style={styles.quizIdleCard}>
               <Text style={styles.quizIdleEmoji}>🧬</Text>
