@@ -20,6 +20,7 @@ import {
 import { useLanguage } from '@/contexts/LanguageContext';
 import { LESSONS_DATA } from '@/data/lessons';
 import { LESSON_ENHANCEMENTS } from '@/data/lessonEnhancements';
+import { useProgramUnlock } from '@/lib/program-unlock';
 import { useAuth } from '@/contexts/AuthContext';
 import { useUserProfile } from '@/hooks/useUserProfile';
 import { useEffectiveChronotype } from '@/hooks/useEffectiveChronotype';
@@ -101,8 +102,14 @@ export default function WebLessonPage() {
   }
 
   const isPremiumStep = lesson.step_number > 3;
-  const accessPending = Boolean(user && isPremiumStep && !accessChecked);
-  const isLocked = isPremiumStep && (!user || (accessChecked && !hasPremiumAccess));
+  // Cliente que veio do e-mail Kiwify com ?key= certo (ou já salvou no
+  // localStorage) destrava o conteúdo premium sem precisar logar.
+  const unlockedFromUrl = useProgramUnlock();
+  const accessPending = Boolean(
+    user && isPremiumStep && !accessChecked && !unlockedFromUrl,
+  );
+  const isLocked =
+    isPremiumStep && !unlockedFromUrl && (!user || (accessChecked && !hasPremiumAccess));
 
   if (accessPending) {
     return (

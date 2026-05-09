@@ -27,10 +27,15 @@ export function isProgramAccessConfigured(): boolean {
   return k.length >= 8;
 }
 
-/** Path relativo com query (para router.push). */
+/**
+ * Path relativo com query (para router.push). Aponta direto pra trilha
+ * `/web/programa` — a página oficial onde o cliente vê as 21 lições.
+ * O `?key=` é validado via lib/program-unlock e salvo no localStorage,
+ * então links internos seguintes (lições) funcionam sem o `?key=`.
+ */
 export function getProgramCompletoPath(): string {
   const k = encodeURIComponent(getPublicProgramAccessKey());
-  return `/web/programa-completo?key=${k}`;
+  return `/web/programa?key=${k}`;
 }
 
 /** URL absoluta para colar no Kiwify (redirect / e-mail). */

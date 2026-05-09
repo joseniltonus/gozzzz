@@ -23,6 +23,7 @@ import {
   BadgeCheck,
 } from 'lucide-react-native';
 import { LESSONS_DATA } from '@/data/lessons';
+import { useProgramUnlock } from '@/lib/program-unlock';
 const isWeb = Platform.OS === 'web';
 
 export default function WebProgramPage() {
@@ -30,6 +31,9 @@ export default function WebProgramPage() {
   const { t: translate } = useLanguage();
   const t = (key: string) => translate(key, 'pt');
 
+  // Cliente que veio do e-mail Kiwify com ?key= correto (ou já salvou no
+  // localStorage) destrava todas as 21 lições. Sem login, sem fricção.
+  const unlocked = useProgramUnlock();
 
   const allSteps = [
     ...LESSONS_DATA.map((l) => ({
@@ -37,7 +41,7 @@ export default function WebProgramPage() {
       num: l.step_number,
       title: l.title_pt,
       desc: l.description_pt.substring(0, 120) + '...',
-      free: l.step_number <= 3,
+      free: l.step_number <= 3 || unlocked,
     })),
   ];
 
