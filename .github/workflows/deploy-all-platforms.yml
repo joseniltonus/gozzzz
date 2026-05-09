@@ -112,6 +112,9 @@ jobs:
             echo "Resolved web build env is empty (this should not happen)."
             exit 1
           fi
+          # Diagnóstico: imprime apenas o tamanho do segredo (sem expor o valor).
+          # Se vier 0 → o secret no GitHub está faltando ou com nome diferente.
+          echo "PROGRAM_ACCESS_KEY length = ${#EXPO_PUBLIC_PROGRAM_ACCESS_KEY}"
           if [ -z "$EXPO_PUBLIC_PROGRAM_ACCESS_KEY" ]; then
             echo "::warning::EXPO_PUBLIC_PROGRAM_ACCESS_KEY not set — /web/programa-completo will show 'access not configured'."
           fi
