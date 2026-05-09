@@ -209,9 +209,9 @@ export function buildWelcomeEmail(input: WelcomeEmailInput): {
 
   // Greeting: usa o nome se disponível, senão genérico
   const greetingHtml = firstName
-    ? `Olá, ${safeName}.<br>${input.chronotype ? "Bem-vindo ao Sono+." : "Uma coisa antes da Lição 1."}`
+    ? `Olá, ${safeName}.<br>${input.chronotype ? "Bem-vindo ao GoZzzz." : "Uma coisa antes da Lição 1."}`
     : input.chronotype
-      ? "Olá. Bem-vindo ao Sono+."
+      ? "Olá. Bem-vindo ao GoZzzz."
       : "Olá. Uma coisa antes da Lição 1.";
 
   const personalizationBlock = input.chronotype
@@ -309,7 +309,7 @@ ${escape(preheader)}
               ${
                 input.chronotype
                   ? "Seu acesso ao programa de 21 lições foi liberado. As aulas combinam neurociência do sono e medicina circadiana, em sequência prática — uma lição por noite, cinco minutos cada."
-                  : "Seu acesso ao Sono+ está garantido. Antes de você abrir a primeira lição, vale 60 segundos pra fazer uma coisa que muda toda a sequência das próximas 21 noites."
+                  : "Seu acesso ao GoZzzz está garantido. Antes de você abrir a primeira lição, vale 60 segundos pra fazer uma coisa que muda toda a sequência das próximas 21 noites."
               }
             </p>
 
@@ -379,7 +379,7 @@ function buildTextWithChronotype(
   const b = CHRONOTYPE_BLOCKS[c];
   const hello = firstName ? `Olá, ${firstName}.` : "Olá.";
   return [
-    `${hello} Bem-vindo ao Sono+.`,
+    `${hello} Bem-vindo ao GoZzzz.`,
     "",
     "Seu pagamento foi confirmado e o acesso ao programa de 21 lições está liberado.",
     "",
@@ -403,7 +403,7 @@ function buildTextWithChronotype(
 function buildTextWithoutChronotype(firstName: string): string {
   const hello = firstName ? `Olá, ${firstName}.` : "Olá.";
   return [
-    `${hello} Bem-vindo ao Sono+.`,
+    `${hello} Bem-vindo ao GoZzzz.`,
     "",
     "Seu acesso está garantido. Antes da primeira lição, faça o teste de cronótipo (60 segundos, sem cadastro). Saber seu perfil biológico antes de começar muda toda a sequência das próximas 21 noites e poupa 1-2 semanas de tentativa-e-erro.",
     "",
