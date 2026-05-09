@@ -1,11 +1,25 @@
 /**
  * Acesso ao programa completo (21 lições em texto) via URL com query `key`.
- * Defina EXPO_PUBLIC_PROGRAM_ACCESS_KEY no Vercel/EAS (mesmo valor que você
- * cola no e-mail do Kiwify e no redirect). Não é segredo militar — só evita
- * curiosos; quem tem o link comprou ou recebeu de você.
+ *
+ * Esta chave NÃO é um segredo criptográfico. Ela aparece na URL pública que
+ * o cliente recebe por e-mail após a compra (Kiwify) — qualquer pessoa que
+ * tem o link consegue ler. O objetivo é apenas evitar descoberta acidental
+ * (Google indexar, alguém adivinhar a URL). Por isso fica hardcoded mesmo,
+ * sem env var: simplifica deploy e o JS bundle público teria o valor inlined
+ * de qualquer jeito.
+ *
+ * Para invalidar acessos antigos no futuro, basta trocar a string abaixo
+ * por outra (gerada com `openssl rand -hex 16`) e reenviar o link novo aos
+ * compradores. Os links antigos param de funcionar automaticamente.
  */
+const PROGRAM_ACCESS_KEY = '044471cbfb3f96fae4db57f7271f89c9';
+
 export function getPublicProgramAccessKey(): string {
-  return process.env.EXPO_PUBLIC_PROGRAM_ACCESS_KEY ?? '';
+  // Permite override por env var (ex.: pra QA com chave diferente), mas o
+  // valor padrão hardcoded acima é o que vai pra produção.
+  const fromEnv = process.env.EXPO_PUBLIC_PROGRAM_ACCESS_KEY?.trim();
+  if (fromEnv && fromEnv.length >= 8) return fromEnv;
+  return PROGRAM_ACCESS_KEY;
 }
 
 export function isProgramAccessConfigured(): boolean {
