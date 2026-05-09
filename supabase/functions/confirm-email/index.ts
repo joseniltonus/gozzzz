@@ -71,7 +71,8 @@ async function sendWelcomeEmail(
         <tr>
           <td style="background-color:#09061a;border-radius:0 0 12px 12px;padding:20px 32px;text-align:center;">
             <p style="color:#3d3a52;font-size:12px;margin:0;line-height:18px;">
-              &copy; 2025 <span style="color:#f5f5f5;">GoZzzz</span>. Todos os direitos reservados.<br/>
+              &copy; 2026 <span style="color:#f5f5f5;">GoZzzz</span>. Todos os direitos reservados.<br/>
+              MORFEU SA&Uacute;DE E TECNOLOGIA LTDA &middot; CNPJ 66.059.212/0001-52<br/>
               <a href="https://gozzzz.app" style="color:#d4a96a;text-decoration:none;">gozzzz.app</a>
             </p>
           </td>
@@ -94,7 +95,7 @@ async function sendWelcomeEmail(
       to: email,
       subject: "Bem-vindo ao GoZzzz - Sua conta esta ativa",
       html,
-      text: `GoZzzz - Bem-vindo, ${firstName}!\n\nSua conta foi confirmada com sucesso.\n\nAgora voce tem acesso completo ao programa GoZzzz e pode comecar sua transformacao do sono hoje mesmo.\n\nO que voce vai aprender:\n- Fundamentos de um sono de qualidade\n- Rotinas que preparam corpo e mente para dormir\n- Como eliminar habitos que sabotam seu descanso\n- Acordar descansado e cheio de energia todo dia\n\nAcesse o programa em: https://gozzzz.app\n\nQualquer duvida, responda este e-mail.\n\n© 2025 GoZzzz. Todos os direitos reservados.\nhttps://gozzzz.app`,
+      text: `GoZzzz - Bem-vindo, ${firstName}!\n\nSua conta foi confirmada com sucesso.\n\nAgora voce tem acesso completo ao programa GoZzzz e pode comecar sua transformacao do sono hoje mesmo.\n\nO que voce vai aprender:\n- Fundamentos de um sono de qualidade\n- Rotinas que preparam corpo e mente para dormir\n- Como eliminar habitos que sabotam seu descanso\n- Acordar descansado e cheio de energia todo dia\n\nAcesse o programa em: https://gozzzz.app\n\nQualquer duvida, responda este e-mail.\n\n© 2026 GoZzzz. Todos os direitos reservados.\nMORFEU SAUDE E TECNOLOGIA LTDA · CNPJ 66.059.212/0001-52\nhttps://gozzzz.app`,
       headers: {
         "List-Unsubscribe": "<mailto:unsubscribe@gozzzz.app?subject=unsubscribe>",
         "List-Unsubscribe-Post": "List-Unsubscribe=One-Click",

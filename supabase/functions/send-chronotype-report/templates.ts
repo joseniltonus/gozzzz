@@ -450,6 +450,7 @@ function renderHtml(c: ChronotypeContent, accent: string): string {
       </div>
     </div>
     <div class="footer">
+      MORFEU SAÚDE E TECNOLOGIA LTDA · CNPJ 66.059.212/0001-52<br>
       GoZzzz · São Paulo, BR · Em conformidade com a LGPD: dados usados apenas para entrega do relatório.<br>
       <a href="mailto:unsubscribe@support.gozzzz.app?subject=unsubscribe">Cancelar inscrição</a>
     </div>
@@ -524,6 +525,8 @@ function buildPlainText(c: ChronotypeContent): string {
   lines.push(
     "Cancelar inscrição: mailto:unsubscribe@support.gozzzz.app?subject=unsubscribe",
   );
+  lines.push("");
+  lines.push("MORFEU SAÚDE E TECNOLOGIA LTDA · CNPJ 66.059.212/0001-52");
   return lines.join("\n");
 }
 

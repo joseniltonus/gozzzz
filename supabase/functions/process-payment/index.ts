@@ -69,12 +69,14 @@ function buildCheckoutParams(
   });
   params.append("payment_method_types[]", "card");
 
-  // Pix só funciona em transações BRL — habilitado automaticamente quando o
-  // checkout é em reais. Para clientes com cartão internacional / USD, Stripe
-  // não oferece Pix, então mantemos só `card` nesses casos.
+  // Pix está temporariamente desativado no Stripe — provisionamento ainda
+  // pendente do lado deles (ticket aberto). Enquanto isso, parcelamento via
+  // Kiwify atende quem prefere Pix/Boleto. Para reativar quando a Stripe
+  // liberar, descomentar o bloco abaixo.
+  //
   // Stripe BR suporta Pix nativo em Checkout Sessions desde 2022.
   // Docs: https://stripe.com/docs/payments/pix
-  if (priceConfig.currency === "brl") {
+  if (priceConfig.currency === "brl" && false) {
     params.append("payment_method_types[]", "pix");
 
     // QR code do Pix expira em 30 minutos.

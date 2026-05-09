@@ -74,6 +74,7 @@ const PROGRAM_URL_DEFAULT = "https://gozzzz.app/web/programa";
 const QUIZ_URL = "https://gozzzz.app/web/sono-plus#quiz";
 const SUPPORT_EMAIL = "suporte@gozzzz.app";
 const COMPANY_NAME = "MORFEU SAÚDE E TECNOLOGIA LTDA";
+const COMPANY_CNPJ = "66.059.212/0001-52";
 
 // Paleta da identidade (alinhada ao spec):
 //   #7c5ce8  roxo primário        — links, labels, destaques
@@ -348,7 +349,7 @@ ${escape(preheader)}
 
       <tr><td align="center" style="padding:28px 16px 8px;">
         <p class="text-soft" style="margin:0 0 6px;font-family:${FONT_STACK};font-size:11px;color:#9590b0;line-height:1.6;">
-          ${COMPANY_NAME}
+          ${COMPANY_NAME} · CNPJ ${COMPANY_CNPJ}
         </p>
         <p class="text-soft" style="margin:0;font-family:${FONT_STACK};font-size:11px;color:#9590b0;line-height:1.6;">
           Você está recebendo este e-mail porque comprou o programa GoZzzz Sono+. Se não foi você, responda este e-mail.
@@ -396,7 +397,7 @@ function buildTextWithChronotype(
     "",
     `Qualquer dúvida, responda este e-mail ou escreva pra ${SUPPORT_EMAIL}.`,
     "",
-    COMPANY_NAME,
+    `${COMPANY_NAME} · CNPJ ${COMPANY_CNPJ}`,
   ].join("\n");
 }
 
@@ -415,6 +416,6 @@ function buildTextWithoutChronotype(firstName: string): string {
     "",
     `Qualquer dúvida, responda este e-mail ou escreva pra ${SUPPORT_EMAIL}.`,
     "",
-    COMPANY_NAME,
+    `${COMPANY_NAME} · CNPJ ${COMPANY_CNPJ}`,
   ].join("\n");
 }

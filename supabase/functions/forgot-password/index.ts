@@ -122,7 +122,8 @@ Deno.serve(async (req: Request) => {
         <tr>
           <td style="background-color:#09061a;border-radius:0 0 12px 12px;padding:20px 32px;text-align:center;">
             <p style="color:#3d3a52;font-size:12px;margin:0;line-height:18px;">
-              &copy; 2025 GoZzzz. Todos os direitos reservados.<br/>
+              &copy; 2026 GoZzzz. Todos os direitos reservados.<br/>
+              MORFEU SA&Uacute;DE E TECNOLOGIA LTDA &middot; CNPJ 66.059.212/0001-52<br/>
               <a href="https://gozzzz.app" style="color:#d4a96a;text-decoration:none;">gozzzz.app</a>
             </p>
           </td>
@@ -145,7 +146,7 @@ Deno.serve(async (req: Request) => {
         to: email,
         subject: "Redefinir senha - GoZzzz",
         html,
-        text: `GoZzzz - Redefinir senha\n\n${firstName ? `Ola, ${firstName}!` : "Ola!"}\n\nRecebemos uma solicitacao para redefinir a senha da sua conta GoZzzz.\n\nClique no link abaixo para criar uma nova senha. Este link e valido por 1 hora.\n\n${resetUrl}\n\nSe voce nao solicitou a redefinicao de senha, pode ignorar este e-mail. Sua senha nao sera alterada.\n\n© 2025 GoZzzz. Todos os direitos reservados.\nhttps://gozzzz.app`,
+        text: `GoZzzz - Redefinir senha\n\n${firstName ? `Ola, ${firstName}!` : "Ola!"}\n\nRecebemos uma solicitacao para redefinir a senha da sua conta GoZzzz.\n\nClique no link abaixo para criar uma nova senha. Este link e valido por 1 hora.\n\n${resetUrl}\n\nSe voce nao solicitou a redefinicao de senha, pode ignorar este e-mail. Sua senha nao sera alterada.\n\n© 2026 GoZzzz. Todos os direitos reservados.\nMORFEU SAUDE E TECNOLOGIA LTDA · CNPJ 66.059.212/0001-52\nhttps://gozzzz.app`,
         headers: {
           "List-Unsubscribe": "<mailto:unsubscribe@gozzzz.app?subject=unsubscribe>",
           "List-Unsubscribe-Post": "List-Unsubscribe=One-Click",

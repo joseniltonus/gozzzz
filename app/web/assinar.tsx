@@ -354,10 +354,8 @@ export default function WebAssinarPage() {
                   ))}
                 </View>
 
-                {/* Garantia CDC (substitui depoimentos fabricados — política
-                    do prompt v4: zero prova social fabricada). É a mesma
-                    proteção legal já citada na guaranteeCard abaixo, mas em
-                    formato de selo destacado. */}
+                {/* Garantia CDC — selo único de garantia (substitui depoimentos
+                    fabricados, política: zero prova social). */}
                 <View style={styles.cdcGuarantee}>
                   <Text style={styles.cdcGuaranteeKicker}>
                     GARANTIA DE SATISFAÇÃO — 7 DIAS
@@ -365,14 +363,6 @@ export default function WebAssinarPage() {
                   <Text style={styles.cdcGuaranteeBody}>
                     Se você não estiver satisfeito por qualquer motivo nos primeiros 7 dias, devolvemos 100% do valor — sem burocracia, sem questionamento. É seu direito garantido pelo Código de Defesa do Consumidor (CDC, Art. 49).
                   </Text>
-                </View>
-
-                <View style={styles.guaranteeCard}>
-                  <BadgeCheck size={32} color="#10b981" />
-                  <View style={styles.guaranteeText}>
-                    <Text style={styles.guaranteeTitle}>{t(c.guaranteeTitle)}</Text>
-                    <Text style={styles.guaranteeDesc}>{t(c.guaranteeDesc)}</Text>
-                  </View>
                 </View>
 
               </View>
@@ -383,8 +373,6 @@ export default function WebAssinarPage() {
 
       <View style={styles.footer}>
         <Text style={styles.footerText}>{t('web.footer.copyright')}</Text>
-        <Text style={styles.footerCompany}>MORFEU SAÚDE E TECNOLOGIA LTDA</Text>
-        <Text style={styles.footerCnpj}>CNPJ: 66.059.212/0001-52</Text>
       </View>
       </ScrollView>
     </>
