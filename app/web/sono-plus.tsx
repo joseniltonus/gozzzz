@@ -1157,11 +1157,11 @@ export default function SonoPlusLandingPage() {
                       <Text style={styles.checkoutBtnLTxt}>
                         {STRIPE_ENABLED
                           ? 'Parcelar em 6x — R$ 24,50/mês'
-                          : 'Comprar agora — R$ 147 ou 6x de R$ 24,50'}
+                          : 'Comprar agora — R$ 147 à vista ou em até 6x'}
                       </Text>
                     </TouchableOpacity>
                     <Text style={styles.kiwifyNote}>
-                      via Kiwify · cartão, Pix ou boleto · acesso liberado na hora
+                      via Kiwify · cartão de crédito · acesso liberado após confirmação
                     </Text>
 
                     {STRIPE_ENABLED && (
