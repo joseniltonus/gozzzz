@@ -106,10 +106,14 @@ jobs:
       - name: Build web bundle
         env:
           EXPO_PUBLIC_STRIPE_PUBLISHABLE_KEY: ${{ secrets.EXPO_PUBLIC_STRIPE_PUBLISHABLE_KEY }}
+          EXPO_PUBLIC_PROGRAM_ACCESS_KEY: ${{ secrets.EXPO_PUBLIC_PROGRAM_ACCESS_KEY }}
         run: |
           if [ -z "$EXPO_PUBLIC_SUPABASE_URL" ] || [ -z "$EXPO_PUBLIC_SUPABASE_ANON_KEY" ]; then
             echo "Resolved web build env is empty (this should not happen)."
             exit 1
+          fi
+          if [ -z "$EXPO_PUBLIC_PROGRAM_ACCESS_KEY" ]; then
+            echo "::warning::EXPO_PUBLIC_PROGRAM_ACCESS_KEY not set — /web/programa-completo will show 'access not configured'."
           fi
           npm run build:web
 
