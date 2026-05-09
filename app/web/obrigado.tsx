@@ -19,7 +19,9 @@ import {
   BookOpen,
   ArrowRight,
   Clock,
+  ExternalLink,
 } from 'lucide-react-native';
+import { KIWIFY_MEMBER_AREA_URL } from '@/lib/payment-links';
 
 const isWeb = Platform.OS === 'web';
 
@@ -84,6 +86,19 @@ export default function WebObrigadoPage() {
             Obrigado por confiar no GoZzzz. Você acaba de garantir acesso vitalício ao programa de 21 lições.
           </Text>
 
+          <TouchableOpacity
+            style={styles.heroCta}
+            activeOpacity={0.88}
+            onPress={() => Linking.openURL(KIWIFY_MEMBER_AREA_URL)}
+          >
+            <BookOpen size={20} color="#0d0d16" />
+            <Text style={styles.heroCtaTxt}>Acessar primeira lição agora</Text>
+            <ExternalLink size={16} color="#0d0d16" />
+          </TouchableOpacity>
+          <Text style={styles.heroCtaHint}>
+            Faça login na área de membros usando o e-mail da compra.
+          </Text>
+
           <View style={styles.steps}>
             <View style={styles.step}>
               <View style={styles.stepIconWrap}>
@@ -92,7 +107,7 @@ export default function WebObrigadoPage() {
               <View style={styles.stepBody}>
                 <Text style={styles.stepTitle}>1. Verifique o seu e-mail</Text>
                 <Text style={styles.stepDesc}>
-                  Em até 10 minutos você receberá uma mensagem com o link de acesso completo às lições. Confirme também a caixa de spam.
+                  Você também recebeu um e-mail com o link direto de acesso e a senha temporária da sua conta. Confirme a caixa de spam se não chegar.
                 </Text>
               </View>
             </View>
@@ -130,17 +145,17 @@ export default function WebObrigadoPage() {
                 <BookOpen size={20} color="#d4a96a" />
               </View>
               <View style={styles.stepBody}>
-                <Text style={styles.stepTitle}>3. Comece pelas 3 primeiras lições</Text>
+                <Text style={styles.stepTitle}>3. Quer dar uma espiada nas lições gratuitas?</Text>
                 <Text style={styles.stepDesc}>
-                  Enquanto o acesso completo chega, dê o primeiro passo agora — as três primeiras lições estão liberadas.
+                  As 3 primeiras lições estão sempre disponíveis no nosso site, sem precisar de login.
                 </Text>
                 <TouchableOpacity
-                  style={styles.primaryBtn}
+                  style={styles.secondaryBtn}
                   activeOpacity={0.88}
                   onPress={() => router.push('/web/programa')}
                 >
-                  <Text style={styles.primaryBtnTxt}>Ver as primeiras lições</Text>
-                  <ArrowRight size={16} color="#0d0d16" />
+                  <Text style={styles.secondaryBtnTxt}>Ver as 3 primeiras lições</Text>
+                  <ArrowRight size={16} color="#d4a96a" />
                 </TouchableOpacity>
               </View>
             </View>
@@ -264,6 +279,47 @@ const styles = StyleSheet.create({
     alignSelf: 'flex-start',
   },
   primaryBtnTxt: { fontSize: 14, fontWeight: '800', color: '#0d0d16' },
+  secondaryBtn: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 8,
+    backgroundColor: 'transparent',
+    borderWidth: 1.5,
+    borderColor: '#d4a96a',
+    paddingVertical: 12,
+    paddingHorizontal: 18,
+    borderRadius: 12,
+    marginTop: 12,
+    alignSelf: 'flex-start',
+  },
+  secondaryBtnTxt: { fontSize: 14, fontWeight: '700', color: '#d4a96a' },
+  heroCta: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 10,
+    backgroundColor: '#d4a96a',
+    paddingVertical: 18,
+    paddingHorizontal: 28,
+    borderRadius: 14,
+    marginTop: 8,
+    marginBottom: 8,
+    width: '100%',
+    maxWidth: 480,
+    shadowColor: '#d4a96a',
+    shadowOpacity: 0.35,
+    shadowOffset: { width: 0, height: 8 },
+    shadowRadius: 24,
+    elevation: 6,
+  },
+  heroCtaTxt: { fontSize: 17, fontWeight: '800', color: '#0d0d16', letterSpacing: -0.2 },
+  heroCtaHint: {
+    fontSize: 12,
+    color: '#94a3b8',
+    textAlign: 'center',
+    marginBottom: 28,
+  },
   divider: {
     width: '100%',
     height: 1,

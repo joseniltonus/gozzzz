@@ -32,7 +32,7 @@ import {
 import { useLanguage } from '@/contexts/LanguageContext';
 import { LESSONS_DATA } from '@/data/lessons';
 import { supabase } from '@/lib/supabase';
-import { KIWIFY_PARCELADO_URL } from '@/lib/payment-links';
+import { KIWIFY_PARCELADO_URL, STRIPE_ENABLED } from '@/lib/payment-links';
 const isWeb = Platform.OS === 'web';
 const WHATSAPP = 'https://wa.me/5511982820759?text=SONO';
 
@@ -1142,12 +1142,10 @@ export default function SonoPlusLandingPage() {
                   );
                 })()}
 
-                {/* Modelo híbrido com hierarquia invertida: parcelado Kiwify
-                    como primário (botão dourado cheio) + à vista Stripe como
-                    secundário (outline). Reduz barreira psicológica do "R$
-                    147" inicial — público BR converte melhor com "6x R$ 24,50"
-                    em destaque. Quando KIWIFY_PARCELADO_URL está vazio,
-                    o fluxo cai pra Stripe primário (estado de antes). */}
+                {/* Estratégia atual: Kiwify único (cartão + Pix + boleto +
+                    parcelado + área de membros). Stripe está desativado via
+                    flag pra evitar confusão de dois botões. Pra reativar
+                    modelo híbrido, mudar STRIPE_ENABLED pra true. */}
                 {KIWIFY_PARCELADO_URL ? (
                   <>
                     <TouchableOpacity
@@ -1157,29 +1155,35 @@ export default function SonoPlusLandingPage() {
                     >
                       <CreditCard size={20} color="#0d0d16" />
                       <Text style={styles.checkoutBtnLTxt}>
-                        Parcelar em 6x — R$ 24,50/mês
+                        {STRIPE_ENABLED
+                          ? 'Parcelar em 6x — R$ 24,50/mês'
+                          : 'Comprar agora — R$ 147 ou 6x de R$ 24,50'}
                       </Text>
                     </TouchableOpacity>
                     <Text style={styles.kiwifyNote}>
-                      via Kiwify · juros do cartão por conta do banco
+                      via Kiwify · cartão, Pix ou boleto · acesso liberado na hora
                     </Text>
 
-                    <View style={styles.payDivider}>
-                      <View style={styles.payDividerLine} />
-                      <Text style={styles.payDividerTxt}>ou</Text>
-                      <View style={styles.payDividerLine} />
-                    </View>
+                    {STRIPE_ENABLED && (
+                      <>
+                        <View style={styles.payDivider}>
+                          <View style={styles.payDividerLine} />
+                          <Text style={styles.payDividerTxt}>ou</Text>
+                          <View style={styles.payDividerLine} />
+                        </View>
 
-                    <TouchableOpacity
-                      style={styles.checkoutBtnAlt}
-                      activeOpacity={0.88}
-                      onPress={() => router.push('/web/assinar')}
-                    >
-                      <Crown size={18} color={GOLD} />
-                      <Text style={styles.checkoutBtnAltTxt}>
-                        Pagar à vista — R$ 147
-                      </Text>
-                    </TouchableOpacity>
+                        <TouchableOpacity
+                          style={styles.checkoutBtnAlt}
+                          activeOpacity={0.88}
+                          onPress={() => router.push('/web/assinar')}
+                        >
+                          <Crown size={18} color={GOLD} />
+                          <Text style={styles.checkoutBtnAltTxt}>
+                            Pagar à vista — R$ 147
+                          </Text>
+                        </TouchableOpacity>
+                      </>
+                    )}
                   </>
                 ) : (
                   <TouchableOpacity
@@ -1204,7 +1208,9 @@ export default function SonoPlusLandingPage() {
                   </View>
                   <View style={styles.securityBadgeCk}>
                     <Shield size={14} color="#3b82f6" />
-                    <Text style={styles.securityBadgeCkTxt}>Stripe Secure</Text>
+                    <Text style={styles.securityBadgeCkTxt}>
+                      {STRIPE_ENABLED ? 'Stripe Secure' : 'Kiwify · Pagamento Seguro'}
+                    </Text>
                   </View>
                   <View style={styles.securityBadgeCk}>
                     <BadgeCheck size={14} color="#f59e0b" />
