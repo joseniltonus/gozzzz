@@ -602,6 +602,11 @@ export default function SonoPlusLandingPage() {
               </TouchableOpacity>
             </Link>
             <View style={styles.navRight}>
+              <Link href="/blog" asChild>
+                <TouchableOpacity style={styles.navGhost} accessibilityRole="link">
+                  <Text style={styles.navGhostTxt}>Blog</Text>
+                </TouchableOpacity>
+              </Link>
               <Link href="/web/sono-plus" asChild>
                 <TouchableOpacity style={styles.navGhost} accessibilityRole="link">
                   <BookOpen size={16} color={ACCENT_LIGHT} />
@@ -1327,6 +1332,12 @@ export default function SonoPlusLandingPage() {
               <Link href="/web/programa" asChild>
                 <TouchableOpacity accessibilityRole="link">
                   <Text style={styles.footerLink}>Todas as lições</Text>
+                </TouchableOpacity>
+              </Link>
+              <Text style={styles.footerSep}>·</Text>
+              <Link href="/blog" asChild>
+                <TouchableOpacity accessibilityRole="link">
+                  <Text style={styles.footerLink}>Blog</Text>
                 </TouchableOpacity>
               </Link>
               <Text style={styles.footerSep}>·</Text>

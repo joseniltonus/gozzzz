@@ -6,6 +6,8 @@ Allow: /web/programa
 Allow: /web/coach
 Allow: /web/sobre
 Allow: /web/assinar
+Allow: /blog
+Allow: /blog/
 
 # Rotas internas do app (auth e tabs autenticadas) não devem ser indexadas
 Disallow: /(auth)/
