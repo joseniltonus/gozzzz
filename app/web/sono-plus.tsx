@@ -33,6 +33,7 @@ import { useLanguage } from '@/contexts/LanguageContext';
 import { LESSONS_DATA } from '@/data/lessons';
 import { supabase } from '@/lib/supabase';
 import { KIWIFY_PARCELADO_URL, STRIPE_ENABLED } from '@/lib/payment-links';
+import { buildSonoPlusSchemaGraph } from '@/lib/seo-sono-plus-schema';
 const isWeb = Platform.OS === 'web';
 const WHATSAPP = 'https://wa.me/5511982820759?text=SONO';
 
@@ -74,6 +75,30 @@ const DEFAULT_WEB_PRICING: Record<'pt' | 'en', PricingData> = {
     annual: { price: 24.99, label: '$24.99', equiv: 'lifetime access', note: 'one-time payment' },
   },
 };
+
+/** FAQ estático — compartilhado entre JSON-LD e UI (evita drift SEO vs página). */
+const SONO_PLUS_FAQ = [
+  {
+    question: 'O que são exatamente os 21 passos?',
+    answer:
+      'Uma sequência guiada: cada passo traduz princípios de ciência do sono em ações concretas para o dia seguinte — em blocos que cobrem entender o seu padrão, reconstruir hábitos e consolidar resultados.',
+  },
+  {
+    question: 'Posso experimentar antes de assinar?',
+    answer:
+      'Sim. As 3 primeiras lições são gratuitas para você sentir o ritmo e a clareza do método.',
+  },
+  {
+    question: 'O que é Sono+ em relação ao programa?',
+    answer:
+      'O programa cobre o percurso completo na app/web. Sono+ é a linha opcional de acompanhamento ao vivo — uma sessão de diagnóstico de 60 minutos com plano personalizado e relatório entregue em 72h.',
+  },
+  {
+    question: 'Isso substitui acompanhamento médico?',
+    answer:
+      'Não. Conteúdo e consultoria comportamental são educativos — não fazem diagnóstico nem prescrevem tratamento médico.',
+  },
+] as const;
 
 // ─── Quiz inline (mesma lógica do ChronotypeQuizModal, fora do componente
 // para que arrays/funções não sejam recriados a cada render) ───────────────
@@ -450,95 +475,19 @@ export default function SonoPlusLandingPage() {
       }));
   }, [language]);
 
-  const faq = [
-    {
-      question: 'O que são exatamente os 21 passos?',
-      answer:
-        'Uma sequência guiada: cada passo traduz princípios de ciência do sono em ações concretas para o dia seguinte — em blocos que cobrem entender o seu padrão, reconstruir hábitos e consolidar resultados.',
-    },
-    {
-      question: 'Posso experimentar antes de assinar?',
-      answer:
-        'Sim. As 3 primeiras lições são gratuitas para você sentir o ritmo e a clareza do método.',
-    },
-    {
-      question: 'O que é Sono+ em relação ao programa?',
-      answer:
-        'O programa cobre o percurso completo na app/web. Sono+ é a linha opcional de acompanhamento ao vivo — uma sessão de diagnóstico de 60 minutos com plano personalizado e relatório entregue em 72h.',
-    },
-    {
-      question: 'Isso substitui acompanhamento médico?',
-      answer:
-        'Não. Conteúdo e consultoria comportamental são educativos — não fazem diagnóstico nem prescrevem tratamento médico.',
-    },
-  ];
-
   const socialImageUrl = 'https://gozzzz.app/og/sono-plus.png';
 
-  // @graph combinado: Organization (entidade da marca), Product (com oferta
-  // + preço), FAQPage, BreadcrumbList. priceValidUntil é exigido pelo
-  // Google Merchant Listings — atualizar anualmente.
-  //
-  // Quando a marca tiver perfis sociais ativos, adicionar URLs em `sameAs`
-  // (Instagram, LinkedIn, X, YouTube) — ajuda o Google a verificar a
-  // entidade e ranquear melhor por nome de marca.
-  const schemaGraph = {
-    '@context': 'https://schema.org',
-    '@graph': [
-      {
-        '@type': 'Organization',
-        '@id': 'https://gozzzz.app/#org',
-        name: 'GoZzzz',
-        legalName: 'MORFEU SAÚDE E TECNOLOGIA LTDA',
-        url: 'https://gozzzz.app',
-        logo: 'https://gozzzz.app/og/sono-plus.png',
-        email: 'suporte@gozzzz.app',
-        taxID: '66.059.212/0001-52',
-        sameAs: [],
-      },
-      {
-        '@type': 'Product',
-        name: 'Programa de Sono em 21 Passos — GoZzzz',
-        description:
-          'Trilha de 21 passos para reorganizar sono, ritmo circadiano e rotina com base em neurociência do sono.',
-        url: 'https://gozzzz.app/web/sono-plus',
-        image: socialImageUrl,
-        brand: { '@type': 'Brand', name: 'GoZzzz' },
-        offers: {
-          '@type': 'Offer',
-          price: '147.00',
-          priceCurrency: 'BRL',
-          availability: 'https://schema.org/InStock',
-          priceValidUntil: '2026-12-31',
-          url: 'https://gozzzz.app/web/sono-plus',
-          seller: { '@id': 'https://gozzzz.app/#org' },
-        },
-      },
-      {
-        '@type': 'FAQPage',
-        mainEntity: faq.map((item) => ({
-          '@type': 'Question',
-          name: item.question,
-          acceptedAnswer: {
-            '@type': 'Answer',
-            text: item.answer,
-          },
-        })),
-      },
-      {
-        '@type': 'BreadcrumbList',
-        itemListElement: [
-          { '@type': 'ListItem', position: 1, name: 'GoZzzz', item: 'https://gozzzz.app/web' },
-          {
-            '@type': 'ListItem',
-            position: 2,
-            name: 'Programa 21 Passos',
-            item: 'https://gozzzz.app/web/sono-plus',
-          },
-        ],
-      },
-    ],
-  };
+  const schemaGraph = useMemo(
+    () =>
+      buildSonoPlusSchemaGraph({
+        isPt,
+        headTitle,
+        headDesc,
+        socialImageUrl,
+        faq: [...SONO_PLUS_FAQ],
+      }),
+    [isPt, headTitle, headDesc],
+  );
 
   const heroProof = [
     `21 ${t('web.program.steps')}`,
@@ -687,13 +636,13 @@ export default function SonoPlusLandingPage() {
         <LinearGradient colors={[ACCENT_DEEP, '#0c0a1f', BG]} style={styles.heroGradTop}>
           <View style={styles.heroGlow} />
           <View style={[styles.heroInner, { paddingTop: 36, paddingBottom: 8 }]}>
-            <Text role="heading" aria-level={1} style={styles.heroH1}>
+            <Text role="heading" aria-level={1} nativeID="speakable-headline" style={styles.heroH1}>
               {isPt ? 'Programa de Sono em 21 Passos' : t('web.program.title')}
             </Text>
             <Text style={styles.heroKicker}>
               {isPt ? 'Baseado em Neurociência' : t('web.program.subtitle')}
             </Text>
-            <Text style={styles.heroLead}>
+            <Text nativeID="speakable-summary" style={styles.heroLead}>
               {isPt
                 ? 'Você dorme, mas não descansa. Essa trilha de 21 passos reorganiza seu sono, seu ritmo e sua rotina — com base em pesquisa real, sem promessa mágica.'
                 : 'A 21-step path for people who want to stop guessing and start moving — with clarity, rhythm, and evidence-informed structure.'}
@@ -1324,10 +1273,16 @@ export default function SonoPlusLandingPage() {
           <View style={styles.block}>
             <Text role="heading" aria-level={2} style={styles.h2}>Perguntas frequentes</Text>
             <View style={{ marginTop: 16 }}>
-              {faq.map((item, i) => (
+              {SONO_PLUS_FAQ.map((item, i) => (
                 <View key={i} style={styles.faqCard}>
                   <Text style={styles.faqQ}>{item.question}</Text>
-                  <Text style={styles.faqA}>{item.answer}</Text>
+                  {i === 0 ? (
+                    <Text nativeID="speakable-faq" style={styles.faqA}>
+                      {item.answer}
+                    </Text>
+                  ) : (
+                    <Text style={styles.faqA}>{item.answer}</Text>
+                  )}
                 </View>
               ))}
             </View>
