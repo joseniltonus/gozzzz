@@ -420,13 +420,15 @@ export default function SonoPlusLandingPage() {
     },
   };
 
+  // Title encurtado pra 38-39 chars (não trunca em mobile, que corta em ~55).
+  // Description em <=155 chars (limite de snippet do Google em desktop).
   const headTitle = isPt
-    ? 'Programa de Sono em 21 Passos | GoZzzz — Baseado em Neurociência'
-    : 'GoZzzz | 21-step sleep program — structured, evidence-guided';
+    ? 'Programa de Sono em 21 Passos · GoZzzz'
+    : 'GoZzzz · 21-Step Sleep Program';
 
   const headDesc = isPt
-    ? 'Trilha de 21 passos para reorganizar sono, ritmo circadiano e rotina — com base em pesquisa de Walker, Huberman, Czeisler e Breus. 3 primeiras lições gratuitas. Acesso vitalício por R$ 147.'
-    : 'A 21-step path to reorganize sleep, rhythm, and routine — start with 3 free lessons. Sono+: optional live consulting.';
+    ? '21 passos baseados em neurociência para reorganizar seu sono, ritmo e rotina. 3 lições grátis. Acesso vitalício por R$ 147.'
+    : '21-step sleep program rooted in neuroscience. Reorganize sleep, rhythm and routine. 3 free lessons. Lifetime access.';
 
   const headOgDesc = isPt
     ? '21 passos baseados em neurociência para quem quer parar de adivinhar e começar a dormir de verdade. 3 lições grátis. R$ 147 pagamento único.'
@@ -473,11 +475,27 @@ export default function SonoPlusLandingPage() {
 
   const socialImageUrl = 'https://gozzzz.app/og/sono-plus.png';
 
-  // Combined @graph schema: Product (with offer + price), FAQPage, BreadcrumbList.
-  // priceValidUntil is required by Google's Merchant Listings; bumped yearly.
+  // @graph combinado: Organization (entidade da marca), Product (com oferta
+  // + preço), FAQPage, BreadcrumbList. priceValidUntil é exigido pelo
+  // Google Merchant Listings — atualizar anualmente.
+  //
+  // Quando a marca tiver perfis sociais ativos, adicionar URLs em `sameAs`
+  // (Instagram, LinkedIn, X, YouTube) — ajuda o Google a verificar a
+  // entidade e ranquear melhor por nome de marca.
   const schemaGraph = {
     '@context': 'https://schema.org',
     '@graph': [
+      {
+        '@type': 'Organization',
+        '@id': 'https://gozzzz.app/#org',
+        name: 'GoZzzz',
+        legalName: 'MORFEU SAÚDE E TECNOLOGIA LTDA',
+        url: 'https://gozzzz.app',
+        logo: 'https://gozzzz.app/og/sono-plus.png',
+        email: 'suporte@gozzzz.app',
+        taxID: '66.059.212/0001-52',
+        sameAs: [],
+      },
       {
         '@type': 'Product',
         name: 'Programa de Sono em 21 Passos — GoZzzz',
@@ -493,6 +511,7 @@ export default function SonoPlusLandingPage() {
           availability: 'https://schema.org/InStock',
           priceValidUntil: '2026-12-31',
           url: 'https://gozzzz.app/web/sono-plus',
+          seller: { '@id': 'https://gozzzz.app/#org' },
         },
       },
       {
@@ -598,23 +617,19 @@ export default function SonoPlusLandingPage() {
       <Head>
         <title>{headTitle}</title>
         <meta name="description" content={headDesc} />
-        <meta
-          name="keywords"
-          content={
-            isPt
-              ? 'programa sono 21 passos, como dormir melhor, insônia solução, ritmo circadiano, cronotipo, dívida de sono, neurociência do sono, sono profundo, GoZzzz'
-              : '21 step sleep program, insomnia, sleep better, sleep science, gozzzz, optional sono plus'
-          }
-        />
-        <meta property="og:title" content={isPt ? 'Programa de Sono em 21 Passos | GoZzzz' : headTitle} />
+        {/* meta keywords removido — Google ignora desde 2009 e só infla HTML. */}
+        <meta property="og:title" content={isPt ? 'Programa de Sono em 21 Passos · GoZzzz' : headTitle} />
         <meta property="og:description" content={headOgDesc} />
         <meta property="og:type" content="website" />
         <meta property="og:url" content="https://gozzzz.app/web/sono-plus" />
         <meta property="og:image" content={socialImageUrl} />
+        <meta property="og:image:width" content="1200" />
+        <meta property="og:image:height" content="800" />
         <meta property="og:image:alt" content="GoZzzz - Programa de Sono em 21 Passos baseado em neurociência" />
+        <meta property="og:site_name" content="GoZzzz" />
         <meta property="og:locale" content={isPt ? 'pt_BR' : 'en_US'} />
         <meta name="twitter:card" content="summary_large_image" />
-        <meta name="twitter:title" content={isPt ? 'Programa de Sono em 21 Passos | GoZzzz' : headTitle} />
+        <meta name="twitter:title" content={isPt ? 'Programa de Sono em 21 Passos · GoZzzz' : headTitle} />
         <meta name="twitter:description" content={headTwitterDesc} />
         <meta name="twitter:image" content={socialImageUrl} />
         <meta
