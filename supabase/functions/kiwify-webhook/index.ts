@@ -7,22 +7,28 @@
 //
 // Endpoint: POST /functions/v1/kiwify-webhook
 //
-// Configuração no painel Kiwify:
-//   1. Apps → API → Webhook (ou similar)
-//   2. URL: https://<seu-projeto>.supabase.co/functions/v1/kiwify-webhook
-//   3. Eventos: order.paid (ou "Compra aprovada")
-//   4. Salva o "token"/"secret" gerado pelo Kiwify e configura como
-//      KIWIFY_WEBHOOK_SECRET nos Secrets do Supabase.
+// Configuração no painel Kiwify (Apps → Webhooks):
+//   URL base:
+//     https://<projeto>.supabase.co/functions/v1/kiwify-webhook
+//
+//   Autenticação — escolha UM dos métodos abaixo (a função aceita todos):
+//
+//   A) Token na URL (mais simples se o painel não mostrar token):
+//      Gere um segredo (ex.: openssl rand -hex 24), salve como
+//      KIWIFY_WEBHOOK_SECRET no Supabase e use a URL:
+//      .../kiwify-webhook?token=SEU_SEGREDO_AQUI
+//
+//   B) Token no corpo JSON:
+//      A API da Kiwify devolve um campo `token` ao criar o webhook — esse
+//      mesmo valor costuma vir em cada POST. Copie do painel "Ver logs"
+//      (teste do webhook) ou da resposta da API e use como KIWIFY_WEBHOOK_SECRET.
+//
+//   C) Assinatura HMAC (se a Kiwify enviar ?signature= ou header):
+//      Mantemos verificação HMAC-SHA1 do body com o mesmo secret.
 //
 // Variáveis de ambiente:
-//   KIWIFY_WEBHOOK_SECRET  (obrigatório — usado pra validar assinatura HMAC)
-//   RESEND_API_KEY         (obrigatório — envio de email)
-//
-// Segurança:
-//   - Valida assinatura HMAC-SHA1 do Kiwify (formato `?signature=` na URL).
-//   - Aceita apenas POST.
-//   - Retorna 200 mesmo em "não fiz nada" (Kiwify retry behavior — só queremos
-//     que ele não retente quando deu pra processar).
+//   KIWIFY_WEBHOOK_SECRET — obrigatório (um dos métodos acima)
+//   RESEND_API_KEY        — obrigatório
 
 import "jsr:@supabase/functions-js/edge-runtime.d.ts";
 import { buildPurchaseConfirmationEmail } from "./templates.ts";
@@ -49,6 +55,17 @@ const APPROVED_STATUSES = new Set([
   "approved",
   "completed",
   "compra aprovada",
+  "pago",
+  "aprovado",
+  "aprovada",
+]);
+
+/** Evento explícito da Kiwify (webhook de e-commerce) */
+const APPROVED_EVENT_TYPES = new Set([
+  "compra_aprovada",
+  "compra aprovada",
+  "order_paid",
+  "order.paid",
 ]);
 
 interface KiwifyCustomer {
@@ -77,7 +94,11 @@ interface KiwifyPayload {
   id?: string;
   order_status?: string;
   status?: string;
+  /** Token de autenticação do webhook (API Kiwify — vem em cada POST) */
+  token?: string;
   webhook_event_type?: string;
+  event?: string;
+  type?: string;
   Customer?: KiwifyCustomer;
   customer?: KiwifyCustomer;
   Product?: KiwifyProduct;
@@ -125,9 +146,7 @@ async function verifyKiwifySignature(
   signature: string,
   secret: string,
 ): Promise<boolean> {
-  // Kiwify usa HMAC-SHA1 do body cru com o secret compartilhado, e envia
-  // o digest em hex via `?signature=…` (ou header similar). Comparamos
-  // em tempo constante pra evitar timing attacks.
+  // Algumas integrações enviam assinatura HMAC-SHA1 do body com o secret.
   try {
     const enc = new TextEncoder();
     const key = await crypto.subtle.importKey(
@@ -154,6 +173,90 @@ async function verifyKiwifySignature(
   }
 }
 
+/** Comparação em tempo constante para strings (tokens). */
+function timingSafeEqualString(a: string, b: string): boolean {
+  if (a.length !== b.length) return false;
+  let diff = 0;
+  for (let i = 0; i < a.length; i++) {
+    diff |= a.charCodeAt(i) ^ b.charCodeAt(i);
+  }
+  return diff === 0;
+}
+
+function extractBodyToken(payload: Record<string, unknown>): string | undefined {
+  const keys = ["token", "webhook_token", "WebhookToken", "signature_token"];
+  for (const k of keys) {
+    const v = payload[k];
+    if (typeof v === "string" && v.trim().length > 0) return v.trim();
+  }
+  return undefined;
+}
+
+/**
+ * A Kiwify não documenta um único método de auth no painel gratuito.
+ * Aceitamos: token na query (?token=), token no JSON, ou HMAC (?signature=).
+ */
+async function verifyWebhookRequest(
+  req: Request,
+  rawBody: string,
+  payload: Record<string, unknown>,
+  secret: string,
+): Promise<boolean> {
+  const url = new URL(req.url);
+
+  const qpToken = url.searchParams.get("token");
+  if (qpToken && timingSafeEqualString(qpToken.trim(), secret)) {
+    console.log("Webhook auth: OK (query param token)");
+    return true;
+  }
+
+  const bodyToken = extractBodyToken(payload);
+  if (bodyToken && timingSafeEqualString(bodyToken, secret)) {
+    console.log("Webhook auth: OK (JSON body token)");
+    return true;
+  }
+
+  const signature =
+    url.searchParams.get("signature") ??
+    req.headers.get("x-kiwify-signature") ??
+    "";
+
+  if (signature) {
+    const ok = await verifyKiwifySignature(rawBody, signature, secret);
+    if (ok) console.log("Webhook auth: OK (HMAC signature)");
+    return ok;
+  }
+
+  return false;
+}
+
+function isApprovedPurchase(payload: KiwifyPayload): boolean {
+  const status = (
+    payload.order_status ??
+    payload.status ??
+    ""
+  )
+    .toString()
+    .toLowerCase()
+    .trim();
+
+  if (APPROVED_STATUSES.has(status)) return true;
+
+  const evt = (
+    payload.webhook_event_type ??
+    payload.event ??
+    payload.type ??
+    ""
+  )
+    .toString()
+    .toLowerCase()
+    .trim();
+
+  if (APPROVED_EVENT_TYPES.has(evt)) return true;
+
+  return false;
+}
+
 Deno.serve(async (req: Request) => {
   if (req.method === "OPTIONS") {
     return new Response(null, { status: 200, headers: corsHeaders });
@@ -163,7 +266,7 @@ Deno.serve(async (req: Request) => {
     return jsonResponse({ error: "Method not allowed" }, 405);
   }
 
-  const webhookSecret = Deno.env.get("KIWIFY_WEBHOOK_SECRET");
+  const webhookSecret = Deno.env.get("KIWIFY_WEBHOOK_SECRET")?.trim();
   const resendKey = Deno.env.get("RESEND_API_KEY");
 
   if (!webhookSecret) {
@@ -175,27 +278,7 @@ Deno.serve(async (req: Request) => {
     return jsonResponse({ error: "Email provider not configured" }, 500);
   }
 
-  // Lê o body cru ANTES de fazer parse, pra computar HMAC sobre os bytes
-  // exatos que o Kiwify enviou (parsing+stringify mudaria espaços/ordem).
   const rawBody = await req.text();
-
-  // Assinatura: prioriza query param, fallback pra header.
-  const url = new URL(req.url);
-  const signature =
-    url.searchParams.get("signature") ??
-    req.headers.get("x-kiwify-signature") ??
-    "";
-
-  if (!signature) {
-    console.warn("Missing signature on Kiwify webhook request");
-    return jsonResponse({ error: "Missing signature" }, 401);
-  }
-
-  const valid = await verifyKiwifySignature(rawBody, signature, webhookSecret);
-  if (!valid) {
-    console.warn("Invalid signature on Kiwify webhook request");
-    return jsonResponse({ error: "Invalid signature" }, 401);
-  }
 
   let payload: KiwifyPayload;
   try {
@@ -205,23 +288,47 @@ Deno.serve(async (req: Request) => {
     return jsonResponse({ error: "Invalid JSON" }, 400);
   }
 
-  const status = (
-    payload.order_status ??
-    payload.status ??
-    ""
-  )
-    .toString()
-    .toLowerCase()
-    .trim();
+  const authorized = await verifyWebhookRequest(
+    req,
+    rawBody,
+    payload as Record<string, unknown>,
+    webhookSecret,
+  );
 
-  const isApproved = APPROVED_STATUSES.has(status);
+  if (!authorized) {
+    console.warn(
+      "Webhook unauthorized — configure one of: " +
+        "(1) append ?token=<same as KIWIFY_WEBHOOK_SECRET> to the webhook URL in Kiwify, " +
+        "(2) set KIWIFY_WEBHOOK_SECRET to the `token` field inside the POST body (see Ver logs → payload), " +
+        "(3) or use HMAC ?signature= if your integration sends it.",
+    );
+    return jsonResponse(
+      {
+        error: "Unauthorized",
+        hint:
+          "Use ?token= on the webhook URL matching KIWIFY_WEBHOOK_SECRET, or set secret to the token field from webhook JSON.",
+      },
+      401,
+    );
+  }
 
-  // Não enviar e-mail pra status diferentes (pending, refused, refunded, etc).
-  // Retornamos 200 pra Kiwify não retentar — recebemos o webhook, só não
-  // tinha ação a tomar nesse status.
-  if (!isApproved) {
-    console.log(`Skipping webhook with status="${status}" (not approved)`);
-    return jsonResponse({ ok: true, skipped: true, status }, 200);
+  if (!isApprovedPurchase(payload)) {
+    const status =
+      (payload.order_status ?? payload.status ?? "").toString();
+    const evt =
+      (payload.webhook_event_type ?? payload.event ?? "").toString();
+    console.log(
+      `Skipping webhook — not an approved purchase (status="${status}", event="${evt}")`,
+    );
+    return jsonResponse(
+      {
+        ok: true,
+        skipped: true,
+        order_status: status || null,
+        webhook_event_type: evt || null,
+      },
+      200,
+    );
   }
 
   const customer = payload.Customer ?? payload.customer;
