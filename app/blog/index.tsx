@@ -6,7 +6,7 @@
  */
 
 import { useMemo } from 'react';
-import { Linking, Platform, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { Image, Linking, Platform, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { Link, useRouter } from 'expo-router';
 import Head from 'expo-router/head';
 import { LinearGradient } from 'expo-linear-gradient';
@@ -133,9 +133,20 @@ export default function BlogIndexPage() {
                       activeOpacity={0.85}
                       accessibilityRole="link"
                     >
-                      <View style={[styles.cardEmojiWrap, { backgroundColor: cat.color + '22', borderColor: cat.color + '44' }]}>
-                        <Text style={styles.cardEmoji}>{p.emoji}</Text>
-                      </View>
+                      {p.heroImage ? (
+                        <View style={[styles.cardImageWrap, { borderColor: cat.color + '44' }]}>
+                          <Image
+                            source={{ uri: p.heroImage }}
+                            accessibilityLabel={`Ilustração do artigo: ${p.title}`}
+                            resizeMode="cover"
+                            style={styles.cardImage}
+                          />
+                        </View>
+                      ) : (
+                        <View style={[styles.cardEmojiWrap, { backgroundColor: cat.color + '22', borderColor: cat.color + '44' }]}>
+                          <Text style={styles.cardEmoji}>{p.emoji}</Text>
+                        </View>
+                      )}
                       <Text style={styles.cardTitle} numberOfLines={3}>{p.title}</Text>
                       <Text style={styles.cardExcerpt} numberOfLines={3}>{p.excerpt}</Text>
                       <View style={styles.cardMeta}>
@@ -263,6 +274,17 @@ const styles = StyleSheet.create({
     marginBottom: 12,
   },
   cardEmoji: { fontSize: 22 },
+  cardImageWrap: {
+    width: '100%',
+    aspectRatio: 16 / 10,
+    borderRadius: 12,
+    borderWidth: 1,
+    overflow: 'hidden',
+    marginBottom: 12,
+    marginHorizontal: -2,
+    backgroundColor: '#0c0a1f',
+  },
+  cardImage: { width: '100%', height: '100%' },
   cardTitle: { color: TEXT_MAIN, fontSize: 16, fontWeight: '700', lineHeight: 22 },
   cardExcerpt: { color: TEXT_MUTED, fontSize: 13, lineHeight: 19, marginTop: 8 },
   cardMeta: { flexDirection: 'row', alignItems: 'center', gap: 6, marginTop: 14 },

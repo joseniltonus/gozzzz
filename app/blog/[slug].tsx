@@ -14,7 +14,7 @@
  */
 
 import { useEffect, useMemo, useState } from 'react';
-import { Linking, Platform, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { Image, Linking, Platform, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import Head from 'expo-router/head';
 import { Link, useLocalSearchParams, useRouter } from 'expo-router';
 import { LinearGradient } from 'expo-linear-gradient';
@@ -112,14 +112,30 @@ export default function BlogPostPage() {
 
         <LinearGradient colors={[ACCENT_DEEP, '#0c0a1f', BG]} style={styles.hero}>
           <View style={styles.heroInner}>
-            <View
-              style={[
-                styles.heroEmojiWrap,
-                { backgroundColor: cat.color + '22', borderColor: cat.color + '55' },
-              ]}
-            >
-              <Text style={styles.heroEmoji}>{post.emoji}</Text>
-            </View>
+            {post.heroImage ? (
+              <View
+                style={[
+                  styles.heroImageWrap,
+                  { borderColor: cat.color + '55' },
+                ]}
+              >
+                <Image
+                  source={{ uri: post.heroImage }}
+                  accessibilityLabel={`Ilustração editorial do artigo: ${post.title}`}
+                  resizeMode="cover"
+                  style={styles.heroImage}
+                />
+              </View>
+            ) : (
+              <View
+                style={[
+                  styles.heroEmojiWrap,
+                  { backgroundColor: cat.color + '22', borderColor: cat.color + '55' },
+                ]}
+              >
+                <Text style={styles.heroEmoji}>{post.emoji}</Text>
+              </View>
+            )}
 
             <View style={styles.breadcrumbs}>
               <Link href="/blog" asChild>
@@ -345,6 +361,44 @@ function RenderBlock({ block, accent }: { block: BlogBlock; accent: string }) {
           {block.cite && <Text style={styles.quoteCite}>— {block.cite}</Text>}
         </View>
       );
+    case 'researcherCite': {
+      const tone = block.color || accent;
+      return (
+        <View
+          style={[
+            styles.researcherCite,
+            { borderLeftColor: tone, backgroundColor: tone + '12' },
+          ]}
+          accessibilityRole="text"
+          accessibilityLabel={`Referência científica: ${block.name}, ${block.role}, ${block.institution}. Conceito citado: ${block.concept}`}
+        >
+          <View style={styles.researcherHead}>
+            <View style={[styles.researcherAvatar, { backgroundColor: tone }]}>
+              <Text style={styles.researcherInitial}>{block.initial}</Text>
+            </View>
+            <View style={styles.researcherIdentity}>
+              <View style={styles.researcherTagRow}>
+                <View style={[styles.researcherTag, { backgroundColor: tone + '30', borderColor: tone + '60' }]}>
+                  <Text style={[styles.researcherTagTxt, { color: tone }]}>
+                    Referência científica
+                  </Text>
+                </View>
+              </View>
+              <Text style={styles.researcherName}>{block.name}</Text>
+              <Text style={styles.researcherRole}>
+                {block.role} · {block.institution}
+              </Text>
+            </View>
+          </View>
+          <Text style={styles.researcherConcept}>
+            <Text style={[styles.researcherConceptLabel, { color: tone }]}>
+              Conceito citado —{' '}
+            </Text>
+            {block.concept}
+          </Text>
+        </View>
+      );
+    }
     default:
       return null;
   }
@@ -460,6 +514,16 @@ const styles = StyleSheet.create({
     marginBottom: 20,
   },
   heroEmoji: { fontSize: 32 },
+  heroImageWrap: {
+    width: '100%',
+    aspectRatio: 16 / 10,
+    borderRadius: 18,
+    borderWidth: 1,
+    overflow: 'hidden',
+    marginBottom: 22,
+    backgroundColor: '#0c0a1f',
+  },
+  heroImage: { width: '100%', height: '100%' },
   breadcrumbs: { flexDirection: 'row', alignItems: 'center', gap: 8, marginBottom: 12 },
   breadcrumbLink: { color: ACCENT_LIGHT, fontSize: 12, fontWeight: '700' },
   breadcrumbSep: { color: 'rgba(255,255,255,0.3)', fontSize: 12 },
@@ -538,6 +602,42 @@ const styles = StyleSheet.create({
   },
   quoteText: { color: TEXT_MAIN, fontSize: 16, lineHeight: 26, fontStyle: 'italic' },
   quoteCite: { color: TEXT_MUTED, fontSize: 12, marginTop: 6, fontWeight: '600' },
+  researcherCite: {
+    marginVertical: 18,
+    padding: 18,
+    paddingLeft: 18,
+    borderRadius: 14,
+    borderLeftWidth: 4,
+    borderWidth: 1,
+    borderColor: 'rgba(255,255,255,0.08)',
+  },
+  researcherHead: {
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+    gap: 14,
+    marginBottom: 12,
+  },
+  researcherAvatar: {
+    width: 44,
+    height: 44,
+    borderRadius: 12,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  researcherInitial: { color: '#ffffff', fontSize: 18, fontWeight: '900' },
+  researcherIdentity: { flex: 1 },
+  researcherTagRow: { flexDirection: 'row', marginBottom: 6 },
+  researcherTag: {
+    paddingHorizontal: 8,
+    paddingVertical: 3,
+    borderRadius: 999,
+    borderWidth: 1,
+  },
+  researcherTagTxt: { fontSize: 10, fontWeight: '800', letterSpacing: 0.4 },
+  researcherName: { color: TEXT_MAIN, fontSize: 15, fontWeight: '800', lineHeight: 20 },
+  researcherRole: { color: TEXT_MUTED, fontSize: 12, fontWeight: '600', marginTop: 2 },
+  researcherConcept: { color: TEXT_MAIN, fontSize: 14, lineHeight: 22 },
+  researcherConceptLabel: { fontSize: 12, fontWeight: '800', letterSpacing: 0.3, textTransform: 'uppercase' },
   faqSection: { marginTop: 40 },
   faqItem: {
     backgroundColor: BG_CARD,

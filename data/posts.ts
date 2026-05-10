@@ -30,7 +30,22 @@ export type BlogBlock =
   | { type: 'ul'; items: string[] }
   | { type: 'ol'; items: string[] }
   | { type: 'callout'; tone: 'info' | 'warning' | 'tip'; text: string }
-  | { type: 'quote'; text: string; cite?: string };
+  | { type: 'quote'; text: string; cite?: string }
+  | {
+      type: 'researcherCite';
+      /** Letra única que vira "avatar" — geralmente sobrenome. */
+      initial: string;
+      /** Nome completo + grau (ex: "Matthew Walker, PhD"). */
+      name: string;
+      /** Cargo/papel (ex: "Professor de Neurociência"). */
+      role: string;
+      /** Instituição (ex: "UC Berkeley"). */
+      institution: string;
+      /** Conceito que o pesquisador defende e que estamos referenciando. */
+      concept: string;
+      /** Cor de destaque (hex). Default = accent da categoria. */
+      color?: string;
+    };
 
 export interface BlogFaqItem {
   question: string;
@@ -45,8 +60,10 @@ export interface BlogPost {
   updatedAt: string;
   readingMinutes: number;
   category: BlogCategoryId;
-  /** Emoji que vira "ilustração" no hero do artigo. */
+  /** Emoji que vira "ilustração" fallback (caso heroImage ausente). */
   emoji: string;
+  /** Caminho absoluto da ilustração hero (ex: "/blog/blog-slug.png"). */
+  heroImage?: string;
   /** Resumo curto pro card no índice (~140-160 chars). */
   excerpt: string;
   /** Resposta direta nos primeiros 100-150 chars do post — bom pra featured snippets. */
@@ -91,6 +108,7 @@ export const BLOG_POSTS: BlogPost[] = [
     readingMinutes: 4,
     category: 'sintomas',
     emoji: '😴',
+    heroImage: '/blog/blog-dormir-8-horas-acordar-cansado.png',
     excerpt:
       'Dormir muito não é dormir bem. O que decide se você acorda descansado é a arquitetura dos ciclos — não o relógio.',
     intro:
@@ -121,7 +139,21 @@ export const BLOG_POSTS: BlogPost[] = [
       { type: 'h2', text: 'O outro fator que ninguém comenta: o cronótipo' },
       {
         type: 'p',
-        text: 'O psicólogo do sono Michael J. Breus, PhD, popularizou a ideia de quatro cronótipos (Leão, Urso, Lobo e Golfinho) como modelo educativo do seu relógio biológico individual. Quem é Lobo (preferência tardia) tentando acordar às 6h vai cortar REM — que se concentra mais na segunda metade da noite. Resultado: 8 horas que não restauram emocionalmente.',
+        text: 'A ideia de quatro cronótipos como modelo educativo do relógio biológico individual ajuda a entender por que algumas pessoas dormem 8 horas e ainda assim acordam mal.',
+      },
+      {
+        type: 'researcherCite',
+        initial: 'B',
+        name: 'Michael J. Breus, PhD',
+        role: 'Psicólogo do sono',
+        institution: 'Especialista em medicina comportamental do sono',
+        concept:
+          'Modelo dos 4 cronótipos (Leão, Urso, Lobo, Golfinho) como referência educativa de preferência biológica de horário.',
+        color: '#a78bfa',
+      },
+      {
+        type: 'p',
+        text: 'Quem é Lobo (preferência tardia) tentando acordar às 6h vai cortar REM — que se concentra mais na segunda metade da noite. Resultado: 8 horas que não restauram emocionalmente.',
       },
       {
         type: 'callout',
@@ -173,6 +205,7 @@ export const BLOG_POSTS: BlogPost[] = [
     readingMinutes: 4,
     category: 'cronotipo',
     emoji: '🦁',
+    heroImage: '/blog/blog-cronotipo-forcar-acordar-cedo.png',
     excerpt:
       'O 5AM Club não é universal. Cronótipo tardio não é preguiça — é biologia. Entenda quando ir contra ela vira sabotagem.',
     intro:
@@ -185,8 +218,18 @@ export const BLOG_POSTS: BlogPost[] = [
       },
       { type: 'h2', text: 'Os 4 cronótipos no modelo de Breus' },
       {
+        type: 'researcherCite',
+        initial: 'B',
+        name: 'Michael J. Breus, PhD',
+        role: 'Psicólogo do sono — cronobiologia clínica',
+        institution: 'Autor de The Power of When',
+        concept:
+          'Modelo simplificado de 4 cronótipos (Leão, Urso, Lobo, Golfinho) — ferramenta educativa pra comunicar preferência biológica de horário.',
+        color: '#a78bfa',
+      },
+      {
         type: 'p',
-        text: 'O modelo simplificado de quatro arquétipos foi popularizado pelo psicólogo do sono Michael J. Breus, PhD, especialista em cronobiologia clínica. As percentagens populacionais a seguir são ilustrações didáticas, não consenso epidemiológico:',
+        text: 'As percentagens populacionais a seguir são ilustrações didáticas, não consenso epidemiológico:',
       },
       {
         type: 'ul',
@@ -200,7 +243,21 @@ export const BLOG_POSTS: BlogPost[] = [
       { type: 'h2', text: 'O que acontece quando você força contra o seu cronótipo' },
       {
         type: 'p',
-        text: 'O fenômeno se chama "jet lag social" — viver num horário diferente do que sua biologia preferiria. Estudos populacionais associam jet lag social crônico a piora de humor, prejuízo cognitivo e marcadores metabólicos desfavoráveis. Não é casual: a parte da noite que você corta ao "acordar cedo demais" é justamente onde o REM se concentra.',
+        text: 'O fenômeno tem nome técnico — "jet lag social" — e descreve viver num horário diferente do que sua biologia preferiria.',
+      },
+      {
+        type: 'researcherCite',
+        initial: 'R',
+        name: 'Till Roenneberg, PhD',
+        role: 'Cronobiólogo',
+        institution: 'LMU Munich',
+        concept:
+          'Cunhou o conceito de "jet lag social" — a discrepância entre o sono no relógio social (semana) e no relógio biológico (fim de semana sem alarme).',
+        color: '#22d3ee',
+      },
+      {
+        type: 'p',
+        text: 'Estudos populacionais associam jet lag social crônico a piora de humor, prejuízo cognitivo e marcadores metabólicos desfavoráveis. Não é casual: a parte da noite que você corta ao "acordar cedo demais" é justamente onde o REM se concentra.',
       },
       {
         type: 'callout',
@@ -253,6 +310,7 @@ export const BLOG_POSTS: BlogPost[] = [
     readingMinutes: 4,
     category: 'habitos',
     emoji: '📱',
+    heroImage: '/blog/blog-luz-celular-22h-cerebro.png',
     excerpt:
       'Não é "luz azul" só. É a intensidade da luz noturna chegando na retina e dizendo ao seu cérebro que ainda é dia.',
     intro:
@@ -265,7 +323,31 @@ export const BLOG_POSTS: BlogPost[] = [
       },
       {
         type: 'p',
-        text: 'O conceito ganhou destaque público nos materiais educativos de Andrew Huberman, PhD, professor de neurobiologia em Stanford, e na medicina do sono de Charles Czeisler, MD, PhD, em Harvard. Quando ipRGC detecta luz forte tarde da noite, o NSQ reage como se ainda fosse dia.',
+        text: 'Esse circuito ipRGC → NSQ é tema central de dois pesquisadores que costumam aparecer em divulgação científica sobre sono:',
+      },
+      {
+        type: 'researcherCite',
+        initial: 'H',
+        name: 'Andrew Huberman, PhD',
+        role: 'Professor de Neurobiologia e Oftalmologia',
+        institution: 'Stanford School of Medicine',
+        concept:
+          'Comunicação científica sobre o papel da luz na retina (ipRGC) no controle do relógio circadiano e na liberação de melatonina.',
+        color: '#10b981',
+      },
+      {
+        type: 'researcherCite',
+        initial: 'C',
+        name: 'Charles A. Czeisler, MD, PhD',
+        role: 'Professor de Medicina do Sono',
+        institution: 'Harvard Medical School',
+        concept:
+          'Pesquisa fundamental sobre como luz de alta intensidade à noite suprime melatonina e atrasa o relógio circadiano humano.',
+        color: '#4a9eff',
+      },
+      {
+        type: 'p',
+        text: 'Quando ipRGC detecta luz forte tarde da noite, o NSQ reage como se ainda fosse dia.',
       },
       { type: 'h2', text: 'O efeito prático em 30 minutos de tela às 22h' },
       {
@@ -327,6 +409,7 @@ export const BLOG_POSTS: BlogPost[] = [
     readingMinutes: 4,
     category: 'mitos',
     emoji: '📉',
+    heroImage: '/blog/blog-divida-de-sono-fim-de-semana.png',
     excerpt:
       'Dormir até tarde sábado e domingo mascara o cansaço — não paga a dívida. E pode até atrasar mais o seu relógio biológico.',
     intro:
@@ -348,7 +431,17 @@ export const BLOG_POSTS: BlogPost[] = [
       },
       {
         type: 'p',
-        text: 'Segunda: dormir até as 11h no domingo desloca o seu relógio biológico — você acaba dormindo mais tarde domingo à noite e começa a semana com um mini-jet-lag autoinfligido. O cronobiólogo Till Roenneberg cunhou o termo "jet lag social" pra esse fenômeno.',
+        text: 'Segunda: dormir até as 11h no domingo desloca o seu relógio biológico — você acaba dormindo mais tarde domingo à noite e começa a semana com um mini-jet-lag autoinfligido.',
+      },
+      {
+        type: 'researcherCite',
+        initial: 'R',
+        name: 'Till Roenneberg, PhD',
+        role: 'Cronobiólogo',
+        institution: 'LMU Munich',
+        concept:
+          'Cunhou o termo "jet lag social" — descreve o descompasso entre o sono nos dias de semana e nos dias livres, associado a piora metabólica e cognitiva.',
+        color: '#22d3ee',
       },
       {
         type: 'callout',
@@ -401,6 +494,7 @@ export const BLOG_POSTS: BlogPost[] = [
     readingMinutes: 4,
     category: 'sintomas',
     emoji: '🌑',
+    heroImage: '/blog/blog-acordar-3-da-manha.png',
     excerpt:
       'Acordar às 3h não é aleatório. É o ponto onde quatro processos fisiológicos se encontram — e qualquer um pode estar fora de calibre.',
     intro:
@@ -416,6 +510,16 @@ export const BLOG_POSTS: BlogPost[] = [
       {
         type: 'p',
         text: 'O cortisol normalmente sobe nas duas horas antes do acordar — é o "alarme" hormonal natural. Em pessoas sob estresse crônico, esse pico pode antecipar pra 3h, despertando o sono já prematuramente.',
+      },
+      {
+        type: 'researcherCite',
+        initial: 'C',
+        name: 'Charles A. Czeisler, MD, PhD',
+        role: 'Professor de Medicina do Sono',
+        institution: 'Harvard Medical School',
+        concept:
+          'Pesquisa do ritmo circadiano do cortisol e da resposta de despertar (cortisol awakening response) como marcador da arquitetura do eixo HPA.',
+        color: '#4a9eff',
       },
       { type: 'h3', text: '2. Queda de glicose' },
       {
@@ -484,6 +588,7 @@ export const BLOG_POSTS: BlogPost[] = [
     readingMinutes: 4,
     category: 'habitos',
     emoji: '🌅',
+    heroImage: '/blog/blog-luz-solar-manha-10-minutos.png',
     excerpt:
       'O hábito mais bem documentado pra melhorar sono noturno acontece pela manhã. 10 minutos de luz solar fazem mais que aplicativo nenhum.',
     intro:
@@ -491,8 +596,18 @@ export const BLOG_POSTS: BlogPost[] = [
     body: [
       { type: 'h2', text: 'O cérebro precisa receber o sinal de "manhã"' },
       {
+        type: 'researcherCite',
+        initial: 'H',
+        name: 'Andrew Huberman, PhD',
+        role: 'Professor de Neurobiologia e Oftalmologia',
+        institution: 'Stanford School of Medicine',
+        concept:
+          'Comunicação científica sobre a luz solar matinal direta como sincronizador mais robusto do eixo cortisol-circadiano em humanos saudáveis.',
+        color: '#10b981',
+      },
+      {
         type: 'p',
-        text: 'Andrew Huberman, PhD, professor de neurobiologia em Stanford, popularizou na comunicação científica a importância da luz solar matinal direta na ativação do eixo cortisol-circadiano. Quando as células ipRGC da retina recebem luz solar de alta intensidade pela manhã, elas disparam um sinal robusto pro núcleo supraquiasmático.',
+        text: 'Quando as células ipRGC da retina recebem luz solar de alta intensidade pela manhã, elas disparam um sinal robusto pro núcleo supraquiasmático.',
       },
       {
         type: 'p',
@@ -559,6 +674,7 @@ export const BLOG_POSTS: BlogPost[] = [
     readingMinutes: 3,
     category: 'otimizacao',
     emoji: '🌡️',
+    heroImage: '/blog/blog-temperatura-quarto-dormir.png',
     excerpt:
       'O corpo precisa esfriar pra dormir profundo. Quarto quente sabota a noite mais do que muito hábito tido como vilão.',
     intro:
@@ -567,7 +683,27 @@ export const BLOG_POSTS: BlogPost[] = [
       { type: 'h2', text: 'Por que o corpo precisa esfriar pra dormir' },
       {
         type: 'p',
-        text: 'A temperatura corporal central segue um ritmo circadiano: sobe ao acordar, atinge pico no início da tarde, e cai à noite. A queda noturna não é coincidência — ela é um dos sinais para o cérebro entrar em sono profundo (N3). Pesquisas com Charles Czeisler, MD, PhD, em Harvard, e Matthew Walker, PhD, em Berkeley, descrevem essa relação como uma das mais robustas da medicina do sono.',
+        text: 'A temperatura corporal central segue um ritmo circadiano: sobe ao acordar, atinge pico no início da tarde, e cai à noite. A queda noturna não é coincidência — ela é um dos sinais para o cérebro entrar em sono profundo (N3).',
+      },
+      {
+        type: 'researcherCite',
+        initial: 'C',
+        name: 'Charles A. Czeisler, MD, PhD',
+        role: 'Professor de Medicina do Sono',
+        institution: 'Harvard Medical School',
+        concept:
+          'Pesquisa fundamental sobre o ritmo circadiano da temperatura corporal central como gatilho do início e da profundidade do sono.',
+        color: '#4a9eff',
+      },
+      {
+        type: 'researcherCite',
+        initial: 'W',
+        name: 'Matthew Walker, PhD',
+        role: 'Professor de Neurociência e Psicologia',
+        institution: 'University of California, Berkeley',
+        concept:
+          'Divulgação científica sobre a relação entre temperatura ambiente fria (16-20 °C) e a consolidação do sono profundo de ondas lentas.',
+        color: '#7c5ce8',
       },
       { type: 'h2', text: 'A faixa que a literatura aponta' },
       {
@@ -631,6 +767,7 @@ export const BLOG_POSTS: BlogPost[] = [
     readingMinutes: 3,
     category: 'habitos',
     emoji: '☕',
+    heroImage: '/blog/blog-cafeina-quanto-tempo-antes-de-dormir.png',
     excerpt:
       'Cafeína bloqueia adenosina por horas. O último café tem que respeitar a meia-vida — e ela é maior do que parece.',
     intro:
@@ -640,6 +777,16 @@ export const BLOG_POSTS: BlogPost[] = [
       {
         type: 'p',
         text: 'Durante o dia, adenosina vai se acumulando no cérebro e gera pressão de sono. Cafeína funciona ocupando os mesmos receptores que a adenosina ocuparia — sem disparar a sonolência. O resultado é mascarar o cansaço, não eliminá-lo.',
+      },
+      {
+        type: 'researcherCite',
+        initial: 'W',
+        name: 'Matthew Walker, PhD',
+        role: 'Professor de Neurociência e Psicologia',
+        institution: 'University of California, Berkeley',
+        concept:
+          'Comunicação científica sobre o bloqueio dos receptores de adenosina pela cafeína e a meia-vida prolongada da molécula (5-6h em média) como fator subestimado de fragmentação do sono noturno.',
+        color: '#7c5ce8',
       },
       { type: 'h2', text: 'A matemática da meia-vida' },
       {
@@ -709,6 +856,7 @@ export const BLOG_POSTS: BlogPost[] = [
     readingMinutes: 4,
     category: 'educacao',
     emoji: '🧠',
+    heroImage: '/blog/blog-sono-profundo-rem-diferenca.png',
     excerpt:
       'N3 e REM não são sinônimos. Cada um tem função própria — e a falta de um dá um tipo bem específico de cansaço.',
     intro:
@@ -717,7 +865,17 @@ export const BLOG_POSTS: BlogPost[] = [
       { type: 'h2', text: 'Sono profundo (N3): a manutenção física' },
       {
         type: 'p',
-        text: 'O N3 — também chamado de sono de ondas lentas — predomina nas primeiras horas da noite. É nele que o sistema glinfático parece participar da limpeza de metabólitos cerebrais (ainda em pesquisa em humanos), o hormônio do crescimento é liberado, e o tecido muscular se repara. Matthew Walker, PhD, em Berkeley, dedica boa parte do seu trabalho público à importância desse estágio.',
+        text: 'O N3 — também chamado de sono de ondas lentas — predomina nas primeiras horas da noite. É nele que o sistema glinfático parece participar da limpeza de metabólitos cerebrais (ainda em pesquisa em humanos), o hormônio do crescimento é liberado, e o tecido muscular se repara.',
+      },
+      {
+        type: 'researcherCite',
+        initial: 'W',
+        name: 'Matthew Walker, PhD',
+        role: 'Professor de Neurociência e Psicologia',
+        institution: 'University of California, Berkeley',
+        concept:
+          'Trabalho científico e de divulgação sobre o papel do sono profundo (N3) na consolidação de memória declarativa, recuperação física e função imune.',
+        color: '#7c5ce8',
       },
       {
         type: 'p',
@@ -726,7 +884,21 @@ export const BLOG_POSTS: BlogPost[] = [
       { type: 'h2', text: 'REM: a manutenção emocional e cognitiva' },
       {
         type: 'p',
-        text: 'O REM se concentra na segunda metade da noite — e por isso quem dorme pouco corta proporcionalmente mais REM. É a fase em que sonhos vívidos acontecem, memórias declarativas se consolidam, e a regulação emocional é processada. Charles Czeisler, MD, PhD, em Harvard, e o trabalho histórico de Matthew Walker descrevem o REM como um "primeiro socorro emocional" da noite anterior.',
+        text: 'O REM se concentra na segunda metade da noite — e por isso quem dorme pouco corta proporcionalmente mais REM. É a fase em que sonhos vívidos acontecem, memórias declarativas se consolidam, e a regulação emocional é processada.',
+      },
+      {
+        type: 'researcherCite',
+        initial: 'C',
+        name: 'Charles A. Czeisler, MD, PhD',
+        role: 'Professor de Medicina do Sono',
+        institution: 'Harvard Medical School',
+        concept:
+          'Pesquisa sobre a distribuição do sono REM ao longo da noite e o impacto de horários irregulares no encurtamento dessa fase reparadora.',
+        color: '#4a9eff',
+      },
+      {
+        type: 'p',
+        text: 'O trabalho conjunto desses pesquisadores descreve o REM como um "primeiro socorro emocional" da noite anterior — quando ele falta, a regulação afetiva do dia seguinte fica comprometida.',
       },
       {
         type: 'p',
@@ -801,6 +973,7 @@ export const BLOG_POSTS: BlogPost[] = [
     readingMinutes: 4,
     category: 'educacao',
     emoji: '💊',
+    heroImage: '/blog/blog-melatonina-funciona-quando-tomar.png',
     excerpt:
       'Melatonina não dá sono — sinaliza ao corpo que é noite. Entender essa diferença muda totalmente quando ela ajuda.',
     intro:
@@ -815,6 +988,16 @@ export const BLOG_POSTS: BlogPost[] = [
       {
         type: 'p',
         text: 'A glândula pineal libera melatonina endógena à medida que escurece. O hormônio age como um sinal sistêmico de "é noite biológica". Não desliga você — ela cria condição pra que o sono ocorra mais facilmente, junto com queda de temperatura, redução de cortisol e aumento de pressão de adenosina.',
+      },
+      {
+        type: 'researcherCite',
+        initial: 'C',
+        name: 'Charles A. Czeisler, MD, PhD',
+        role: 'Professor de Medicina do Sono',
+        institution: 'Harvard Medical School',
+        concept:
+          'Pesquisa sobre melatonina como sinalizador circadiano (não hipnótico) e sobre o uso clínico em doses fisiológicas pra realinhar o relógio biológico em casos selecionados.',
+        color: '#4a9eff',
       },
       { type: 'h2', text: 'Onde ela funciona bem (com evidência)' },
       {
@@ -886,6 +1069,7 @@ export const BLOG_POSTS: BlogPost[] = [
     readingMinutes: 3,
     category: 'tecnica',
     emoji: '🌬️',
+    heroImage: '/blog/blog-respiracao-4-7-8-funciona.png',
     excerpt:
       'Respiração lenta com expiração longa ativa o nervo vago e baixa o estado de alerta. A técnica 4-7-8 é só uma das que funcionam.',
     intro:
@@ -908,8 +1092,18 @@ export const BLOG_POSTS: BlogPost[] = [
         text: 'A expiração longa estimula o nervo vago, que ativa o sistema nervoso parassimpático — o "modo descanso" do corpo. Frequência cardíaca cai, pressão arterial reduz e o estado de alerta diminui. Não é placebo — é fisiologia direta.',
       },
       {
+        type: 'researcherCite',
+        initial: 'W',
+        name: 'Andrew Weil, MD',
+        role: 'Professor de Medicina Integrativa',
+        institution: 'University of Arizona',
+        concept:
+          'Popularizou a técnica respiratória 4-7-8 como ferramenta acessível de ativação parassimpática via expiração prolongada (ratio expiração:inspiração > 1).',
+        color: '#f59e0b',
+      },
+      {
         type: 'p',
-        text: 'A técnica foi popularizada por Andrew Weil, MD, professor da Universidade do Arizona, no contexto de medicina integrativa. A premissa central — expiração mais longa que inspiração — é compartilhada com várias tradições respiratórias e tem suporte na neurociência cardiopulmonar.',
+        text: 'A premissa central — expiração mais longa que inspiração — é compartilhada com várias tradições respiratórias e tem suporte na neurociência cardiopulmonar.',
       },
       { type: 'h2', text: 'Quando ela ajuda' },
       {
@@ -968,6 +1162,7 @@ export const BLOG_POSTS: BlogPost[] = [
     readingMinutes: 4,
     category: 'sintomas',
     emoji: '🌀',
+    heroImage: '/blog/blog-nao-consigo-desligar-mente-noite.png',
     excerpt:
       'Mente que não para tem um padrão fisiológico específico — e ele responde a três protocolos com mecanismo claro.',
     intro:
@@ -987,6 +1182,16 @@ export const BLOG_POSTS: BlogPost[] = [
       {
         type: 'p',
         text: 'Por 5 minutos, escreva tudo que está vindo à cabeça — preocupações, tarefas, ideias. Sem editar. Pesquisas com escrita expressiva sugerem que essa "transferência" reduz a recursão mental: o cérebro deixa de "segurar" o que já foi externalizado.',
+      },
+      {
+        type: 'researcherCite',
+        initial: 'P',
+        name: 'James W. Pennebaker, PhD',
+        role: 'Professor de Psicologia',
+        institution: 'University of Texas at Austin',
+        concept:
+          'Linha histórica de pesquisa em "escrita expressiva" — escrever sobre preocupações e emoções reduz ruminação cognitiva e melhora marcadores de bem-estar e qualidade do sono.',
+        color: '#ef4444',
       },
       { type: 'h3', text: '2. Respiração com expiração longa' },
       {
@@ -1079,6 +1284,11 @@ export function getPostPlainText(post: BlogPost): string {
       case 'ul':
       case 'ol':
         out.push(block.items.join('. '));
+        break;
+      case 'researcherCite':
+        out.push(
+          `Referência científica: ${block.name}, ${block.role} ${block.institution}. Conceito: ${block.concept}.`,
+        );
         break;
     }
   }
