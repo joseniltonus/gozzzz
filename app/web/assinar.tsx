@@ -13,7 +13,7 @@ import { useRouter } from 'expo-router';
 import Head from 'expo-router/head';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { LinearGradient } from 'expo-linear-gradient';
-import { Moon, ArrowLeft, Crown, Check, Shield, Lock, BadgeCheck, CreditCard, CircleAlert as AlertCircle } from 'lucide-react-native';
+import { ArrowLeft, Crown, Check, Shield, Lock, BadgeCheck, CreditCard, CircleAlert as AlertCircle } from 'lucide-react-native';
 import { supabase, SUPABASE_URL, SUPABASE_ANON_KEY } from '@/lib/supabase';
 import { KIWIFY_PARCELADO_URL, STRIPE_ENABLED } from '@/lib/payment-links';
 const isWeb = Platform.OS === 'web';
@@ -196,12 +196,9 @@ export default function WebAssinarPage() {
         <link rel="canonical" href="https://gozzzz.app/web/assinar" />
       </Head>
       <ScrollView style={styles.page} showsVerticalScrollIndicator={false}>
-        <LinearGradient colors={['#0f172a', '#1e293b']} style={styles.nav}>
+        <LinearGradient colors={['#0c0a1f', '#1e1b4b']} style={styles.nav}>
         <View style={styles.navInner}>
           <TouchableOpacity onPress={() => router.push('/web')} style={styles.navBrand}>
-            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: 22, height: 22 }}>
-              <Moon size={22} color="#fbbf24" strokeWidth={2} />
-            </div>
             <Text style={styles.navBrandText}>GoZzzz</Text>
           </TouchableOpacity>
           <View style={styles.navRight}>
@@ -213,8 +210,7 @@ export default function WebAssinarPage() {
         </View>
       </LinearGradient>
 
-      <LinearGradient colors={['#1e293b', '#0f172a']} style={styles.header}>
-        <Crown size={52} color="#fbbf24" />
+      <LinearGradient colors={['#1e1b4b', '#0c0a1f']} style={styles.header}>
         <Text style={styles.headerTitle}>{t(c.headerTitle)}</Text>
         <Text style={styles.headerSubtitle}>{t(c.headerSubtitle)}</Text>
       </LinearGradient>
@@ -264,7 +260,7 @@ export default function WebAssinarPage() {
                       onPress={() => Linking.openURL(KIWIFY_PARCELADO_URL)}
                       activeOpacity={0.85}
                     >
-                      <CreditCard size={20} color="#0d0d16" />
+                      <CreditCard size={20} color="#ffffff" />
                       <Text style={styles.checkoutBtnText}>
                         {STRIPE_ENABLED
                           ? 'Parcelar em 6x — R$ 24,50/mês'
@@ -291,12 +287,12 @@ export default function WebAssinarPage() {
                         >
                           {loading ? (
                             <>
-                              <ActivityIndicator size="small" color="#d4a96a" />
+                              <ActivityIndicator size="small" color="#7c5ce8" />
                               <Text style={styles.checkoutBtnAltText}>{t(c.redirecting)}</Text>
                             </>
                           ) : (
                             <>
-                              <Crown size={18} color="#d4a96a" />
+                              <Crown size={18} color="#7c5ce8" />
                               <Text style={styles.checkoutBtnAltText}>
                                 Pagar à vista — R$ 147
                               </Text>
@@ -315,12 +311,12 @@ export default function WebAssinarPage() {
                   >
                     {loading ? (
                       <>
-                        <ActivityIndicator size="small" color="#0d0d16" />
+                        <ActivityIndicator size="small" color="#ffffff" />
                         <Text style={styles.checkoutBtnText}>{t(c.redirecting)}</Text>
                       </>
                     ) : (
                       <>
-                        <Crown size={20} color="#0d0d16" />
+                        <Crown size={20} color="#ffffff" />
                         <Text style={styles.checkoutBtnText}>
                           Pagar à vista — R$ 147
                         </Text>
@@ -388,7 +384,7 @@ export default function WebAssinarPage() {
 }
 
 const styles = StyleSheet.create({
-  page: { flex: 1, backgroundColor: '#07070f' },
+  page: { flex: 1, backgroundColor: '#0a0a1a' },
 
   nav: {},
   navInner: {
@@ -415,7 +411,7 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: 'rgba(251,191,36,0.25)',
   },
-  localeBadgeText: { fontSize: 12, fontWeight: '700', color: '#fbbf24' },
+  localeBadgeText: { fontSize: 12, fontWeight: '700', color: '#a5b4fc' },
   backBtn: { flexDirection: 'row', alignItems: 'center', gap: 6 },
   backBtnText: { fontSize: 14, color: '#94a3b8', fontWeight: '500' },
 
@@ -460,8 +456,8 @@ const styles = StyleSheet.create({
     borderColor: 'rgba(255,255,255,0.08)',
   },
   planCardSelected: {
-    borderColor: '#d4a96a',
-    shadowColor: '#d4a96a',
+    borderColor: '#7c5ce8',
+    shadowColor: '#7c5ce8',
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.2,
     shadowRadius: 10,
@@ -482,7 +478,7 @@ const styles = StyleSheet.create({
   planNameActive: { color: '#e8d5b7' },
   planPriceRow: { flexDirection: 'row', alignItems: 'baseline', gap: 4, marginBottom: 4 },
   planPrice: { fontSize: 36, fontWeight: '800', color: '#5a5a72' },
-  planPriceActive: { color: '#d4a96a' },
+  planPriceActive: { color: '#7c5ce8' },
   planPer: { fontSize: 15, color: '#8892a4', fontWeight: '500' },
   planTotal: { fontSize: 13, color: '#5a5a72' },
   planPriceHero: {
@@ -495,7 +491,7 @@ const styles = StyleSheet.create({
   },
   planPriceCaption: {
     fontSize: 14,
-    color: '#d4a96a',
+    color: '#7c5ce8',
     textAlign: 'center',
     fontWeight: '600',
   },
@@ -504,8 +500,8 @@ const styles = StyleSheet.create({
     borderWidth: 2, borderColor: 'rgba(255,255,255,0.2)',
     justifyContent: 'center', alignItems: 'center',
   },
-  radioActive: { borderColor: '#d4a96a' },
-  radioInner: { width: 12, height: 12, borderRadius: 6, backgroundColor: '#d4a96a' },
+  radioActive: { borderColor: '#7c5ce8' },
+  radioInner: { width: 12, height: 12, borderRadius: 6, backgroundColor: '#7c5ce8' },
 
   errorBox: {
     flexDirection: 'row',
@@ -525,19 +521,19 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     gap: 10,
-    backgroundColor: '#d4a96a',
+    backgroundColor: '#7c5ce8',
     paddingVertical: 20,
     borderRadius: 16,
     marginTop: 24,
     marginBottom: 12,
-    shadowColor: '#d4a96a',
+    shadowColor: '#7c5ce8',
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.35,
     shadowRadius: 12,
     elevation: 6,
   },
   checkoutBtnDisabled: { opacity: 0.7 },
-  checkoutBtnText: { fontSize: 18, fontWeight: '800', color: '#0d0d16' },
+  checkoutBtnText: { fontSize: 18, fontWeight: '800', color: '#ffffff' },
 
   payDivider: {
     flexDirection: 'row',
@@ -563,10 +559,10 @@ const styles = StyleSheet.create({
     paddingHorizontal: 24,
     borderRadius: 16,
     borderWidth: 1.5,
-    borderColor: '#d4a96a',
-    backgroundColor: 'rgba(212,169,106,0.06)',
+    borderColor: '#7c5ce8',
+    backgroundColor: 'rgba(124,92,232,0.06)',
   },
-  checkoutBtnAltText: { fontSize: 16, fontWeight: '700', color: '#d4a96a' },
+  checkoutBtnAltText: { fontSize: 16, fontWeight: '700', color: '#7c5ce8' },
   kiwifyNote: {
     fontSize: 11,
     color: '#94a3b8',
@@ -617,16 +613,16 @@ const styles = StyleSheet.create({
   featureText: { fontSize: 15, color: '#8892a4', flex: 1 },
 
   cdcGuarantee: {
-    backgroundColor: 'rgba(212,169,106,0.06)',
+    backgroundColor: 'rgba(124,92,232,0.06)',
     borderRadius: 16,
     borderWidth: 1,
-    borderColor: 'rgba(212,169,106,0.15)',
+    borderColor: 'rgba(124,92,232,0.15)',
     padding: 20,
     marginTop: 32,
     marginBottom: 8,
   },
   cdcGuaranteeKicker: {
-    color: '#d4a96a',
+    color: '#7c5ce8',
     fontSize: 12,
     fontWeight: '800',
     letterSpacing: 1,
@@ -697,10 +693,10 @@ const styles = StyleSheet.create({
   },
   successTitle: { fontSize: 28, fontWeight: '800', color: '#e8d5b7', textAlign: 'center', marginBottom: 12 },
   successDesc: { fontSize: 16, color: '#8892a4', textAlign: 'center', lineHeight: 26, marginBottom: 32 },
-  successBtn: { backgroundColor: '#d4a96a', paddingHorizontal: 40, paddingVertical: 16, borderRadius: 14 },
-  successBtnText: { fontSize: 16, fontWeight: '800', color: '#0d0d16' },
+  successBtn: { backgroundColor: '#7c5ce8', paddingHorizontal: 40, paddingVertical: 16, borderRadius: 14 },
+  successBtnText: { fontSize: 16, fontWeight: '800', color: '#ffffff' },
 
-  footer: { backgroundColor: '#07070f', paddingVertical: 24, alignItems: 'center', gap: 4 },
+  footer: { backgroundColor: '#0a0a1a', paddingVertical: 24, alignItems: 'center', gap: 4 },
   footerText: { fontSize: 13, color: '#8892a4' },
   footerCompany: { fontSize: 12, color: '#8892a4', fontWeight: '600' },
   footerCnpj: { fontSize: 12, color: '#64748b' },

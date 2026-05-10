@@ -12,7 +12,6 @@ import { useRouter, useLocalSearchParams } from 'expo-router';
 import Head from 'expo-router/head';
 import { LinearGradient } from 'expo-linear-gradient';
 import {
-  Moon,
   Check,
   Mail,
   MessageCircle,
@@ -73,12 +72,9 @@ export default function WebObrigadoPage() {
         <link rel="canonical" href="https://gozzzz.app/web/obrigado" />
       </Head>
       <ScrollView style={styles.page} contentContainerStyle={styles.pageContent} showsVerticalScrollIndicator={false}>
-        <LinearGradient colors={['#0f172a', '#1e293b']} style={styles.nav}>
+        <LinearGradient colors={['#0c0a1f', '#1e1b4b']} style={styles.nav}>
           <View style={styles.navInner}>
             <TouchableOpacity onPress={() => router.push('/web')} style={styles.navBrand}>
-              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: 22, height: 22 }}>
-                <Moon size={22} color="#fbbf24" strokeWidth={2} />
-              </div>
               <Text style={styles.navBrandText}>GoZzzz</Text>
             </TouchableOpacity>
           </View>
@@ -110,9 +106,9 @@ export default function WebObrigadoPage() {
               }
             }}
           >
-            <BookOpen size={20} color="#0d0d16" />
+            <BookOpen size={20} color="#ffffff" />
             <Text style={styles.heroCtaTxt}>Abrir as 21 lições agora</Text>
-            <ExternalLink size={16} color="#0d0d16" />
+            <ExternalLink size={16} color="#ffffff" />
           </TouchableOpacity>
           <Text style={styles.heroCtaHint}>
             {isProgramAccessConfigured()
@@ -123,7 +119,7 @@ export default function WebObrigadoPage() {
           <View style={styles.steps}>
             <View style={styles.step}>
               <View style={styles.stepIconWrap}>
-                <Mail size={20} color="#d4a96a" />
+                <Mail size={20} color="#7c5ce8" />
               </View>
               <View style={styles.stepBody}>
                 <Text style={styles.stepTitle}>1. Verifique o seu e-mail</Text>
@@ -135,7 +131,7 @@ export default function WebObrigadoPage() {
 
             <View style={styles.step}>
               <View style={styles.stepIconWrap}>
-                <Clock size={20} color="#d4a96a" />
+                <Clock size={20} color="#7c5ce8" />
               </View>
               <View style={styles.stepBody}>
                 <Text style={styles.stepTitle}>2. Não chegou em 30 minutos?</Text>
@@ -163,7 +159,7 @@ export default function WebObrigadoPage() {
 
             <View style={styles.step}>
               <View style={styles.stepIconWrap}>
-                <BookOpen size={20} color="#d4a96a" />
+                <BookOpen size={20} color="#7c5ce8" />
               </View>
               <View style={styles.stepBody}>
                 <Text style={styles.stepTitle}>3. Quer dar uma espiada nas lições gratuitas?</Text>
@@ -176,7 +172,7 @@ export default function WebObrigadoPage() {
                   onPress={() => router.push('/web/programa')}
                 >
                   <Text style={styles.secondaryBtnTxt}>Ver as 3 primeiras lições</Text>
-                  <ArrowRight size={16} color="#d4a96a" />
+                  <ArrowRight size={16} color="#7c5ce8" />
                 </TouchableOpacity>
               </View>
             </View>
@@ -197,7 +193,7 @@ export default function WebObrigadoPage() {
 }
 
 const styles = StyleSheet.create({
-  page: { flex: 1, backgroundColor: '#07070f' },
+  page: { flex: 1, backgroundColor: '#0a0a1a' },
   pageContent: { flexGrow: 1, paddingBottom: 64 },
   nav: { paddingTop: isWeb ? 16 : 50, paddingBottom: 16, paddingHorizontal: 20 },
   navInner: {
@@ -264,9 +260,9 @@ const styles = StyleSheet.create({
     width: 40,
     height: 40,
     borderRadius: 20,
-    backgroundColor: 'rgba(212,169,106,0.10)',
+    backgroundColor: 'rgba(124,92,232,0.10)',
     borderWidth: 1,
-    borderColor: 'rgba(212,169,106,0.20)',
+    borderColor: 'rgba(124,92,232,0.20)',
     alignItems: 'center',
     justifyContent: 'center',
     flexShrink: 0,
@@ -292,14 +288,14 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     gap: 8,
-    backgroundColor: '#d4a96a',
+    backgroundColor: '#7c5ce8',
     paddingVertical: 13,
     paddingHorizontal: 20,
     borderRadius: 12,
     marginTop: 12,
     alignSelf: 'flex-start',
   },
-  primaryBtnTxt: { fontSize: 14, fontWeight: '800', color: '#0d0d16' },
+  primaryBtnTxt: { fontSize: 14, fontWeight: '800', color: '#ffffff' },
   secondaryBtn: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -307,20 +303,20 @@ const styles = StyleSheet.create({
     gap: 8,
     backgroundColor: 'transparent',
     borderWidth: 1.5,
-    borderColor: '#d4a96a',
+    borderColor: '#7c5ce8',
     paddingVertical: 12,
     paddingHorizontal: 18,
     borderRadius: 12,
     marginTop: 12,
     alignSelf: 'flex-start',
   },
-  secondaryBtnTxt: { fontSize: 14, fontWeight: '700', color: '#d4a96a' },
+  secondaryBtnTxt: { fontSize: 14, fontWeight: '700', color: '#7c5ce8' },
   heroCta: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
     gap: 10,
-    backgroundColor: '#d4a96a',
+    backgroundColor: '#7c5ce8',
     paddingVertical: 18,
     paddingHorizontal: 28,
     borderRadius: 14,
@@ -328,13 +324,13 @@ const styles = StyleSheet.create({
     marginBottom: 8,
     width: '100%',
     maxWidth: 480,
-    shadowColor: '#d4a96a',
+    shadowColor: '#7c5ce8',
     shadowOpacity: 0.35,
     shadowOffset: { width: 0, height: 8 },
     shadowRadius: 24,
     elevation: 6,
   },
-  heroCtaTxt: { fontSize: 17, fontWeight: '800', color: '#0d0d16', letterSpacing: -0.2 },
+  heroCtaTxt: { fontSize: 17, fontWeight: '800', color: '#ffffff', letterSpacing: -0.2 },
   heroCtaHint: {
     fontSize: 12,
     color: '#94a3b8',
@@ -354,5 +350,5 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     lineHeight: 18,
   },
-  footnoteLink: { color: '#d4a96a', textDecorationLine: 'underline' },
+  footnoteLink: { color: '#7c5ce8', textDecorationLine: 'underline' },
 });

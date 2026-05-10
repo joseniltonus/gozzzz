@@ -36,10 +36,17 @@ import { KIWIFY_PARCELADO_URL, STRIPE_ENABLED } from '@/lib/payment-links';
 const isWeb = Platform.OS === 'web';
 const WHATSAPP = 'https://wa.me/5511982820759?text=SONO';
 
-const GOLD = '#d4a96a';
-const GOLD_DIM = 'rgba(212,169,106,0.14)';
-const BG = '#07070f';
-const BG_CARD = '#12121e';
+// Paleta dark/roxo — tela 1 landing page (Maio 2026).
+// Mantido o nome `GOLD` como alias semântico de "accent primário" pra evitar
+// renomear ~120 ocorrências de uma vez. Visualmente é roxo, não dourado.
+const ACCENT = '#7c5ce8';                       // roxo primário (CTA, kicker)
+const ACCENT_LIGHT = '#a5b4fc';                 // lavanda (ícones, highlights)
+const ACCENT_DEEP = '#1e1b4b';                  // roxo profundo pro nav/hero
+const ACCENT_DIM = 'rgba(124,92,232,0.14)';     // background de pílulas/badges
+const GOLD = ACCENT;
+const GOLD_DIM = ACCENT_DIM;
+const BG = '#0a0a1a';                           // navy quase preto, leve azul/roxo
+const BG_CARD = '#14122e';                      // card com pigmento roxo sutil
 const TEXT_MAIN = '#e8e5df';
 const TEXT_MUTED = '#94a3b8';
 const NAV_H = 56;
@@ -623,18 +630,17 @@ export default function SonoPlusLandingPage() {
 
       <ScrollView style={styles.page} showsVerticalScrollIndicator={false}>
         {/* Nav — alinhado a /web/assinar */}
-        <LinearGradient colors={['#0f172a', '#1e293b']} style={styles.navGrad}>
+        <LinearGradient colors={['#0c0a1f', ACCENT_DEEP]} style={styles.navGrad}>
           <View style={styles.navInner}>
             <Link href="/web" asChild>
               <TouchableOpacity style={styles.brand} accessibilityRole="link">
-                <Moon size={22} color="#fbbf24" strokeWidth={2} />
                 <Text style={styles.brandText}>GoZzzz</Text>
               </TouchableOpacity>
             </Link>
             <View style={styles.navRight}>
               <Link href="/web/sono-plus" asChild>
                 <TouchableOpacity style={styles.navGhost} accessibilityRole="link">
-                  <BookOpen size={16} color="#fbbf24" />
+                  <BookOpen size={16} color={ACCENT_LIGHT} />
                   <Text style={styles.navGhostTxt}>Programa 21 Passos</Text>
                 </TouchableOpacity>
               </Link>
@@ -662,11 +668,10 @@ export default function SonoPlusLandingPage() {
           </View>
         )}
 
-        {/* Hero — faixa igual ao header do checkout (slate + coroa) */}
-        <LinearGradient colors={['#1e293b', '#0f172a', '#07070f']} style={styles.heroGradTop}>
+        {/* Hero — paleta dark/roxo. Sem ícone decorativo (logo é só texto). */}
+        <LinearGradient colors={[ACCENT_DEEP, '#0c0a1f', BG]} style={styles.heroGradTop}>
           <View style={styles.heroGlow} />
-          <View style={[styles.heroInner, { paddingTop: 28, paddingBottom: 8 }]}>
-            <Crown size={52} color="#fbbf24" strokeWidth={1.75} />
+          <View style={[styles.heroInner, { paddingTop: 36, paddingBottom: 8 }]}>
             <Text role="heading" aria-level={1} style={styles.heroH1}>
               {isPt ? 'Programa de Sono em 21 Passos' : t('web.program.title')}
             </Text>
@@ -681,7 +686,7 @@ export default function SonoPlusLandingPage() {
 
             <View style={styles.heroBtns}>
               <TouchableOpacity style={styles.btnGoldFill} onPress={() => router.push('/web/programa')}>
-                <BookOpen size={18} color="#0f172a" />
+                <BookOpen size={18} color="#ffffff" />
                 <Text style={styles.btnGoldFillTxt}>
                   {isPt ? 'Começar grátis → ver as 3 primeiras lições' : 'Start free → see the 3 first lessons'}
                 </Text>
@@ -931,7 +936,7 @@ export default function SonoPlusLandingPage() {
                   activeOpacity={0.88}
                   style={styles.quizCtaCheckout}
                 >
-                  <Crown size={18} color="#0f172a" />
+                  <Crown size={18} color="#ffffff" />
                   <Text style={styles.quizCtaCheckoutTxt}>
                     Acessar o programa do {ct.name} — R$ 147
                   </Text>
@@ -996,7 +1001,7 @@ export default function SonoPlusLandingPage() {
                 const { Ico } = c;
                 return (
                   <View key={idx} style={styles.bentoCard}>
-                    <LinearGradient colors={['rgba(212,169,106,0.12)', 'rgba(255,255,255,0.02)']} style={styles.bentoIcon}>
+                    <LinearGradient colors={['rgba(124,92,232,0.12)', 'rgba(255,255,255,0.02)']} style={styles.bentoIcon}>
                       <Ico size={22} color={GOLD} strokeWidth={2} />
                     </LinearGradient>
                     <Text style={styles.bentoTitle}>{c.title}</Text>
@@ -1153,7 +1158,7 @@ export default function SonoPlusLandingPage() {
                       activeOpacity={0.88}
                       onPress={() => Linking.openURL(KIWIFY_PARCELADO_URL)}
                     >
-                      <CreditCard size={20} color="#0d0d16" />
+                      <CreditCard size={20} color="#ffffff" />
                       <Text style={styles.checkoutBtnLTxt}>
                         {STRIPE_ENABLED
                           ? 'Parcelar em 6x — R$ 24,50/mês'
@@ -1191,7 +1196,7 @@ export default function SonoPlusLandingPage() {
                     activeOpacity={0.88}
                     onPress={() => router.push('/web/assinar')}
                   >
-                    <Crown size={20} color="#0d0d16" />
+                    <Crown size={20} color="#ffffff" />
                     <Text style={styles.checkoutBtnLTxt}>
                       Pagar à vista — R$ 147
                     </Text>
@@ -1294,7 +1299,7 @@ export default function SonoPlusLandingPage() {
                 </View>
               ))}
               <TouchableOpacity style={styles.btnGoldFillWide} onPress={openWhatsApp}>
-                <MessageCircle size={18} color="#0f172a" />
+                <MessageCircle size={18} color="#ffffff" />
                 <Text style={styles.btnGoldFillTxt}>Agendar minha sessão →</Text>
               </TouchableOpacity>
             </View>
@@ -1321,7 +1326,7 @@ export default function SonoPlusLandingPage() {
               Comece pelas lições gratuitas ou desbloqueie o percurso completo. Sono+ fica disponível quando quiser refinamento ao vivo.
             </Text>
             <TouchableOpacity style={styles.btnGoldFillWide} onPress={() => router.push('/web/assinar')}>
-              <Crown size={20} color="#0f172a" />
+              <Crown size={20} color="#ffffff" />
               <Text style={styles.btnGoldFillTxt}>{t('coach.ctaSubscribe')}</Text>
             </TouchableOpacity>
             <TouchableOpacity style={styles.btnOutlineGold} onPress={() => router.push('/web/programa')}>
@@ -1422,7 +1427,7 @@ const styles = StyleSheet.create({
   },
   navGhostTxt: { color: '#94a3b8', fontWeight: '600', fontSize: 13 },
   navGold: { paddingHorizontal: 16, paddingVertical: 10, borderRadius: 10, backgroundColor: GOLD },
-  navGoldTxt: { color: '#0f172a', fontWeight: '800', fontSize: 13 },
+  navGoldTxt: { color: '#ffffff', fontWeight: '800', fontSize: 13 },
 
   heroGradTop: { width: '100%', paddingBottom: 40, overflow: 'hidden' },
   heroGlow: {
@@ -1432,7 +1437,7 @@ const styles = StyleSheet.create({
     right: '20%',
     height: 280,
     borderRadius: 200,
-    backgroundColor: 'rgba(212,169,106,0.08)',
+    backgroundColor: 'rgba(124,92,232,0.08)',
   },
   heroInner: { maxWidth: 720, width: '100%', alignSelf: 'center', paddingHorizontal: 24, alignItems: 'center', zIndex: 1 },
   heroH1: {
@@ -1481,7 +1486,7 @@ const styles = StyleSheet.create({
     borderRadius: 14,
     minWidth: isWeb ? 220 : undefined,
   },
-  btnGoldFillTxt: { color: '#0f172a', fontWeight: '800', fontSize: 15 },
+  btnGoldFillTxt: { color: '#ffffff', fontWeight: '800', fontSize: 15 },
   btnGhost: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -1502,7 +1507,7 @@ const styles = StyleSheet.create({
     gap: 6,
     backgroundColor: 'rgba(255,255,255,0.06)',
     borderWidth: 1,
-    borderColor: 'rgba(212,169,106,0.22)',
+    borderColor: 'rgba(124,92,232,0.22)',
     borderRadius: 999,
     paddingHorizontal: 11,
     paddingVertical: 7,
@@ -1513,7 +1518,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#0c0c18',
     borderTopWidth: 1,
     borderBottomWidth: 1,
-    borderColor: 'rgba(212,169,106,0.10)',
+    borderColor: 'rgba(124,92,232,0.10)',
     paddingVertical: 20,
     paddingHorizontal: 24,
     width: '100%',
@@ -1595,7 +1600,7 @@ const styles = StyleSheet.create({
     paddingBottom: 8,
     backgroundColor: BG,
     borderBottomWidth: 1,
-    borderBottomColor: 'rgba(212,169,106,0.06)',
+    borderBottomColor: 'rgba(124,92,232,0.06)',
   },
   previewHead: { paddingHorizontal: 24, maxWidth: 1100, width: '100%', alignSelf: 'center', marginBottom: 16 },
   previewSub: { marginTop: 8, color: TEXT_MUTED, fontSize: 14, lineHeight: 21 },
@@ -1606,7 +1611,7 @@ const styles = StyleSheet.create({
     borderRadius: 18,
     padding: 18,
     borderWidth: 1,
-    borderColor: 'rgba(212,169,106,0.18)',
+    borderColor: 'rgba(124,92,232,0.18)',
     marginRight: 4,
   },
   previewCardTop: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 },
@@ -1629,7 +1634,7 @@ const styles = StyleSheet.create({
 
   body: { maxWidth: 1100, width: '100%', alignSelf: 'center', paddingHorizontal: 24, paddingBottom: 48 },
   block: { marginTop: 36 },
-  sectionBand: { paddingTop: 8, borderTopWidth: 1, borderTopColor: 'rgba(212,169,106,0.08)' },
+  sectionBand: { paddingTop: 8, borderTopWidth: 1, borderTopColor: 'rgba(124,92,232,0.08)' },
   sectionBandMuted: {
     marginHorizontal: -24,
     paddingHorizontal: 24,
@@ -1637,7 +1642,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#0c0c16',
     borderTopWidth: 1,
     borderBottomWidth: 1,
-    borderColor: 'rgba(212,169,106,0.06)',
+    borderColor: 'rgba(124,92,232,0.06)',
   },
   sectionKicker: { color: GOLD, fontSize: 11, fontWeight: '800', letterSpacing: 1.2, marginBottom: 8, textTransform: 'uppercase' },
   h2: { color: TEXT_MAIN, fontSize: 22, fontWeight: '700', lineHeight: 28 },
@@ -1676,7 +1681,7 @@ const styles = StyleSheet.create({
     paddingVertical: 28,
     borderTopWidth: 1,
     borderBottomWidth: 1,
-    borderColor: 'rgba(212,169,106,0.06)',
+    borderColor: 'rgba(124,92,232,0.06)',
     position: 'relative',
   },
   actRow: { flexDirection: 'row', gap: 14, marginTop: 18, alignItems: 'flex-start' },
@@ -1684,7 +1689,7 @@ const styles = StyleSheet.create({
     width: 36,
     height: 36,
     borderRadius: 18,
-    backgroundColor: 'rgba(212,169,106,0.18)',
+    backgroundColor: 'rgba(124,92,232,0.18)',
     borderWidth: 1,
     borderColor: GOLD,
     alignItems: 'center',
@@ -1702,7 +1707,7 @@ const styles = StyleSheet.create({
     gap: 8,
     alignSelf: 'flex-start',
     borderWidth: 1,
-    borderColor: 'rgba(212,169,106,0.35)',
+    borderColor: 'rgba(124,92,232,0.35)',
     paddingVertical: 12,
     paddingHorizontal: 16,
     borderRadius: 12,
@@ -1726,7 +1731,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
-  stepNum: { fontSize: 18, fontWeight: '900', color: '#07070f' },
+  stepNum: { fontSize: 18, fontWeight: '900', color: '#ffffff' },
   stepTitle: { color: TEXT_MAIN, fontSize: 15, fontWeight: '700', marginBottom: 5 },
   stepDesc: { color: TEXT_MUTED, fontSize: 15, lineHeight: 23 },
 
@@ -1737,7 +1742,7 @@ const styles = StyleSheet.create({
     backgroundColor: BG_CARD,
     borderRadius: 16,
     borderWidth: 1,
-    borderColor: 'rgba(212,169,106,0.12)',
+    borderColor: 'rgba(124,92,232,0.12)',
     paddingVertical: isWeb ? 18 : 14,
     paddingHorizontal: 10,
     alignItems: 'center',
@@ -1746,7 +1751,7 @@ const styles = StyleSheet.create({
   statDivider: {
     width: isWeb ? StyleSheet.hairlineWidth : '80%',
     height: isWeb ? undefined : StyleSheet.hairlineWidth,
-    backgroundColor: 'rgba(212,169,106,0.2)',
+    backgroundColor: 'rgba(124,92,232,0.2)',
     alignSelf: 'stretch',
   },
   statNum: { color: TEXT_MAIN, fontSize: 26, fontWeight: '800' },
@@ -1822,13 +1827,13 @@ const styles = StyleSheet.create({
     gap: 10,
     paddingVertical: 12,
     paddingHorizontal: 24,
-    backgroundColor: 'rgba(212,169,106,0.12)',
+    backgroundColor: 'rgba(124,92,232,0.12)',
     borderBottomWidth: 1,
-    borderBottomColor: 'rgba(212,169,106,0.2)',
+    borderBottomColor: 'rgba(124,92,232,0.2)',
   },
   chronoBannerEmoji: { fontSize: 22 },
   chronoBannerKicker: {
-    color: '#d4a96a',
+    color: ACCENT_LIGHT,
     fontSize: 12,
     fontWeight: '800',
     letterSpacing: 0.4,
@@ -1853,7 +1858,7 @@ const styles = StyleSheet.create({
     shadowRadius: 12,
     elevation: 6,
   },
-  checkoutBtnLTxt: { fontSize: 17, fontWeight: '800', color: '#0d0d16' },
+  checkoutBtnLTxt: { fontSize: 17, fontWeight: '800', color: '#ffffff' },
   payDivider: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -1879,7 +1884,7 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     borderWidth: 1.5,
     borderColor: GOLD,
-    backgroundColor: 'rgba(212,169,106,0.06)',
+    backgroundColor: 'rgba(124,92,232,0.06)',
   },
   checkoutBtnAltTxt: { fontSize: 15, fontWeight: '700', color: GOLD },
   kiwifyNote: {
@@ -1945,7 +1950,7 @@ const styles = StyleSheet.create({
     paddingVertical: 26,
     borderTopWidth: 1,
     borderBottomWidth: 1,
-    borderColor: 'rgba(212,169,106,0.14)',
+    borderColor: 'rgba(124,92,232,0.14)',
     borderRadius: 0,
   },
   sonoPlusRow: { flexDirection: 'row', gap: 16, alignItems: 'flex-start', marginBottom: 20 },
@@ -1958,12 +1963,12 @@ const styles = StyleSheet.create({
     borderRadius: 18,
     padding: 20,
     borderWidth: 1,
-    borderColor: 'rgba(212,169,106,0.28)',
+    borderColor: 'rgba(124,92,232,0.28)',
   },
   priceHead: { marginBottom: 10 },
   onlineTag: {
     alignSelf: 'flex-start',
-    backgroundColor: 'rgba(212,169,106,0.15)',
+    backgroundColor: 'rgba(124,92,232,0.15)',
     paddingHorizontal: 9,
     paddingVertical: 4,
     borderRadius: 8,
@@ -1977,7 +1982,7 @@ const styles = StyleSheet.create({
   priceAmt: { fontSize: 32, fontWeight: '900', color: GOLD },
   priceSub: { color: TEXT_MUTED, fontSize: 13, fontWeight: '600' },
   priceFmt: { color: TEXT_MUTED, fontSize: 13, marginBottom: 10 },
-  divider: { height: StyleSheet.hairlineWidth, backgroundColor: 'rgba(212,169,106,0.15)', marginVertical: 14 },
+  divider: { height: StyleSheet.hairlineWidth, backgroundColor: 'rgba(124,92,232,0.15)', marginVertical: 14 },
   priceRow: { flexDirection: 'row', gap: 10, marginBottom: 12, alignItems: 'flex-start' },
   bulletWrap: { paddingTop: 2 },
   priceLineTitle: { color: TEXT_MAIN, fontSize: 13, fontWeight: '600', lineHeight: 20 },
@@ -2011,7 +2016,7 @@ const styles = StyleSheet.create({
     borderRadius: 20,
     padding: 24,
     borderWidth: 1,
-    borderColor: 'rgba(212,169,106,0.22)',
+    borderColor: 'rgba(124,92,232,0.22)',
     gap: 10,
   },
   ctaTitle: { fontSize: 21, fontWeight: '800', color: TEXT_MAIN, textAlign: 'center', marginTop: 4 },
@@ -2053,7 +2058,7 @@ const styles = StyleSheet.create({
   footerSep: { color: 'rgba(203,209,222,0.4)', fontSize: 12 },
   footerCopy: { fontSize: 12, color: TEXT_MUTED, textAlign: 'center', paddingHorizontal: 16 },
   footerSupport: { fontSize: 12, color: TEXT_MUTED, textAlign: 'center', paddingHorizontal: 16, marginTop: 2 },
-  footerSupportEmail: { color: '#d4a96a', fontWeight: '600' },
+  footerSupportEmail: { color: ACCENT_LIGHT, fontWeight: '600' },
 
   // ─── Quiz inline ──────────────────────────────────────────────
   quizSection: {
@@ -2068,7 +2073,7 @@ const styles = StyleSheet.create({
     backgroundColor: BG_CARD,
     borderRadius: 20,
     borderWidth: 1,
-    borderColor: 'rgba(212,169,106,0.25)',
+    borderColor: 'rgba(124,92,232,0.25)',
     padding: 28,
     alignItems: 'center',
   },
@@ -2097,14 +2102,14 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     gap: 8,
   },
-  quizIdleBtnTxt: { color: '#0f172a', fontWeight: '800', fontSize: 15 },
+  quizIdleBtnTxt: { color: '#ffffff', fontWeight: '800', fontSize: 15 },
   quizIdleNote: { color: '#4a5568', fontSize: 12, marginTop: 12 },
 
   quizCard: {
     backgroundColor: BG_CARD,
     borderRadius: 20,
     borderWidth: 1,
-    borderColor: 'rgba(212,169,106,0.18)',
+    borderColor: 'rgba(124,92,232,0.18)',
     padding: 24,
   },
   quizProgressRow: { flexDirection: 'row', gap: 6, marginBottom: 24 },
@@ -2130,7 +2135,7 @@ const styles = StyleSheet.create({
   },
   quizOptionSelected: {
     borderColor: GOLD,
-    backgroundColor: 'rgba(212,169,106,0.10)',
+    backgroundColor: 'rgba(124,92,232,0.10)',
   },
   quizOptionEmoji: { fontSize: 22 },
   quizOptionLabel: { flex: 1, fontSize: 14, fontWeight: '500', color: TEXT_MUTED },
@@ -2143,15 +2148,15 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
-  quizOptionCheckTxt: { color: '#0f172a', fontSize: 12, fontWeight: '800' },
+  quizOptionCheckTxt: { color: '#ffffff', fontSize: 12, fontWeight: '800' },
   quizPrimaryBtn: {
     backgroundColor: GOLD,
     borderRadius: 14,
     paddingVertical: 15,
     alignItems: 'center',
   },
-  quizPrimaryBtnDisabled: { backgroundColor: 'rgba(212,169,106,0.3)' },
-  quizPrimaryBtnTxt: { color: '#0f172a', fontWeight: '800', fontSize: 15 },
+  quizPrimaryBtnDisabled: { backgroundColor: 'rgba(124,92,232,0.3)' },
+  quizPrimaryBtnTxt: { color: '#ffffff', fontWeight: '800', fontSize: 15 },
   quizBackBtn: { alignItems: 'center', marginTop: 12, paddingVertical: 8 },
   quizBackTxt: { color: '#64748b', fontSize: 13 },
 
@@ -2178,10 +2183,10 @@ const styles = StyleSheet.create({
     maxWidth: 440,
   },
   quizPlanNoteCard: {
-    backgroundColor: 'rgba(212,169,106,0.08)',
+    backgroundColor: 'rgba(124,92,232,0.08)',
     borderRadius: 12,
     borderWidth: 1,
-    borderColor: 'rgba(212,169,106,0.2)',
+    borderColor: 'rgba(124,92,232,0.2)',
     padding: 14,
     width: '100%',
     marginBottom: 20,
@@ -2249,7 +2254,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     gap: 8,
   },
-  quizCtaCheckoutTxt: { color: '#0f172a', fontWeight: '800', fontSize: 15 },
+  quizCtaCheckoutTxt: { color: '#ffffff', fontWeight: '800', fontSize: 15 },
   quizResetBtn: { marginTop: 12, paddingVertical: 8 },
   quizResetTxt: { color: '#64748b', fontSize: 12 },
 
@@ -2266,7 +2271,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#0e0e1c',
     borderRadius: 16,
     borderWidth: 1,
-    borderColor: 'rgba(212,169,106,0.18)',
+    borderColor: 'rgba(124,92,232,0.18)',
     padding: 22,
     flexDirection: 'row',
     gap: 16,
