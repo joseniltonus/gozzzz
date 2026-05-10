@@ -25,6 +25,7 @@ import {
   getProgramCompletoPath,
   isProgramAccessConfigured,
 } from '@/lib/program-access';
+import { useProgramUnlock } from '@/lib/program-unlock';
 
 const isWeb = Platform.OS === 'web';
 
@@ -37,6 +38,13 @@ export default function WebObrigadoPage() {
   // facilitar tracking e diferenciar mensagem se quisermos no futuro.
   const params = useLocalSearchParams<{ source?: string; orderId?: string }>();
   const source = (Array.isArray(params.source) ? params.source[0] : params.source) ?? 'kiwify';
+
+  // Importante: chamamos o hook só pelo efeito colateral de salvar o `?key=`
+  // no localStorage. Se o cliente fechar esta página sem clicar em nada, o
+  // próximo acesso a /web/programa ainda destrava porque a chave já está
+  // gravada. Resolve o cenário "Kiwify não enviou e-mail / cliente fechou
+  // o navegador antes de clicar".
+  useProgramUnlock();
 
   // Dispara um evento de conversão simples no GA/pixel quando a página carrega.
   // (Sem dependência de SDK extra — usa window.dataLayer se existir.)
