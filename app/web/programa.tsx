@@ -21,10 +21,47 @@ import {
   CreditCard,
   Shield,
   BadgeCheck,
+  Wand2,
 } from 'lucide-react-native';
 import { LESSONS_DATA } from '@/data/lessons';
 import { useProgramUnlock } from '@/lib/program-unlock';
+import { useEffectiveChronotype } from '@/hooks/useEffectiveChronotype';
+import { getChronotypeOneLiner } from '@/data/chronotypeOneLiner';
 const isWeb = Platform.OS === 'web';
+
+const CHRONOTYPE_META: Record<
+  'dolphin' | 'lion' | 'bear' | 'wolf',
+  { emoji: string; label: string; tint: string; tintBg: string; tintBorder: string }
+> = {
+  dolphin: {
+    emoji: '🐬',
+    label: 'Golfinho',
+    tint: '#a78bfa',
+    tintBg: 'rgba(167,139,250,0.12)',
+    tintBorder: 'rgba(167,139,250,0.32)',
+  },
+  lion: {
+    emoji: '🦁',
+    label: 'Leão',
+    tint: '#f59e0b',
+    tintBg: 'rgba(245,158,11,0.12)',
+    tintBorder: 'rgba(245,158,11,0.32)',
+  },
+  bear: {
+    emoji: '🐻',
+    label: 'Urso',
+    tint: '#10b981',
+    tintBg: 'rgba(16,185,129,0.12)',
+    tintBorder: 'rgba(16,185,129,0.32)',
+  },
+  wolf: {
+    emoji: '🐺',
+    label: 'Lobo',
+    tint: '#4a9eff',
+    tintBg: 'rgba(74,158,255,0.12)',
+    tintBorder: 'rgba(74,158,255,0.32)',
+  },
+};
 
 export default function WebProgramPage() {
   const router = useRouter();
@@ -34,6 +71,8 @@ export default function WebProgramPage() {
   // Cliente que veio do e-mail Kiwify com ?key= correto (ou já salvou no
   // localStorage) destrava todas as 21 lições. Sem login, sem fricção.
   const unlocked = useProgramUnlock();
+  const chronotype = useEffectiveChronotype();
+  const meta = chronotype ? CHRONOTYPE_META[chronotype] : null;
 
   const allSteps = [
     ...LESSONS_DATA.map((l) => ({
@@ -41,6 +80,7 @@ export default function WebProgramPage() {
       num: l.step_number,
       title: l.title_pt,
       desc: l.description_pt.substring(0, 120) + '...',
+      oneLiner: chronotype ? getChronotypeOneLiner(l.step_number, chronotype, 'pt') : null,
       free: l.step_number <= 3 || unlocked,
     })),
   ];
@@ -101,6 +141,47 @@ export default function WebProgramPage() {
       {/* STEPS */}
       <View style={styles.content}>
         <View style={styles.container}>
+          {/* Banner de personalização — adapta CTA ou confirmação conforme cronótipo */}
+          {meta ? (
+            <View style={[styles.personalizedBanner, { backgroundColor: meta.tintBg, borderColor: meta.tintBorder }]}>
+              <Text style={styles.personalizedBannerEmoji}>{meta.emoji}</Text>
+              <View style={styles.personalizedBannerCol}>
+                <Text style={[styles.personalizedBannerTitle, { color: meta.tint }]}>
+                  Sua trilha personalizada — {meta.label}
+                </Text>
+                <Text style={styles.personalizedBannerDesc}>
+                  As lições mostram orientação adaptada ao seu cronótipo. Você pode refazer o quiz a qualquer momento.
+                </Text>
+              </View>
+              <TouchableOpacity
+                style={styles.personalizedBannerBtn}
+                onPress={() => router.push('/web/sono-plus#quiz')}
+                activeOpacity={0.85}
+              >
+                <Text style={styles.personalizedBannerBtnText}>Refazer quiz</Text>
+              </TouchableOpacity>
+            </View>
+          ) : (
+            <TouchableOpacity
+              style={styles.quizCtaBanner}
+              onPress={() => router.push('/web/sono-plus#quiz')}
+              activeOpacity={0.88}
+            >
+              <View style={styles.quizCtaIconWrap}>
+                <Wand2 size={22} color="#fbbf24" />
+              </View>
+              <View style={styles.quizCtaCol}>
+                <Text style={styles.quizCtaTitle}>Personalizar minha trilha</Text>
+                <Text style={styles.quizCtaDesc}>
+                  Descubra seu cronótipo em 2 minutos e veja orientação específica em cada lição.
+                </Text>
+              </View>
+              <View style={styles.quizCtaBtn}>
+                <Text style={styles.quizCtaBtnText}>Fazer quiz</Text>
+              </View>
+            </TouchableOpacity>
+          )}
+
           <Text style={styles.sectionTitle}>{t('web.program.allLessons')}</Text>
           <Text style={styles.sectionDesc}>{t('web.program.learnScience')}</Text>
 
@@ -129,6 +210,22 @@ export default function WebProgramPage() {
                 </View>
 
                 <Text style={[styles.stepTitle, !step.free && styles.stepTitleLocked]}>{step.title}</Text>
+
+                {/* Badge de cronótipo nas 3 primeiras lições — espelha mobile */}
+                {meta && step.num <= 3 && (
+                  <View style={[styles.chronotypeBadge, { backgroundColor: meta.tintBg, borderColor: meta.tintBorder }]}>
+                    <Text style={styles.chronotypeBadgeEmoji}>{meta.emoji}</Text>
+                    <Text style={[styles.chronotypeBadgeText, { color: meta.tint }]}>{meta.label}</Text>
+                  </View>
+                )}
+
+                {/* One-liner personalizado — mesma fonte que o app mobile */}
+                {step.oneLiner && meta && (
+                  <Text style={[styles.stepOneLiner, { color: meta.tint, opacity: step.free ? 1 : 0.55 }]}>
+                    {step.oneLiner}
+                  </Text>
+                )}
+
                 <Text style={[styles.stepDesc, !step.free && styles.stepDescLocked]}>{step.desc}</Text>
 
                 <View style={styles.stepFooter}>
@@ -279,6 +376,83 @@ const styles = StyleSheet.create({
     elevation: 3,
   },
   stepCardLocked: { opacity: 0.65, borderStyle: 'dashed', borderWidth: 1.5, borderColor: 'rgba(255,255,255,0.1)' },
+  chronotypeBadge: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+    paddingHorizontal: 10,
+    paddingVertical: 5,
+    borderRadius: 10,
+    borderWidth: 1,
+    alignSelf: 'flex-start',
+    marginBottom: 8,
+  },
+  chronotypeBadgeEmoji: { fontSize: 13, lineHeight: 15 },
+  chronotypeBadgeText: { fontSize: 11.5, fontWeight: '700', letterSpacing: 0.2 },
+  stepOneLiner: {
+    fontSize: 13,
+    lineHeight: 19,
+    fontWeight: '500',
+    fontStyle: 'italic',
+    marginBottom: 10,
+  },
+  personalizedBanner: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 14,
+    borderRadius: 14,
+    borderWidth: 1,
+    paddingVertical: 14,
+    paddingHorizontal: 18,
+    marginBottom: 32,
+    flexWrap: 'wrap',
+  },
+  personalizedBannerEmoji: { fontSize: 26 },
+  personalizedBannerCol: { flex: 1, minWidth: 220 },
+  personalizedBannerTitle: { fontSize: 15, fontWeight: '800', marginBottom: 3 },
+  personalizedBannerDesc: { fontSize: 12.5, color: '#a3b1c2', lineHeight: 18 },
+  personalizedBannerBtn: {
+    backgroundColor: 'rgba(255,255,255,0.06)',
+    paddingHorizontal: 14,
+    paddingVertical: 9,
+    borderRadius: 10,
+    borderWidth: 1,
+    borderColor: 'rgba(255,255,255,0.12)',
+  },
+  personalizedBannerBtnText: { fontSize: 12, fontWeight: '700', color: '#e8e5df' },
+  quizCtaBanner: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 16,
+    backgroundColor: 'rgba(251,191,36,0.06)',
+    borderRadius: 14,
+    borderWidth: 1,
+    borderColor: 'rgba(251,191,36,0.22)',
+    paddingVertical: 16,
+    paddingHorizontal: 20,
+    marginBottom: 32,
+    flexWrap: 'wrap',
+  },
+  quizCtaIconWrap: {
+    width: 44,
+    height: 44,
+    borderRadius: 22,
+    backgroundColor: 'rgba(251,191,36,0.12)',
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderWidth: 1,
+    borderColor: 'rgba(251,191,36,0.3)',
+  },
+  quizCtaCol: { flex: 1, minWidth: 220 },
+  quizCtaTitle: { fontSize: 15, fontWeight: '800', color: '#fbbf24', marginBottom: 3 },
+  quizCtaDesc: { fontSize: 12.5, color: '#a3b1c2', lineHeight: 18 },
+  quizCtaBtn: {
+    backgroundColor: '#fbbf24',
+    paddingHorizontal: 16,
+    paddingVertical: 10,
+    borderRadius: 10,
+  },
+  quizCtaBtnText: { fontSize: 13, fontWeight: '800', color: '#0d0d16' },
   stepHeader: { flexDirection: 'row', alignItems: 'center', marginBottom: 14, gap: 8 },
   stepNum: {
     width: 36,

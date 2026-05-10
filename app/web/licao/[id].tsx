@@ -33,6 +33,14 @@ import { LessonInteractiveCardWeb } from '@/components/LessonInteractiveCardWeb'
 import { SleepLessonCardWeb } from '@/components/SleepLessonCardWeb';
 import { SLEEP_LESSON_CONTENT } from '@/data/sleepLessonContent';
 import { getChronotypeOneLiner } from '@/data/chronotypeOneLiner';
+import { getChronotypeProtocol } from '@/data/chronotypeLessonProtocols';
+
+const CHRONOTYPE_LABELS: Record<'dolphin' | 'lion' | 'bear' | 'wolf', { emoji: string; label: string; tint: string }> = {
+  dolphin: { emoji: '🐬', label: 'Golfinho', tint: '#a78bfa' },
+  lion: { emoji: '🦁', label: 'Leão', tint: '#f59e0b' },
+  bear: { emoji: '🐻', label: 'Urso', tint: '#10b981' },
+  wolf: { emoji: '🐺', label: 'Lobo', tint: '#4a9eff' },
+};
 
 const isWeb = Platform.OS === 'web';
 
@@ -176,6 +184,36 @@ export default function WebLessonPage() {
   };
 
   const oneLiner = getChronotypeOneLiner(lesson.step_number, chronotype, language as 'pt' | 'en');
+  const protocol = getChronotypeProtocol(lesson.id, chronotype, language as 'pt' | 'en');
+  const chronotypeMeta = chronotype ? CHRONOTYPE_LABELS[chronotype] : null;
+
+  const protocolCallout =
+    protocol && chronotypeMeta ? (
+      <View
+        style={[
+          styles.protocolCallout,
+          {
+            borderColor: `${chronotypeMeta.tint}55`,
+            backgroundColor: `${chronotypeMeta.tint}14`,
+          },
+        ]}
+      >
+        <View style={styles.protocolCalloutHeader}>
+          <Text style={styles.protocolCalloutEmoji}>{chronotypeMeta.emoji}</Text>
+          <Text style={[styles.protocolCalloutLabel, { color: chronotypeMeta.tint }]}>
+            Pra você como {chronotypeMeta.label}
+          </Text>
+        </View>
+        <Text style={[styles.protocolCalloutWindow, { color: chronotypeMeta.tint }]}>
+          {protocol.window}
+        </Text>
+        <Text style={styles.protocolCalloutBody}>{protocol.why}</Text>
+        <View style={[styles.protocolCalloutLimitRow, { borderColor: `${chronotypeMeta.tint}33` }]}>
+          <Text style={styles.protocolCalloutLimitLabel}>Limite</Text>
+          <Text style={styles.protocolCalloutLimitValue}>{protocol.limit}</Text>
+        </View>
+      </View>
+    ) : null;
 
   const navigateToPrevLesson = () => {
     if (!lesson) return;
@@ -324,6 +362,9 @@ export default function WebLessonPage() {
         </LinearGradient>
 
         <View style={{ flex: 1, flexDirection: 'column' }}>
+          {protocolCallout && (
+            <View style={styles.protocolCalloutContainer}>{protocolCallout}</View>
+          )}
           {SLEEP_LESSON_CONTENT.find((l) => l.id === id) ? (
             <SleepLessonCardWeb key={`sleepweb-${id as string}`} lessonId={id as string} onComplete={() => setSleepLessonComplete(true)} />
           ) : (
@@ -388,6 +429,8 @@ export default function WebLessonPage() {
             />
           )}
 
+
+          {protocolCallout}
 
           {enhancement && (
             <View style={[styles.card, styles.cardYellow]}>
@@ -473,6 +516,66 @@ export default function WebLessonPage() {
 }
 
 const styles = StyleSheet.create({
+  protocolCalloutContainer: {
+    paddingHorizontal: 24,
+    paddingTop: 24,
+    maxWidth: 760,
+    alignSelf: 'center',
+    width: '100%',
+  },
+  protocolCallout: {
+    borderRadius: 16,
+    borderWidth: 1.5,
+    paddingVertical: 18,
+    paddingHorizontal: 20,
+    marginBottom: 20,
+  },
+  protocolCalloutHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+    marginBottom: 8,
+  },
+  protocolCalloutEmoji: { fontSize: 22 },
+  protocolCalloutLabel: {
+    fontSize: 12.5,
+    fontWeight: '800',
+    letterSpacing: 1,
+    textTransform: 'uppercase',
+  },
+  protocolCalloutWindow: {
+    fontSize: 22,
+    fontWeight: '800',
+    marginBottom: 8,
+    letterSpacing: 0.2,
+  },
+  protocolCalloutBody: {
+    fontSize: 14,
+    lineHeight: 21,
+    color: '#cbd5e1',
+    marginBottom: 14,
+  },
+  protocolCalloutLimitRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 12,
+    paddingTop: 12,
+    borderTopWidth: 1,
+  },
+  protocolCalloutLimitLabel: {
+    fontSize: 11,
+    fontWeight: '800',
+    letterSpacing: 1,
+    color: '#94a3b8',
+    textTransform: 'uppercase',
+  },
+  protocolCalloutLimitValue: {
+    flex: 1,
+    fontSize: 13,
+    color: '#e2e8f0',
+    fontWeight: '500',
+    lineHeight: 19,
+  },
   lockedPage: { flex: 1, backgroundColor: '#0f172a' },
   lockedBody: {
     flex: 1,

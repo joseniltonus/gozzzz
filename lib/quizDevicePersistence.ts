@@ -28,6 +28,30 @@ export async function readQuizChronotypeFromDevice(userId: string): Promise<Chro
   }
 }
 
+/**
+ * Web-only: lê o cronótipo salvo pelo quiz inline da landing /web/sono-plus
+ * (e pelo `ChronotypeQuizModal` quando rodando no web). Usado como fallback
+ * pra usuários anônimos que vieram do funil Kiwify e ainda não têm conta.
+ *
+ * Por que existe uma chave separada: o quiz da landing salva em `gozzzz_chronotype`
+ * (sem id de usuário). O sistema do app usa `quiz_latest_chronotype` /
+ * `quiz_chronotype_<userId>`. Esta função une as duas leituras pra que a
+ * personalização funcione em todo o web.
+ */
+export function readGozzzzChronotypeWeb(): Chronotype | null {
+  if (Platform.OS !== 'web') return null;
+  if (typeof window === 'undefined' || !window.localStorage) return null;
+  try {
+    const value = window.localStorage.getItem('gozzzz_chronotype');
+    if (isValidChronotypeString(value)) return value;
+    const latest = window.localStorage.getItem('quiz_latest_chronotype');
+    if (isValidChronotypeString(latest)) return latest;
+    return null;
+  } catch {
+    return null;
+  }
+}
+
 export async function saveQuizChronotypeToDevice(userId: string, chronotype: string): Promise<void> {
   try {
     const key = `quiz_chronotype_${userId}`;
