@@ -3,3 +3,8 @@
 # não com JWT de utilizador — verify_jwt tem de estar desligado.
 [functions.process-privacy-requests]
 verify_jwt = false
+
+# Webhook do Kiwify chama com assinatura HMAC própria (não JWT). A função
+# valida o secret no handler — verify_jwt do Supabase precisa ficar OFF.
+[functions.kiwify-webhook]
+verify_jwt = false
