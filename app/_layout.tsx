@@ -142,7 +142,7 @@ function RootNavigator() {
 
         {loading && (
           <View style={styles.loadingOverlay}>
-            <ActivityIndicator size="large" color="#d4a96a" />
+            <ActivityIndicator size="large" color="#7c5ce8" />
           </View>
         )}
 
@@ -196,7 +196,7 @@ const styles = StyleSheet.create({
     ...StyleSheet.absoluteFillObject,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: 'rgba(7,7,15,0.85)',
+    backgroundColor: 'rgba(10,10,26,0.85)',
     zIndex: 999,
   },
   conflictOverlay: {
@@ -231,13 +231,13 @@ const styles = StyleSheet.create({
     marginBottom: 24,
   },
   conflictButton: {
-    backgroundColor: '#d4a96a',
+    backgroundColor: '#7c5ce8',
     paddingHorizontal: 40,
     paddingVertical: 12,
     borderRadius: 10,
   },
   conflictButtonText: {
-    color: '#0f172a',
+    color: '#ffffff',
     fontSize: 16,
     fontWeight: '700',
   },

@@ -63,6 +63,14 @@ export default function BlogPostPage() {
   const related = useMemo(() => getRelatedPosts(post), [post]);
   const schemaGraph = useMemo(() => buildBlogPostSchemaGraph(post), [post]);
 
+  // og:image individual quando o artigo tem ilustração própria; fallback é a OG da landing.
+  // Dimensões: 1200×750 (geradas pelo optimize-blog-images com WIDTH_HERO=1200, ratio 16:10).
+  const ogImage = post.heroImage
+    ? `https://gozzzz.app${post.heroImage}`
+    : 'https://gozzzz.app/og/sono-plus.png';
+  const ogImageWidth = post.heroImage ? '1200' : '1200';
+  const ogImageHeight = post.heroImage ? '750' : '800';
+
   return (
     <>
       <Head>
@@ -72,9 +80,10 @@ export default function BlogPostPage() {
         <meta property="og:description" content={post.metaDescription} />
         <meta property="og:type" content="article" />
         <meta property="og:url" content={`https://gozzzz.app/blog/${post.slug}`} />
-        <meta property="og:image" content="https://gozzzz.app/og/sono-plus.png" />
-        <meta property="og:image:width" content="1200" />
-        <meta property="og:image:height" content="800" />
+        <meta property="og:image" content={ogImage} />
+        <meta property="og:image:width" content={ogImageWidth} />
+        <meta property="og:image:height" content={ogImageHeight} />
+        <meta property="og:image:alt" content={`Ilustração editorial: ${post.title}`} />
         <meta property="og:site_name" content="GoZzzz" />
         <meta property="og:locale" content="pt_BR" />
         <meta property="article:published_time" content={post.publishedAt} />
@@ -83,7 +92,8 @@ export default function BlogPostPage() {
         <meta name="twitter:card" content="summary_large_image" />
         <meta name="twitter:title" content={post.title} />
         <meta name="twitter:description" content={post.metaDescription} />
-        <meta name="twitter:image" content="https://gozzzz.app/og/sono-plus.png" />
+        <meta name="twitter:image" content={ogImage} />
+        <meta name="twitter:image:alt" content={`Ilustração editorial: ${post.title}`} />
         <meta
           name="robots"
           content="index,follow,max-image-preview:large,max-snippet:-1"

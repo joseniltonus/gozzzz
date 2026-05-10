@@ -136,7 +136,7 @@ export default function BlogIndexPage() {
                       {p.heroImage ? (
                         <View style={[styles.cardImageWrap, { borderColor: cat.color + '44' }]}>
                           <Image
-                            source={{ uri: p.heroImage }}
+                            source={{ uri: p.heroImage.replace('.webp', '@thumb.webp') }}
                             accessibilityLabel={`Ilustração do artigo: ${p.title}`}
                             resizeMode="cover"
                             style={styles.cardImage}

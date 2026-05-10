@@ -56,6 +56,13 @@ export function buildBlogIndexSchemaGraph(posts: BlogPost[]): Record<string, unk
 
 export function buildBlogPostSchemaGraph(post: BlogPost): Record<string, unknown> {
   const url = `${BASE_URL}/blog/${post.slug}`;
+  // Prioriza ilustração própria do post pra Google Discover, rich results e Image Search.
+  // Fallback: OG da landing (mantém schema válido mesmo em posts antigos sem heroImage).
+  const heroImageUrl = post.heroImage
+    ? `${BASE_URL}${post.heroImage}`
+    : `${BASE_URL}/og/sono-plus.png`;
+  const heroImageWidth = post.heroImage ? 1200 : 1200;
+  const heroImageHeight = post.heroImage ? 750 : 800;
   return {
     '@context': 'https://schema.org',
     '@graph': [
@@ -76,7 +83,14 @@ export function buildBlogPostSchemaGraph(post: BlogPost): Record<string, unknown
           url: BASE_URL,
         },
         publisher: { '@id': ORG_ID },
-        image: `${BASE_URL}/og/sono-plus.png`,
+        // Google Discover/News exige image; objeto rico (não só URL) ranqueia melhor.
+        image: {
+          '@type': 'ImageObject',
+          url: heroImageUrl,
+          width: heroImageWidth,
+          height: heroImageHeight,
+          caption: `Ilustração editorial: ${post.title}`,
+        },
         articleSection: post.category,
         wordCount: estimateWordCount(post),
       },
@@ -90,9 +104,9 @@ export function buildBlogPostSchemaGraph(post: BlogPost): Record<string, unknown
         isPartOf: { '@id': `${BASE_URL}/#website` },
         primaryImageOfPage: {
           '@type': 'ImageObject',
-          url: `${BASE_URL}/og/sono-plus.png`,
-          width: 1200,
-          height: 800,
+          url: heroImageUrl,
+          width: heroImageWidth,
+          height: heroImageHeight,
         },
         speakable: {
           '@type': 'SpeakableSpecification',

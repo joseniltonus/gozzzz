@@ -15,6 +15,7 @@
     "prebuild:web": "node scripts/generate-sitemap.mjs",
     "build:web": "expo export --platform web --clear",
     "sitemap": "node scripts/generate-sitemap.mjs",
+    "blog:optimize-images": "node scripts/optimize-blog-images.mjs",
     "lint": "expo lint",
     "typecheck": "tsc --noEmit",
     "validate:science": "node scripts/validate-science-references.mjs",
@@ -85,6 +86,7 @@
     "eslint": "^9.0.0",
     "eslint-config-expo": "~10.0.0",
     "qrcode-terminal": "^0.12.0",
+    "sharp": "^0.34.5",
     "typescript": "~5.9.2"
   }
 }

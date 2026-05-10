@@ -62,7 +62,7 @@ export interface BlogPost {
   category: BlogCategoryId;
   /** Emoji que vira "ilustração" fallback (caso heroImage ausente). */
   emoji: string;
-  /** Caminho absoluto da ilustração hero (ex: "/blog/blog-slug.png"). */
+  /** Caminho absoluto da ilustração hero (ex: "/blog/blog-slug.webp"). */
   heroImage?: string;
   /** Resumo curto pro card no índice (~140-160 chars). */
   excerpt: string;
@@ -108,7 +108,7 @@ export const BLOG_POSTS: BlogPost[] = [
     readingMinutes: 4,
     category: 'sintomas',
     emoji: '😴',
-    heroImage: '/blog/blog-dormir-8-horas-acordar-cansado.png',
+    heroImage: '/blog/blog-dormir-8-horas-acordar-cansado.webp',
     excerpt:
       'Dormir muito não é dormir bem. O que decide se você acorda descansado é a arquitetura dos ciclos — não o relógio.',
     intro:
@@ -205,7 +205,7 @@ export const BLOG_POSTS: BlogPost[] = [
     readingMinutes: 4,
     category: 'cronotipo',
     emoji: '🦁',
-    heroImage: '/blog/blog-cronotipo-forcar-acordar-cedo.png',
+    heroImage: '/blog/blog-cronotipo-forcar-acordar-cedo.webp',
     excerpt:
       'O 5AM Club não é universal. Cronótipo tardio não é preguiça — é biologia. Entenda quando ir contra ela vira sabotagem.',
     intro:
@@ -310,7 +310,7 @@ export const BLOG_POSTS: BlogPost[] = [
     readingMinutes: 4,
     category: 'habitos',
     emoji: '📱',
-    heroImage: '/blog/blog-luz-celular-22h-cerebro.png',
+    heroImage: '/blog/blog-luz-celular-22h-cerebro.webp',
     excerpt:
       'Não é "luz azul" só. É a intensidade da luz noturna chegando na retina e dizendo ao seu cérebro que ainda é dia.',
     intro:
@@ -409,7 +409,7 @@ export const BLOG_POSTS: BlogPost[] = [
     readingMinutes: 4,
     category: 'mitos',
     emoji: '📉',
-    heroImage: '/blog/blog-divida-de-sono-fim-de-semana.png',
+    heroImage: '/blog/blog-divida-de-sono-fim-de-semana.webp',
     excerpt:
       'Dormir até tarde sábado e domingo mascara o cansaço — não paga a dívida. E pode até atrasar mais o seu relógio biológico.',
     intro:
@@ -494,7 +494,7 @@ export const BLOG_POSTS: BlogPost[] = [
     readingMinutes: 4,
     category: 'sintomas',
     emoji: '🌑',
-    heroImage: '/blog/blog-acordar-3-da-manha.png',
+    heroImage: '/blog/blog-acordar-3-da-manha.webp',
     excerpt:
       'Acordar às 3h não é aleatório. É o ponto onde quatro processos fisiológicos se encontram — e qualquer um pode estar fora de calibre.',
     intro:
@@ -588,7 +588,7 @@ export const BLOG_POSTS: BlogPost[] = [
     readingMinutes: 4,
     category: 'habitos',
     emoji: '🌅',
-    heroImage: '/blog/blog-luz-solar-manha-10-minutos.png',
+    heroImage: '/blog/blog-luz-solar-manha-10-minutos.webp',
     excerpt:
       'O hábito mais bem documentado pra melhorar sono noturno acontece pela manhã. 10 minutos de luz solar fazem mais que aplicativo nenhum.',
     intro:
@@ -674,7 +674,7 @@ export const BLOG_POSTS: BlogPost[] = [
     readingMinutes: 3,
     category: 'otimizacao',
     emoji: '🌡️',
-    heroImage: '/blog/blog-temperatura-quarto-dormir.png',
+    heroImage: '/blog/blog-temperatura-quarto-dormir.webp',
     excerpt:
       'O corpo precisa esfriar pra dormir profundo. Quarto quente sabota a noite mais do que muito hábito tido como vilão.',
     intro:
@@ -767,7 +767,7 @@ export const BLOG_POSTS: BlogPost[] = [
     readingMinutes: 3,
     category: 'habitos',
     emoji: '☕',
-    heroImage: '/blog/blog-cafeina-quanto-tempo-antes-de-dormir.png',
+    heroImage: '/blog/blog-cafeina-quanto-tempo-antes-de-dormir.webp',
     excerpt:
       'Cafeína bloqueia adenosina por horas. O último café tem que respeitar a meia-vida — e ela é maior do que parece.',
     intro:
@@ -856,7 +856,7 @@ export const BLOG_POSTS: BlogPost[] = [
     readingMinutes: 4,
     category: 'educacao',
     emoji: '🧠',
-    heroImage: '/blog/blog-sono-profundo-rem-diferenca.png',
+    heroImage: '/blog/blog-sono-profundo-rem-diferenca.webp',
     excerpt:
       'N3 e REM não são sinônimos. Cada um tem função própria — e a falta de um dá um tipo bem específico de cansaço.',
     intro:
@@ -973,7 +973,7 @@ export const BLOG_POSTS: BlogPost[] = [
     readingMinutes: 4,
     category: 'educacao',
     emoji: '💊',
-    heroImage: '/blog/blog-melatonina-funciona-quando-tomar.png',
+    heroImage: '/blog/blog-melatonina-funciona-quando-tomar.webp',
     excerpt:
       'Melatonina não dá sono — sinaliza ao corpo que é noite. Entender essa diferença muda totalmente quando ela ajuda.',
     intro:
@@ -1069,7 +1069,7 @@ export const BLOG_POSTS: BlogPost[] = [
     readingMinutes: 3,
     category: 'tecnica',
     emoji: '🌬️',
-    heroImage: '/blog/blog-respiracao-4-7-8-funciona.png',
+    heroImage: '/blog/blog-respiracao-4-7-8-funciona.webp',
     excerpt:
       'Respiração lenta com expiração longa ativa o nervo vago e baixa o estado de alerta. A técnica 4-7-8 é só uma das que funcionam.',
     intro:
@@ -1162,7 +1162,7 @@ export const BLOG_POSTS: BlogPost[] = [
     readingMinutes: 4,
     category: 'sintomas',
     emoji: '🌀',
-    heroImage: '/blog/blog-nao-consigo-desligar-mente-noite.png',
+    heroImage: '/blog/blog-nao-consigo-desligar-mente-noite.webp',
     excerpt:
       'Mente que não para tem um padrão fisiológico específico — e ele responde a três protocolos com mecanismo claro.',
     intro:
