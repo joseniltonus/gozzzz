@@ -7,7 +7,7 @@ import {
   Platform,
   useWindowDimensions,
 } from 'react-native';
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect, useMemo, useCallback } from 'react';
 import { useRouter } from 'expo-router';
 import Head from 'expo-router/head';
 import { LinearGradient } from 'expo-linear-gradient';
@@ -25,20 +25,94 @@ import {
   Lock,
   BadgeCheck,
   Calendar,
+  HelpCircle,
+  Zap,
 } from 'lucide-react-native';
 import { useLanguage } from '@/contexts/LanguageContext';
+import { STRIPE_ENABLED } from '@/lib/payment-links';
 import { useUserProfile } from '@/hooks/useUserProfile';
 import { useEffectiveChronotype } from '@/hooks/useEffectiveChronotype';
 import ChronotypePremiumWebFunnel from '@/components/web/chronotype/ChronotypePremiumWebFunnel';
 
 const isWeb = Platform.OS === 'web';
 
+/** FAQ da home — factual, alinhado à oferta (sem depoimentos inventados). */
+const HOME_WEB_FAQ_PT = [
+  {
+    q: 'O que são os 21 passos?',
+    a: 'Uma sequência guiada: cada passo traduz princípios de ciência do sono em ações concretas — do entendimento do seu padrão à consolidação de hábitos.',
+  },
+  {
+    q: 'Posso experimentar antes de assinar?',
+    a: 'Sim. As 3 primeiras lições são gratuitas para você sentir o ritmo, a linguagem e a profundidade do método.',
+  },
+  {
+    q: 'O que está incluído no acesso completo?',
+    a: 'Acesso a todas as 21 lições na web e no app, atualizações de conteúdo do programa e orientações práticas ao longo do percurso.',
+  },
+  {
+    q: 'Como funciona a garantia de satisfação?',
+    a: 'Você tem 7 dias para solicitar reembolso integral se o produto não atender às suas expectativas, conforme nossa política e o Código de Defesa do Consumidor.',
+  },
+  {
+    q: 'Isso substitui consulta médica ou tratamento?',
+    a: 'Não. O programa é educativo e de hábitos; não faz diagnóstico nem prescreve medicamentos. Em dúvidas de saúde, procure um profissional habilitado.',
+  },
+  {
+    q: 'O que é a personalização por cronótipo?',
+    a: 'Após um quiz rápido, o conteúdo pode destacar orientações mais compatíveis com o seu perfil de sono (ex.: matinal vs. noturno), sem substituir avaliação clínica.',
+  },
+  {
+    q: 'Como funciona o pagamento e o acesso?',
+    a: STRIPE_ENABLED
+      ? 'Na página de compra você pode escolher checkout com cartão (Kiwify) ou fluxo alternativo com Stripe, conforme as opções exibidas no momento. O acesso ao programa é liberado após a confirmação do pagamento.'
+      : 'O checkout é feito pela Kiwify, com cartão de crédito, Pix e boleto quando disponíveis, e parcelamento em até 6x conforme a página de compra. O acesso às lições é liberado após a confirmação do pagamento.',
+  },
+] as const;
+
+const HOME_WEB_FAQ_EN = [
+  {
+    q: 'What are the 21 steps?',
+    a: 'A guided sequence: each step turns sleep-science principles into concrete actions — from understanding your pattern to consolidating habits.',
+  },
+  {
+    q: 'Can I try before I pay?',
+    a: 'Yes. The first 3 lessons are free so you can feel the pace, tone, and depth of the method.',
+  },
+  {
+    q: 'What is included in full access?',
+    a: 'Access to all 21 lessons on web and app, program content updates, and practical guidance along the way.',
+  },
+  {
+    q: 'How does the satisfaction guarantee work?',
+    a: 'You have 7 days to request a full refund if the product does not meet your expectations, per our policy and applicable consumer law.',
+  },
+  {
+    q: 'Does this replace medical care or treatment?',
+    a: 'No. The program is educational and habit-focused; it does not diagnose or prescribe. For health concerns, see a licensed professional.',
+  },
+  {
+    q: 'What is chronotype personalization?',
+    a: 'After a short quiz, content can highlight guidance that fits your sleep profile (e.g., morning vs. evening tendency) — not a clinical assessment.',
+  },
+  {
+    q: 'How do payment and access work?',
+    a: STRIPE_ENABLED
+      ? 'At checkout you may see card payment via our sales partner or an alternate Stripe flow, depending on what is offered on the purchase page. Program access is granted after payment confirmation.'
+      : 'Checkout is handled by our sales partner (Kiwify), with card and local payment options as shown on the purchase page. Lesson access is granted after payment confirmation.',
+  },
+] as const;
+
 const GOLD = '#d4a96a';
 const GOLD_LIGHT = '#e8c99a';
 
-function WebNav() {
+type WebNavProps = {
+  onFaqPress?: () => void;
+};
+
+function WebNav({ onFaqPress }: WebNavProps) {
   const router = useRouter();
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
   const { width } = useWindowDimensions();
   const navPadH = width < 400 ? 16 : 24;
   const [scrolled, setScrolled] = useState(false);
@@ -75,6 +149,12 @@ function WebNav() {
             <TouchableOpacity onPress={() => router.push('/web/sobre')}>
               <Text style={styles.navLink}>{t('web.nav.about')}</Text>
             </TouchableOpacity>
+            {onFaqPress ? (
+              <TouchableOpacity onPress={onFaqPress} style={styles.navGhostLink}>
+                <HelpCircle size={16} color={GOLD} />
+                <Text style={styles.navGhostLinkText}>{language === 'pt' ? 'Dúvidas' : 'FAQ'}</Text>
+              </TouchableOpacity>
+            ) : null}
             <TouchableOpacity onPress={() => router.push('/web/assinar')} style={styles.navCta}>
               <Text style={styles.navCtaText}>{t('web.nav.subscribe')}</Text>
             </TouchableOpacity>
@@ -143,6 +223,8 @@ export default function WebLandingPage() {
         ],
         signature: 'José Nilton, Fundador do GoZzzz',
         result: 'Hoje durmo 7-8 horas praticamente todas as noites.\nE você também pode.',
+        ctaPrimary: 'Começar com acesso completo',
+        ctaSecondary: 'Ver as 3 lições gratuitas',
       }
     : {
         label: "FOUNDER'S STORY",
@@ -154,6 +236,8 @@ export default function WebLandingPage() {
         ],
         signature: 'José Nilton, Founder of GoZzzz',
         result: 'Today I sleep 7–8 hours on virtually every night.\nAnd you can too.',
+        ctaPrimary: 'Get full access',
+        ctaSecondary: 'See the 3 free lessons',
       };
 
   const dynamicStyles = useMemo(() => {
@@ -179,6 +263,79 @@ export default function WebLandingPage() {
           : windowWidth - horizontalPad,
     };
   }, [windowWidth, isDesktop, isTablet]);
+
+  const homeStructuredData = useMemo(() => {
+    const faqItems = language === 'pt' ? HOME_WEB_FAQ_PT : HOME_WEB_FAQ_EN;
+    return {
+      '@context': 'https://schema.org',
+      '@graph': [
+        {
+          '@type': 'WebSite',
+          name: 'GoZzzz',
+          url: 'https://gozzzz.app',
+          description: t('web.meta.home.description', 'pt'),
+          inLanguage: 'pt-BR',
+        },
+        {
+          '@type': 'Organization',
+          name: 'GoZzzz',
+          legalName: 'MORFEU SAÚDE E TECNOLOGIA LTDA',
+          url: 'https://gozzzz.app',
+        },
+        {
+          '@type': 'BreadcrumbList',
+          itemListElement: [
+            { '@type': 'ListItem', position: 1, name: 'GoZzzz', item: 'https://gozzzz.app/web' },
+            { '@type': 'ListItem', position: 2, name: 'Programa 21 Passos', item: 'https://gozzzz.app/web/sono-plus' },
+          ],
+        },
+        {
+          '@type': 'Course',
+          name: t('web.meta.home.title', 'pt'),
+          description: t('web.meta.home.description', 'pt'),
+          provider: {
+            '@type': 'Organization',
+            name: 'GoZzzz',
+            url: 'https://gozzzz.app',
+          },
+          numberOfCredits: '21',
+        },
+        {
+          '@type': 'FAQPage',
+          mainEntity: faqItems.map((item) => ({
+            '@type': 'Question',
+            name: item.q,
+            acceptedAnswer: { '@type': 'Answer', text: item.a },
+          })),
+        },
+      ],
+    };
+  }, [language, t]);
+
+  const homeFaqItems = language === 'pt' ? HOME_WEB_FAQ_PT : HOME_WEB_FAQ_EN;
+
+  const scrollToFaq = useCallback(() => {
+    if (typeof document === 'undefined') return;
+    document.getElementById('web-landing-faq')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }, []);
+
+  const [scrollContentH, setScrollContentH] = useState(0);
+  const [scrollViewportH, setScrollViewportH] = useState(0);
+  const nearBottom = scrollContentH > 0 && scrollY + scrollViewportH >= scrollContentH - 160;
+  const showStickyBar = isWeb && scrollY > 480 && scrollContentH > 400 && !nearBottom;
+
+  const journeySteps =
+    language === 'pt'
+      ? [
+          { Icon: Zap, title: 'Quiz do cronótipo', desc: 'Grátis · ~2 min' },
+          { Icon: BookOpen, title: '21 passos guiados', desc: 'Web e app' },
+          { Icon: Moon, title: 'Hábitos sustentáveis', desc: 'Ciência na prática' },
+        ]
+      : [
+          { Icon: Zap, title: 'Chronotype quiz', desc: 'Free · ~2 min' },
+          { Icon: BookOpen, title: '21 guided steps', desc: 'Web + app' },
+          { Icon: Moon, title: 'Sustainable habits', desc: 'Science applied' },
+        ];
 
   return (
     <>
@@ -210,44 +367,18 @@ export default function WebLandingPage() {
         />
         <link rel="canonical" href="https://gozzzz.app/web" />
         <link rel="preconnect" href="https://js.stripe.com" />
-        <script type="application/ld+json">{JSON.stringify({
-          "@context": "https://schema.org",
-          "@graph": [
-            {
-              "@type": "WebSite",
-              "name": "GoZzzz",
-              "url": "https://gozzzz.app",
-              "description": t('web.meta.home.description', 'pt'),
-              "inLanguage": "pt-BR"
-            },
-            {
-              "@type": "BreadcrumbList",
-              "itemListElement": [
-                { "@type": "ListItem", "position": 1, "name": "GoZzzz", "item": "https://gozzzz.app/web" },
-                { "@type": "ListItem", "position": 2, "name": "Programa 21 Passos", "item": "https://gozzzz.app/web/sono-plus" }
-              ]
-            },
-            {
-              "@type": "Course",
-              "name": t('web.meta.home.title', 'pt'),
-              "description": t('web.meta.home.description', 'pt'),
-              "provider": {
-                "@type": "Organization",
-                "name": "GoZzzz",
-                "url": "https://gozzzz.app"
-              },
-              "numberOfCredits": "21"
-            }
-          ]
-        })}</script>
+        <script type="application/ld+json">{JSON.stringify(homeStructuredData)}</script>
       </Head>
       <ScrollView
         style={styles.page}
         showsVerticalScrollIndicator={false}
         onScroll={(e) => setScrollY(e.nativeEvent.contentOffset.y)}
         scrollEventThrottle={16}
+        contentContainerStyle={showStickyBar ? { paddingBottom: 92 } : undefined}
+        onContentSizeChange={(_w, h) => setScrollContentH(h)}
+        onLayout={(e) => setScrollViewportH(e.nativeEvent.layout.height)}
       >
-        <WebNav />
+        <WebNav onFaqPress={scrollToFaq} />
 
         {chronotype &&
           (() => {
@@ -285,6 +416,32 @@ export default function WebLandingPage() {
               <View key={i} style={[styles.problemItem, { width: dynamicStyles.problemItemWidth }]}>
                 <Text style={styles.problemDot}>✕</Text>
                 <Text style={styles.problemText}>{item}</Text>
+              </View>
+            ))}
+          </View>
+        </View>
+      </View>
+
+      {/* JOURNEY */}
+      <View style={styles.journeySection}>
+        <View style={[styles.container, { paddingHorizontal: contentPadH }]}>
+          <Text style={styles.sectionLabel}>{language === 'pt' ? 'SIMPLES ASSIM' : 'HOW IT WORKS'}</Text>
+          <Text style={[styles.sectionTitle, typographyWide && styles.sectionTitleWide, styles.journeyHeadline]}>
+            {language === 'pt' ? 'Do quiz à rotina de sono' : 'From quiz to sleep routine'}
+          </Text>
+          <Text style={[styles.sectionDesc, styles.journeySub]}>
+            {language === 'pt'
+              ? 'Sem complicação: você entende seu perfil, percorre o programa no seu ritmo e transforma o que aprendeu em hábitos.'
+              : 'No fluff: understand your profile, move through the program at your pace, and turn insights into habits.'}
+          </Text>
+          <View style={[styles.journeyRow, typographyWide && styles.journeyRowWide]}>
+            {journeySteps.map((step, i) => (
+              <View key={i} style={[styles.journeyCell, typographyWide && styles.journeyCellWide]}>
+                <View style={styles.journeyIconWrap}>
+                  <step.Icon size={22} color={GOLD} strokeWidth={2} />
+                </View>
+                <Text style={styles.journeyStepTitle}>{step.title}</Text>
+                <Text style={styles.journeyStepDesc}>{step.desc}</Text>
               </View>
             ))}
           </View>
@@ -337,7 +494,7 @@ export default function WebLandingPage() {
             {sciencePillars.map((p, i) => (
               <View key={i} style={[styles.expertCard, { width: dynamicStyles.expertCardWidth }]}>
                 <View style={styles.expertAvatar}>
-                  <p.icon size={24} color="#fbbf24" />
+                  <p.icon size={24} color={GOLD} />
                 </View>
                 <Text style={styles.expertName}>{p.title}</Text>
                 <Text style={styles.expertRole}>{p.desc}</Text>
@@ -348,6 +505,60 @@ export default function WebLandingPage() {
             <BookOpen size={18} color="#07070f" />
             <Text style={styles.viewAllBtnText}>{language === 'pt' ? 'Sobre Nossa Metodologia' : 'About Our Methodology'}</Text>
           </TouchableOpacity>
+        </View>
+      </View>
+
+      {/* FOUNDER */}
+      <View style={styles.founderSection}>
+        <View style={[styles.container, { paddingHorizontal: contentPadH }]}>
+          <View style={[styles.founderCard, founderLayoutWide && styles.founderCardWide]}>
+            <Text style={styles.founderLabel}>{founderContent.label}</Text>
+            <Text style={[styles.founderHeadline, typographyWide && styles.founderHeadlineWide]}>
+              {founderContent.headline}
+            </Text>
+
+            <View style={styles.founderDividerTop} />
+
+            <View style={styles.founderBody}>
+              {founderContent.paragraphs.map((para, i) => (
+                <Text key={i} style={[styles.founderParagraph, typographyWide && styles.founderParagraphWide]}>
+                  {para}
+                </Text>
+              ))}
+            </View>
+
+            <View style={styles.founderSignatureRow}>
+              <View style={styles.founderAvatarCircle}>
+                <Text style={styles.founderAvatarInitial}>J</Text>
+              </View>
+              <View style={styles.founderSignatureBlock}>
+                <Text style={[styles.founderSignature, typographyWide && styles.founderSignatureWide]}>
+                  {founderContent.signature}
+                </Text>
+              </View>
+            </View>
+
+            <View style={styles.founderResultBox}>
+              <Text style={[styles.founderResultText, typographyWide && styles.founderResultTextWide]}>
+                {founderContent.result}
+              </Text>
+            </View>
+
+            <View style={styles.founderCtaColumn}>
+              <TouchableOpacity style={styles.founderPrimaryBtn} onPress={() => router.push('/web/assinar')} activeOpacity={0.88}>
+                <Crown size={18} color="#07070f" />
+                <Text style={styles.founderPrimaryBtnText}>{founderContent.ctaPrimary}</Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={styles.founderSecondaryTouchable}
+                onPress={() => router.push('/web/programa')}
+                activeOpacity={0.85}
+              >
+                <Text style={styles.founderSecondaryLink}>{founderContent.ctaSecondary}</Text>
+                <ArrowRight size={14} color={GOLD} />
+              </TouchableOpacity>
+            </View>
+          </View>
         </View>
       </View>
 
@@ -388,7 +599,7 @@ export default function WebLandingPage() {
                 } : {})}
               >
                 <Text style={styles.pricingFilledBtnText}>
-                  {t('web.pricing.ctaSubscribe', 'pt')}
+                  {t('web.pricing.ctaSubscribe', language)}
                 </Text>
               </TouchableOpacity>
             </View>
@@ -403,11 +614,34 @@ export default function WebLandingPage() {
             ].map((f, i) => (
               <View key={i} style={styles.pricingFeatureItem}>
                 <View style={styles.pricingFeatureCheck}>
-                  <Check size={14} color="#10b981" />
+                  <Check size={14} color={GOLD} />
                 </View>
                 <Text style={styles.pricingFeatureText}>{f}</Text>
               </View>
             ))}
+          </View>
+
+          <View style={[styles.guaranteeHighlight, typographyWide && styles.guaranteeHighlightWide]}>
+            <Heart size={22} color={GOLD} strokeWidth={2} />
+            <View style={styles.guaranteeHighlightCol}>
+              <Text style={styles.guaranteeHighlightKicker}>
+                {language === 'pt' ? 'GARANTIA DE SATISFAÇÃO · 7 DIAS' : '7-DAY SATISFACTION GUARANTEE'}
+              </Text>
+              <Text style={styles.guaranteeHighlightBody}>
+                {language === 'pt'
+                  ? 'Se o programa não fizer sentido para você, solicite reembolso integral dentro do prazo — em linha com o CDC.'
+                  : 'If the program is not a fit, request a full refund within the stated window — per our policy and consumer law.'}
+              </Text>
+            </View>
+            <TouchableOpacity
+              style={[styles.guaranteeHighlightBtn, typographyWide && styles.guaranteeHighlightBtnWide]}
+              onPress={() => router.push('/web/assinar')}
+              activeOpacity={0.88}
+            >
+              <Text style={styles.guaranteeHighlightBtnText}>
+                {language === 'pt' ? 'Começar com segurança' : 'Start risk-aware'}
+              </Text>
+            </TouchableOpacity>
           </View>
         </View>
       </View>
@@ -419,6 +653,38 @@ export default function WebLandingPage() {
             <Shield size={20} color="#64748b" />
             <Text style={styles.disclaimerTitle}>{t('web.disclaimer.title')}</Text>
             <Text style={styles.disclaimerText}>{t('web.disclaimer.text')}</Text>
+          </View>
+        </View>
+      </View>
+
+      {/* FAQ */}
+      <View
+        nativeID="web-landing-faq"
+        {...(isWeb ? ({ id: 'web-landing-faq' } as object) : {})}
+        style={styles.faqSection}
+      >
+        <View style={[styles.container, { paddingHorizontal: contentPadH }]}>
+          <View style={styles.faqIntroRow}>
+            <HelpCircle size={22} color={GOLD} strokeWidth={2} />
+            <Text style={styles.sectionLabel}>
+              {language === 'pt' ? 'PERGUNTAS FREQUENTES' : 'FAQ'}
+            </Text>
+          </View>
+          <Text style={[styles.sectionTitle, typographyWide && styles.sectionTitleWide, styles.faqTitleCenter]}>
+            {language === 'pt' ? 'Antes de você decidir' : 'Before you decide'}
+          </Text>
+          <Text style={[styles.sectionDesc, styles.faqSubtitleCenter]}>
+            {language === 'pt'
+              ? 'Respostas diretas sobre o programa, o teste e a compra — sem promessas milagrosas.'
+              : 'Straight answers about the program, the trial, and purchase — no miracle claims.'}
+          </Text>
+          <View style={styles.faqList}>
+            {homeFaqItems.map((item, i) => (
+              <View key={i} style={styles.faqCard}>
+                <Text style={styles.faqQuestion}>{item.q}</Text>
+                <Text style={styles.faqAnswer}>{item.a}</Text>
+              </View>
+            ))}
           </View>
         </View>
       </View>
@@ -438,9 +704,9 @@ export default function WebLandingPage() {
                 onMouseLeave: () => setHoveredCtaBtn(false),
               } : {})}
             >
-              <Calendar size={20} color="#1e293b" />
+              <Calendar size={20} color="#07070f" />
               <Text style={styles.ctaBtnText}>{t('web.cta.btn')}</Text>
-              <ArrowRight size={20} color="#1e293b" />
+              <ArrowRight size={20} color="#07070f" />
             </TouchableOpacity>
             <View style={styles.securityBadgesRow}>
               <Lock size={13} color={GOLD} />
@@ -463,45 +729,6 @@ export default function WebLandingPage() {
         </View>
       </View>
 
-      {/* FOUNDER MOMENT */}
-      <View style={styles.founderSection}>
-        <View style={[styles.container, { paddingHorizontal: contentPadH }]}>
-          <View style={[styles.founderCard, founderLayoutWide && styles.founderCardWide]}>
-            <Text style={styles.founderLabel}>{founderContent.label}</Text>
-            <Text style={[styles.founderHeadline, typographyWide && styles.founderHeadlineWide]}>
-              {founderContent.headline}
-            </Text>
-
-            <View style={styles.founderDividerTop} />
-
-            <View style={styles.founderBody}>
-              {founderContent.paragraphs.map((para, i) => (
-                <Text key={i} style={[styles.founderParagraph, typographyWide && styles.founderParagraphWide]}>
-                  {para}
-                </Text>
-              ))}
-            </View>
-
-            <View style={styles.founderSignatureRow}>
-              <View style={styles.founderAvatarCircle}>
-                <Text style={styles.founderAvatarInitial}>J</Text>
-              </View>
-              <View style={styles.founderSignatureBlock}>
-                <Text style={[styles.founderSignature, typographyWide && styles.founderSignatureWide]}>
-                  {founderContent.signature}
-                </Text>
-              </View>
-            </View>
-
-            <View style={styles.founderResultBox}>
-              <Text style={[styles.founderResultText, typographyWide && styles.founderResultTextWide]}>
-                {founderContent.result}
-              </Text>
-            </View>
-          </View>
-        </View>
-      </View>
-
       {/* FOOTER */}
       <View style={styles.footer}>
         <View style={[styles.footerInner, { paddingHorizontal: contentPadH }]}>
@@ -515,6 +742,9 @@ export default function WebLandingPage() {
             </TouchableOpacity>
             <TouchableOpacity onPress={() => router.push('/web/sobre')}>
               <Text style={styles.footerLink}>{t('web.nav.about')}</Text>
+            </TouchableOpacity>
+            <TouchableOpacity onPress={scrollToFaq}>
+              <Text style={styles.footerLink}>{language === 'pt' ? 'Dúvidas frequentes' : 'FAQ'}</Text>
             </TouchableOpacity>
             <TouchableOpacity onPress={() => router.push('/web/assinar')}>
               <Text style={styles.footerLink}>{t('web.nav.subscribe')}</Text>
@@ -535,6 +765,24 @@ export default function WebLandingPage() {
         </View>
       </View>
       </ScrollView>
+      {showStickyBar ? (
+        <View style={styles.stickyCtaBar} pointerEvents="box-none">
+          <View style={[styles.stickyCtaInner, { paddingHorizontal: contentPadH }]}>
+            <TouchableOpacity style={styles.stickyCtaGhost} onPress={() => router.push('/web/programa')} activeOpacity={0.88}>
+              <BookOpen size={17} color={GOLD} />
+              <Text style={styles.stickyCtaGhostText} numberOfLines={1}>
+                {language === 'pt' ? '3 lições grátis' : '3 free lessons'}
+              </Text>
+            </TouchableOpacity>
+            <TouchableOpacity style={styles.stickyCtaPrimary} onPress={() => router.push('/web/assinar')} activeOpacity={0.9}>
+              <Crown size={17} color="#07070f" />
+              <Text style={styles.stickyCtaPrimaryText} numberOfLines={1}>
+                {language === 'pt' ? 'Acesso completo' : 'Full access'}
+              </Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      ) : null}
     </>
   );
 }
@@ -573,12 +821,23 @@ const styles = StyleSheet.create({
     color: 'rgba(255,255,255,0.85)',
   } as any,
   navCta: {
-    backgroundColor: '#fbbf24',
+    backgroundColor: GOLD,
     paddingHorizontal: 20,
     paddingVertical: 10,
     borderRadius: 10,
   } as any,
-  navCtaText: { fontSize: 14, fontWeight: '700', color: '#1e293b' },
+  navCtaText: { fontSize: 14, fontWeight: '700', color: '#07070f' },
+  navGhostLink: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+    paddingHorizontal: 12,
+    paddingVertical: 8,
+    borderRadius: 10,
+    borderWidth: 1,
+    borderColor: 'rgba(212,169,106,0.4)',
+  } as any,
+  navGhostLinkText: { fontSize: 14, fontWeight: '700', color: GOLD },
 
   chronotypeBanner: {
     backgroundColor: '#7c6fff',
@@ -647,6 +906,51 @@ const styles = StyleSheet.create({
   } as any,
   problemDot: { fontSize: 16, color: '#ef4444', fontWeight: '700' },
   problemText: { fontSize: 15, color: '#8892a4', lineHeight: 22, flex: 1 },
+
+  journeySection: {
+    paddingVertical: 64,
+    backgroundColor: '#080810',
+    borderTopWidth: 1,
+    borderTopColor: 'rgba(212,169,106,0.08)',
+  },
+  journeyHeadline: { marginBottom: 10 },
+  journeySub: { marginBottom: 32 },
+  journeyRow: {
+    gap: 14,
+    width: '100%',
+    maxWidth: 960,
+    alignSelf: 'center',
+  },
+  journeyRowWide: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    justifyContent: 'center',
+  },
+  journeyCell: {
+    backgroundColor: '#12121e',
+    borderRadius: 16,
+    padding: 22,
+    borderWidth: 1,
+    borderColor: 'rgba(255,255,255,0.06)',
+    width: '100%',
+  } as any,
+  journeyCellWide: {
+    flexGrow: 1,
+    flexBasis: '28%',
+    minWidth: 200,
+    maxWidth: 300,
+  } as any,
+  journeyIconWrap: {
+    width: 44,
+    height: 44,
+    borderRadius: 12,
+    backgroundColor: 'rgba(212,169,106,0.1)',
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginBottom: 12,
+  },
+  journeyStepTitle: { fontSize: 16, fontWeight: '800', color: '#e8d5b7', marginBottom: 4 },
+  journeyStepDesc: { fontSize: 13, color: '#8892a4', lineHeight: 18 },
 
   solutionSection: { paddingVertical: 80 },
   stepsGrid: {
@@ -762,7 +1066,7 @@ const styles = StyleSheet.create({
     alignSelf: 'center',
   } as any,
   pricingCardFeatured: {
-    backgroundColor: '#0f172a',
+    backgroundColor: '#12121e',
     borderColor: GOLD,
   } as any,
   pricingCardFeaturedWide: {
@@ -837,11 +1141,48 @@ const styles = StyleSheet.create({
     width: 24,
     height: 24,
     borderRadius: 12,
-    backgroundColor: 'rgba(16,185,129,0.15)',
+    backgroundColor: 'rgba(212,169,106,0.15)',
     justifyContent: 'center',
     alignItems: 'center',
   },
   pricingFeatureText: { fontSize: 15, color: '#8892a4' },
+
+  guaranteeHighlight: {
+    marginTop: 36,
+    padding: 20,
+    borderRadius: 18,
+    borderWidth: 1,
+    borderColor: 'rgba(212,169,106,0.28)',
+    backgroundColor: 'rgba(212,169,106,0.06)',
+    gap: 16,
+    alignItems: 'center',
+    flexDirection: 'column',
+  } as any,
+  guaranteeHighlightWide: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+  },
+  guaranteeHighlightCol: { flex: 1, minWidth: 220 },
+  guaranteeHighlightKicker: {
+    fontSize: 12,
+    fontWeight: '800',
+    color: GOLD,
+    letterSpacing: 1.2,
+  },
+  guaranteeHighlightBody: { fontSize: 14, color: '#8892a4', lineHeight: 21, marginTop: 6 },
+  guaranteeHighlightBtn: {
+    backgroundColor: GOLD,
+    paddingHorizontal: 20,
+    paddingVertical: 12,
+    borderRadius: 12,
+    alignSelf: 'stretch',
+  } as any,
+  guaranteeHighlightBtnWide: {
+    alignSelf: 'center',
+  },
+  guaranteeHighlightBtnText: { color: '#07070f', fontWeight: '800', fontSize: 14, textAlign: 'center' },
 
   disclaimerSection: { paddingVertical: 32, backgroundColor: '#07070f' },
   disclaimerBox: {
@@ -1035,6 +1376,66 @@ const styles = StyleSheet.create({
   },
   founderResultTextWide: { fontSize: 18, lineHeight: 28 },
 
+  founderCtaColumn: {
+    marginTop: 28,
+    width: '100%',
+    alignItems: 'center',
+    gap: 14,
+  },
+  founderPrimaryBtn: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 10,
+    backgroundColor: GOLD,
+    paddingHorizontal: 28,
+    paddingVertical: 16,
+    borderRadius: 14,
+    width: '100%',
+    maxWidth: 400,
+  } as any,
+  founderPrimaryBtnText: { fontSize: 16, fontWeight: '800', color: '#07070f' },
+  founderSecondaryTouchable: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+    paddingVertical: 6,
+    paddingHorizontal: 8,
+  },
+  founderSecondaryLink: { fontSize: 14, fontWeight: '600', color: '#8892a4' },
+
+  faqSection: {
+    paddingVertical: 72,
+    backgroundColor: '#07070f',
+    borderTopWidth: 1,
+    borderTopColor: 'rgba(212,169,106,0.1)',
+  },
+  faqIntroRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 10,
+    marginBottom: 8,
+  },
+  faqTitleCenter: { textAlign: 'center', alignSelf: 'center' },
+  faqSubtitleCenter: { textAlign: 'center', marginBottom: 36, maxWidth: 560, alignSelf: 'center' },
+  faqList: { maxWidth: 720, width: '100%', alignSelf: 'center', gap: 12 },
+  faqCard: {
+    backgroundColor: '#12121e',
+    borderRadius: 16,
+    padding: 20,
+    borderWidth: 1,
+    borderColor: 'rgba(255,255,255,0.06)',
+  } as any,
+  faqQuestion: {
+    fontSize: 16,
+    fontWeight: '700',
+    color: '#e8d5b7',
+    marginBottom: 10,
+    lineHeight: 22,
+  },
+  faqAnswer: { fontSize: 14, color: '#8892a4', lineHeight: 22 },
+
   footer: { backgroundColor: '#07070f', paddingVertical: 44, borderTopWidth: 1, borderTopColor: 'rgba(212,169,106,0.12)' },
   footerInner: { maxWidth: 1100, alignSelf: 'center', width: '100%', alignItems: 'center', gap: 20 },
   footerBrandText: { fontSize: 22, fontWeight: '800', color: GOLD, letterSpacing: 1.5 },
@@ -1052,4 +1453,58 @@ const styles = StyleSheet.create({
   } as any,
   footerLegalSep: { fontSize: 13, color: '#374151' },
   footerCopy: { fontSize: 12, color: '#374151', textAlign: 'center', letterSpacing: 0.3 },
+
+  stickyCtaBar: {
+    ...(isWeb
+      ? {
+          position: 'fixed' as const,
+          left: 0,
+          right: 0,
+          bottom: 0,
+          zIndex: 95,
+          paddingTop: 10,
+          paddingBottom: 16,
+          backgroundColor: 'rgba(7,7,15,0.94)',
+          borderTopWidth: 1,
+          borderTopColor: 'rgba(212,169,106,0.28)',
+          backdropFilter: 'blur(14px)',
+        }
+      : {}),
+  } as any,
+  stickyCtaInner: {
+    maxWidth: 1100,
+    width: '100%',
+    alignSelf: 'center',
+    flexDirection: 'row',
+    gap: 10,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  stickyCtaGhost: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+    paddingVertical: 12,
+    paddingHorizontal: 14,
+    borderRadius: 12,
+    borderWidth: 1,
+    borderColor: 'rgba(212,169,106,0.45)',
+    flex: 1,
+    maxWidth: 200,
+    justifyContent: 'center',
+  } as any,
+  stickyCtaGhostText: { fontSize: 13, fontWeight: '700', color: GOLD, flexShrink: 1 },
+  stickyCtaPrimary: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+    paddingVertical: 12,
+    paddingHorizontal: 18,
+    borderRadius: 12,
+    backgroundColor: GOLD,
+    flex: 1,
+    maxWidth: 240,
+    justifyContent: 'center',
+  } as any,
+  stickyCtaPrimaryText: { fontSize: 13, fontWeight: '800', color: '#07070f', flexShrink: 1 },
 });

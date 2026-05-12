@@ -85,6 +85,14 @@ export default function WebProgramPage() {
   const meta = chronotype ? CHRONOTYPE_META[chronotype] : null;
   const quizEmailStack = width < 480;
 
+  const handleNavBack = () => {
+    if (router.canGoBack()) {
+      router.back();
+    } else {
+      router.push('/web');
+    }
+  };
+
   const allSteps = [
     ...LESSONS_DATA.map((l) => ({
       id: l.id,
@@ -113,7 +121,7 @@ export default function WebProgramPage() {
           <TouchableOpacity onPress={() => router.push('/web')} style={styles.navBrand}>
             <Text style={styles.navBrandText}>GoZzzz</Text>
           </TouchableOpacity>
-          <TouchableOpacity onPress={() => router.back()} style={styles.backBtn}>
+          <TouchableOpacity onPress={handleNavBack} style={styles.backBtn}>
             <ArrowLeft size={18} color="#ffffff" />
             <Text style={styles.backBtnText}>Voltar</Text>
           </TouchableOpacity>
@@ -285,20 +293,20 @@ export default function WebProgramPage() {
 
           {/* CTA */}
           <View style={styles.ctaBox}>
-            <Crown size={40} color="#fbbf24" />
+            <Crown size={40} color="#d4a96a" />
             <Text style={styles.ctaTitle}>{t('web.program.ctaTitle')}</Text>
             <Text style={styles.ctaDesc}>{t('web.program.ctaDesc')}</Text>
             <View style={styles.ctaFeatures}>
               {[t('web.program.feature1'), t('web.program.feature2'), t('web.program.feature3')].map((f, i) => (
                 <View key={i} style={styles.ctaFeature}>
-                  <Check size={14} color="#10b981" />
+                  <Check size={14} color="#d4a96a" />
                   <Text style={styles.ctaFeatureText}>{f}</Text>
                 </View>
               ))}
             </View>
             <View style={styles.ctaPayRow}>
               <View style={styles.ctaPayBadge}>
-                <CreditCard size={13} color="#94a3b8" />
+                <CreditCard size={13} color="#8892a4" />
                 <Text style={styles.ctaPayBadgeText}>Cartão</Text>
               </View>
               <View style={styles.ctaPayBadge}>
@@ -311,15 +319,15 @@ export default function WebProgramPage() {
               </View>
             </View>
             <TouchableOpacity style={styles.ctaBtn} onPress={() => router.push('/web/assinar')}>
-              <Crown size={18} color="#1e293b" />
+              <Crown size={18} color="#0d0d16" />
               <Text style={styles.ctaBtnText}>{t('web.program.subscribeNow')}</Text>
             </TouchableOpacity>
             <View style={styles.ctaSecurityRow}>
-              <Lock size={12} color="#10b981" />
+              <Lock size={12} color="#8892a4" />
               <Text style={styles.ctaSecurityText}>{t('payment.ssl')}</Text>
-              <Shield size={12} color="#3b82f6" />
+              <Shield size={12} color="#8892a4" />
               <Text style={styles.ctaSecurityText}>Pagamento seguro via Stripe</Text>
-              <BadgeCheck size={12} color="#f59e0b" />
+              <BadgeCheck size={12} color="#8892a4" />
               <Text style={styles.ctaSecurityText}>{t('payment.pciDss')}</Text>
             </View>
           </View>
@@ -564,19 +572,28 @@ const styles = StyleSheet.create({
   unlockBtnText: { fontSize: 13, fontWeight: '700', color: '#ffffff' },
 
   ctaBox: {
-    backgroundColor: '#0f172a',
+    backgroundColor: '#12121e',
     borderRadius: 24,
     padding: 40,
     marginTop: 48,
     alignItems: 'center',
+    borderWidth: 1,
+    borderColor: 'rgba(255,255,255,0.06)',
     shadowColor: '#000',
-    shadowOffset: { width: 0, height: 8 },
+    shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.2,
-    shadowRadius: 24,
-    elevation: 8,
+    shadowRadius: 8,
+    elevation: 3,
   },
-  ctaTitle: { fontSize: 28, fontWeight: '800', color: '#ffffff', textAlign: 'center', marginTop: 16, marginBottom: 12 },
-  ctaDesc: { fontSize: 16, color: '#94a3b8', textAlign: 'center', lineHeight: 24, maxWidth: 500, marginBottom: 28 },
+  ctaTitle: {
+    fontSize: 28,
+    fontWeight: '800',
+    color: '#e8d5b7',
+    textAlign: 'center',
+    marginTop: 16,
+    marginBottom: 12,
+  },
+  ctaDesc: { fontSize: 16, color: '#8892a4', textAlign: 'center', lineHeight: 24, maxWidth: 500, marginBottom: 28 },
   ctaFeatures: {
     flexDirection: isWeb ? 'row' : 'column',
     gap: 16,
@@ -585,23 +602,23 @@ const styles = StyleSheet.create({
     marginBottom: 32,
   },
   ctaFeature: { flexDirection: 'row', alignItems: 'center', gap: 8 },
-  ctaFeatureText: { fontSize: 14, color: '#cbd5e1', fontWeight: '500' },
+  ctaFeatureText: { fontSize: 14, color: '#8892a4', fontWeight: '500' },
   ctaBtn: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
     gap: 8,
-    backgroundColor: '#fbbf24',
+    backgroundColor: '#d4a96a',
     paddingHorizontal: 40,
     paddingVertical: 18,
     borderRadius: 14,
-    shadowColor: '#fbbf24',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.3,
-    shadowRadius: 10,
-    elevation: 5,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.2,
+    shadowRadius: 8,
+    elevation: 3,
   },
-  ctaBtnText: { fontSize: 17, fontWeight: '800', color: '#1e293b' },
+  ctaBtnText: { fontSize: 17, fontWeight: '800', color: '#0d0d16' },
 
   ctaPayRow: {
     flexDirection: 'row',
@@ -614,13 +631,15 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     gap: 5,
-    backgroundColor: 'rgba(255,255,255,0.1)',
+    backgroundColor: 'rgba(255,255,255,0.06)',
+    borderWidth: 1,
+    borderColor: 'rgba(255,255,255,0.08)',
     paddingHorizontal: 10,
     paddingVertical: 6,
     borderRadius: 8,
   },
-  ctaPayBadgeText: { fontSize: 12, fontWeight: '600', color: '#cbd5e1' },
-  ctaPayBadgeEmoji: { fontSize: 13, fontWeight: '700', color: '#cbd5e1' },
+  ctaPayBadgeText: { fontSize: 12, fontWeight: '600', color: '#8892a4' },
+  ctaPayBadgeEmoji: { fontSize: 13, fontWeight: '700', color: '#8892a4' },
   ctaSecurityRow: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -629,7 +648,7 @@ const styles = StyleSheet.create({
     marginTop: 12,
     flexWrap: 'wrap',
   },
-  ctaSecurityText: { fontSize: 11, color: '#64748b' },
+  ctaSecurityText: { fontSize: 11, color: '#8892a4' },
 
   footer: { backgroundColor: '#07070f', paddingVertical: 24, alignItems: 'center' },
   footerText: { fontSize: 13, color: '#8892a4' },

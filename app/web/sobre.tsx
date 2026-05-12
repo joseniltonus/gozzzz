@@ -26,6 +26,14 @@ export default function WebSobrePage() {
   const router = useRouter();
   const { t } = useLanguage();
 
+  const handleNavBack = () => {
+    if (router.canGoBack()) {
+      router.back();
+    } else {
+      router.push('/web');
+    }
+  };
+
   const researcherNames = ['Matthew Walker', 'Andrew Huberman', 'Michael Breus', 'Charles Czeisler'];
 
   return (
@@ -48,7 +56,7 @@ export default function WebSobrePage() {
             </div>
             <Text style={styles.navBrandText}>GoZzzz</Text>
           </TouchableOpacity>
-          <TouchableOpacity onPress={() => router.back()} style={styles.backBtn}>
+          <TouchableOpacity onPress={handleNavBack} style={styles.backBtn}>
             <ArrowLeft size={18} color="#ffffff" />
             <Text style={styles.backBtnText}>Voltar</Text>
           </TouchableOpacity>

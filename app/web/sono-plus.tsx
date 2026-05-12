@@ -354,7 +354,7 @@ export default function SonoPlusLandingPage() {
               <TouchableOpacity style={styles.navGhost} accessibilityRole="link" onPress={() => router.push('/blog')}>
                 <Text style={styles.navGhostTxt}>Blog</Text>
               </TouchableOpacity>
-              <TouchableOpacity style={styles.navGhost} accessibilityRole="link" onPress={() => router.push('/web/sono-plus')}>
+              <TouchableOpacity style={styles.navGhost} accessibilityRole="link" onPress={() => router.push('/web/programa')}>
                 <BookOpen size={16} color={ACCENT_LIGHT} />
                 <Text style={styles.navGhostTxt}>
                   {navShortLabels ? '21 passos' : 'Programa 21 Passos'}
@@ -926,12 +926,8 @@ export default function SonoPlusLandingPage() {
                 <Text style={styles.footerLink}>GoZzzz — Início</Text>
               </TouchableOpacity>
               <Text style={styles.footerSep}>·</Text>
-              <TouchableOpacity accessibilityRole="link" onPress={() => router.push('/web/sono-plus')}>
-                <Text style={styles.footerLink}>Programa 21 Passos</Text>
-              </TouchableOpacity>
-              <Text style={styles.footerSep}>·</Text>
               <TouchableOpacity accessibilityRole="link" onPress={() => router.push('/web/programa')}>
-                <Text style={styles.footerLink}>Todas as lições</Text>
+                <Text style={styles.footerLink}>Programa 21 Passos</Text>
               </TouchableOpacity>
               <Text style={styles.footerSep}>·</Text>
               <TouchableOpacity accessibilityRole="link" onPress={() => router.push('/blog')}>

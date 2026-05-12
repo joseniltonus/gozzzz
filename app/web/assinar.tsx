@@ -97,6 +97,14 @@ export default function WebAssinarPage() {
   const layoutWide = width >= 720;
   const navStacked = width < 520;
 
+  const handleNavBack = () => {
+    if (router.canGoBack()) {
+      router.back();
+    } else {
+      router.push('/web');
+    }
+  };
+
   useEffect(() => {
     if (isWeb) {
       const params = new URLSearchParams(window.location.search);
@@ -207,7 +215,7 @@ export default function WebAssinarPage() {
               <Text style={styles.navBrandText}>GoZzzz</Text>
             </TouchableOpacity>
             <View style={[styles.navRight, navStacked && styles.navRightStacked]}>
-              <TouchableOpacity onPress={() => router.back()} style={styles.backBtn}>
+              <TouchableOpacity onPress={handleNavBack} style={styles.backBtn}>
                 <ArrowLeft size={18} color="#94a3b8" />
                 <Text style={styles.backBtnText}>{t(c.back)}</Text>
               </TouchableOpacity>
