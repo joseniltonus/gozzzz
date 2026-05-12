@@ -5,7 +5,9 @@ import {
   ScrollView,
   TouchableOpacity,
   Platform,
+  useWindowDimensions,
 } from 'react-native';
+import { useState } from 'react';
 import { useRouter } from 'expo-router';
 import Head from 'expo-router/head';
 import { useLanguage } from '@/contexts/LanguageContext';
@@ -27,6 +29,10 @@ import { LESSONS_DATA } from '@/data/lessons';
 import { useProgramUnlock } from '@/lib/program-unlock';
 import { useEffectiveChronotype } from '@/hooks/useEffectiveChronotype';
 import { getChronotypeOneLiner } from '@/data/chronotypeOneLiner';
+import ChronotypeWebInlineQuiz from '@/components/web/chronotype/ChronotypeWebInlineQuiz';
+import type { Chronotype } from '@/data/chronotypes';
+import type { QuizChronotype } from '@/components/web/chronotype/ChronotypeWebInlineQuiz';
+
 const isWeb = Platform.OS === 'web';
 
 const CHRONOTYPE_META: Record<
@@ -65,14 +71,20 @@ const CHRONOTYPE_META: Record<
 
 export default function WebProgramPage() {
   const router = useRouter();
+  const { width } = useWindowDimensions();
   const { t: translate } = useLanguage();
   const t = (key: string) => translate(key, 'pt');
+  const [showQuizPanel, setShowQuizPanel] = useState(false);
+  const [quizSessionKey, setQuizSessionKey] = useState(0);
+  const [persistedChronotype, setPersistedChronotype] = useState<Chronotype | null>(null);
 
   // Cliente que veio do e-mail Kiwify com ?key= correto (ou já salvou no
   // localStorage) destrava todas as 21 lições. Sem login, sem fricção.
   const unlocked = useProgramUnlock();
-  const chronotype = useEffectiveChronotype();
+  const chronotypeFromHook = useEffectiveChronotype();
+  const chronotype = persistedChronotype ?? chronotypeFromHook;
   const meta = chronotype ? CHRONOTYPE_META[chronotype] : null;
+  const quizEmailStack = width < 480;
 
   const allSteps = [
     ...LESSONS_DATA.map((l) => ({
@@ -142,7 +154,7 @@ export default function WebProgramPage() {
       <View style={styles.content}>
         <View style={styles.container}>
           {/* Banner de personalização — adapta CTA ou confirmação conforme cronótipo */}
-          {meta ? (
+          {meta && !showQuizPanel ? (
             <View style={[styles.personalizedBanner, { backgroundColor: meta.tintBg, borderColor: meta.tintBorder }]}>
               <Text style={styles.personalizedBannerEmoji}>{meta.emoji}</Text>
               <View style={styles.personalizedBannerCol}>
@@ -155,16 +167,34 @@ export default function WebProgramPage() {
               </View>
               <TouchableOpacity
                 style={styles.personalizedBannerBtn}
-                onPress={() => router.push('/web/sono-plus#quiz')}
+                onPress={() => {
+                  setQuizSessionKey((k) => k + 1);
+                  setShowQuizPanel(true);
+                }}
                 activeOpacity={0.85}
               >
                 <Text style={styles.personalizedBannerBtnText}>Refazer quiz</Text>
               </TouchableOpacity>
             </View>
+          ) : showQuizPanel ? (
+            <ChronotypeWebInlineQuiz
+              key={quizSessionKey}
+              paddingHorizontal={0}
+              quizEmailStack={quizEmailStack}
+              variant="embedded"
+              enableHashAutostart={false}
+              nativeId="program-quiz"
+              initialQuizStep="answering"
+              reportSource="web_quiz_inline_programa"
+              onChronotypePersisted={(ct: QuizChronotype) => {
+                setPersistedChronotype(ct);
+              }}
+              onPrimaryCtaPress={() => setShowQuizPanel(false)}
+            />
           ) : (
             <TouchableOpacity
               style={styles.quizCtaBanner}
-              onPress={() => router.push('/web/sono-plus#quiz')}
+              onPress={() => setShowQuizPanel(true)}
               activeOpacity={0.88}
             >
               <View style={styles.quizCtaIconWrap}>
@@ -182,6 +212,7 @@ export default function WebProgramPage() {
             </TouchableOpacity>
           )}
 
+          <View nativeID="program-lessons">
           <Text style={styles.sectionTitle}>{t('web.program.allLessons')}</Text>
           <Text style={styles.sectionDesc}>{t('web.program.learnScience')}</Text>
 
@@ -253,6 +284,7 @@ export default function WebProgramPage() {
                 </View>
               </View>
             ))}
+          </View>
           </View>
 
           {/* CTA */}
