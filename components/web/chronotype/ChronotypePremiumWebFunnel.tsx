@@ -18,7 +18,6 @@ import Animated, {
   withSequence,
   withTiming,
 } from 'react-native-reanimated';
-import type { TextStyle } from 'react-native';
 import { Activity, Brain, Check, Clock, Dna, Lock, Shield, Zap } from 'lucide-react-native';
 import { useLanguage } from '@/contexts/LanguageContext';
 import GozzzzWordmark from '@/components/branding/GozzzzWordmark';
@@ -55,13 +54,8 @@ const webFont =
     ? ({ fontFamily: 'Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif' } as const)
     : {};
 
-/** Na web, MaskedView + Reanimated `entering` falham em vários browsers — gradiente via CSS + View estável. */
-const headlineHighlightWeb = {
-  color: 'transparent',
-  backgroundImage: 'linear-gradient(90deg, #a855f7 0%, #6366f1 52%, #38bdf8 100%)',
-  WebkitBackgroundClip: 'text',
-  backgroundClip: 'text',
-} as unknown as TextStyle;
+/** Cor sólida no web: gradiente em texto (backgroundClip) quebra em alguns browsers com RN Web (CSSStyleDeclaration). */
+const headlineHighlightWeb = { color: '#c4b5fd' } as const;
 
 export default function ChronotypePremiumWebFunnel({ scrollY }: Props) {
   const { t, language } = useLanguage();

@@ -549,7 +549,6 @@ const styles = StyleSheet.create({
     right: 0,
     zIndex: 100,
     backgroundColor: 'transparent',
-    transition: isWeb ? 'background-color 0.4s ease, box-shadow 0.4s ease' : undefined,
   } as any,
   navScrolled: {
     backgroundColor: 'rgba(15,23,42,0.96)',
@@ -572,14 +571,12 @@ const styles = StyleSheet.create({
     fontSize: 15,
     fontWeight: '600',
     color: 'rgba(255,255,255,0.85)',
-    transition: isWeb ? 'color 0.3s ease' : undefined,
   } as any,
   navCta: {
     backgroundColor: '#fbbf24',
     paddingHorizontal: 20,
     paddingVertical: 10,
     borderRadius: 10,
-    transition: isWeb ? 'transform 0.3s ease, opacity 0.3s ease' : undefined,
   } as any,
   navCtaText: { fontSize: 14, fontWeight: '700', color: '#1e293b' },
 
@@ -647,7 +644,6 @@ const styles = StyleSheet.create({
     padding: 16,
     borderWidth: 1,
     borderColor: 'rgba(255,255,255,0.06)',
-    transition: isWeb ? 'box-shadow 0.3s ease, transform 0.3s ease' : undefined,
   } as any,
   problemDot: { fontSize: 16, color: '#ef4444', fontWeight: '700' },
   problemText: { fontSize: 15, color: '#8892a4', lineHeight: 22, flex: 1 },
@@ -668,7 +664,6 @@ const styles = StyleSheet.create({
     padding: 28,
     borderWidth: 1,
     borderColor: 'rgba(255,255,255,0.06)',
-    transition: isWeb ? 'transform 0.3s ease, box-shadow 0.3s ease' : undefined,
   } as any,
   stepIcon: {
     width: 60,
@@ -701,7 +696,6 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     alignSelf: 'center',
     marginTop: 40,
-    transition: isWeb ? 'transform 0.3s ease' : undefined,
   } as any,
   viewAllBtnText: { fontSize: 16, fontWeight: '700', color: '#07070f' },
 
@@ -725,7 +719,6 @@ const styles = StyleSheet.create({
     borderColor: 'rgba(212,169,106,0.15)',
     borderTopWidth: 3,
     borderTopColor: '#d4a96a',
-    transition: isWeb ? 'transform 0.3s ease, box-shadow 0.3s ease' : undefined,
   } as any,
   expertAvatar: {
     width: 56,
@@ -761,7 +754,6 @@ const styles = StyleSheet.create({
     borderWidth: 2,
     borderColor: 'rgba(255,255,255,0.08)',
     alignItems: 'center',
-    transition: isWeb ? 'transform 0.3s ease, box-shadow 0.3s ease' : undefined,
   } as any,
   pricingCardWide: {
     padding: 32,
@@ -813,7 +805,6 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     width: '100%',
     alignItems: 'center',
-    transition: isWeb ? 'background-color 0.3s ease' : undefined,
   } as any,
   pricingGhostBtnHovered: {
     backgroundColor: GOLD,
@@ -822,7 +813,6 @@ const styles = StyleSheet.create({
     fontSize: 15,
     fontWeight: '700',
     color: GOLD,
-    transition: isWeb ? 'color 0.3s ease' : undefined,
   } as any,
   pricingGhostBtnTextHovered: {
     color: '#07070f',
@@ -834,7 +824,6 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     width: '100%',
     alignItems: 'center',
-    transition: isWeb ? 'opacity 0.3s ease, transform 0.3s ease' : undefined,
   } as any,
   pricingFilledBtnHovered: {
     opacity: 0.88,
@@ -916,7 +905,6 @@ const styles = StyleSheet.create({
     paddingVertical: 20,
     borderRadius: 14,
     marginBottom: 28,
-    transition: isWeb ? 'transform 0.3s ease, box-shadow 0.3s ease' : undefined,
   } as any,
   ctaBtnHovered: {
     transform: [{ scale: 1.04 }],
@@ -1055,14 +1043,12 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: '#8892a4',
     fontWeight: '500',
-    transition: isWeb ? 'color 0.3s ease' : undefined,
   } as any,
   footerLegalLinks: { flexDirection: 'row', gap: 10, flexWrap: 'wrap', justifyContent: 'center', alignItems: 'center' },
   footerLegalLink: {
     fontSize: 13,
     color: '#4a5568',
     fontWeight: '500',
-    transition: isWeb ? 'color 0.3s ease' : undefined,
   } as any,
   footerLegalSep: { fontSize: 13, color: '#374151' },
   footerCopy: { fontSize: 12, color: '#374151', textAlign: 'center', letterSpacing: 0.3 },
