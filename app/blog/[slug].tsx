@@ -16,7 +16,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import { Image, Linking, Platform, ScrollView, StyleSheet, Text, TouchableOpacity, View, useWindowDimensions } from 'react-native';
 import Head from 'expo-router/head';
-import { Link, useLocalSearchParams, useRouter } from 'expo-router';
+import { useLocalSearchParams, useRouter } from 'expo-router';
 import { LinearGradient } from 'expo-linear-gradient';
 import {
   ArrowLeft,
@@ -110,20 +110,17 @@ export default function BlogPostPage() {
       <ScrollView style={styles.page} showsVerticalScrollIndicator={false}>
         <LinearGradient colors={['#0c0a1f', ACCENT_DEEP]} style={styles.nav}>
           <View style={[styles.navInner, navStacked && styles.navInnerStacked, { paddingHorizontal: contentPadH }]}>
-            <Link href="/web" asChild>
-              <TouchableOpacity accessibilityRole="link">
-                <Text style={styles.brand}>GoZzzz</Text>
-              </TouchableOpacity>
-            </Link>
-            <Link href="/blog" asChild>
-              <TouchableOpacity
-                style={[styles.navGhost, navStacked && styles.navGhostStacked]}
-                accessibilityRole="link"
-              >
-                <ArrowLeft size={16} color={ACCENT_LIGHT} />
-                <Text style={styles.navGhostTxt}>{navBackShort ? 'Blog' : 'Todos os artigos'}</Text>
-              </TouchableOpacity>
-            </Link>
+            <TouchableOpacity accessibilityRole="link" onPress={() => router.push('/web')}>
+              <Text style={styles.brand}>GoZzzz</Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              style={[styles.navGhost, navStacked && styles.navGhostStacked]}
+              accessibilityRole="link"
+              onPress={() => router.push('/blog')}
+            >
+              <ArrowLeft size={16} color={ACCENT_LIGHT} />
+              <Text style={styles.navGhostTxt}>{navBackShort ? 'Blog' : 'Todos os artigos'}</Text>
+            </TouchableOpacity>
           </View>
         </LinearGradient>
 
@@ -155,11 +152,9 @@ export default function BlogPostPage() {
             )}
 
             <View style={styles.breadcrumbs}>
-              <Link href="/blog" asChild>
-                <TouchableOpacity accessibilityRole="link">
-                  <Text style={styles.breadcrumbLink}>Blog</Text>
-                </TouchableOpacity>
-              </Link>
+              <TouchableOpacity accessibilityRole="link" onPress={() => router.push('/blog')}>
+                <Text style={styles.breadcrumbLink}>Blog</Text>
+              </TouchableOpacity>
               <Text style={styles.breadcrumbSep}>·</Text>
               <Text style={[styles.breadcrumbCat, { color: cat.color }]}>{cat.label}</Text>
             </View>
@@ -266,17 +261,17 @@ export default function BlogPostPage() {
 
           <View style={styles.footer}>
             <View style={styles.footerNav}>
-              <Link href="/web" asChild>
-                <TouchableOpacity accessibilityRole="link"><Text style={styles.footerLink}>Início</Text></TouchableOpacity>
-              </Link>
+              <TouchableOpacity accessibilityRole="link" onPress={() => router.push('/web')}>
+                <Text style={styles.footerLink}>Início</Text>
+              </TouchableOpacity>
               <Text style={styles.footerSep}>·</Text>
-              <Link href="/blog" asChild>
-                <TouchableOpacity accessibilityRole="link"><Text style={styles.footerLink}>Blog</Text></TouchableOpacity>
-              </Link>
+              <TouchableOpacity accessibilityRole="link" onPress={() => router.push('/blog')}>
+                <Text style={styles.footerLink}>Blog</Text>
+              </TouchableOpacity>
               <Text style={styles.footerSep}>·</Text>
-              <Link href="/web/sono-plus" asChild>
-                <TouchableOpacity accessibilityRole="link"><Text style={styles.footerLink}>Programa 21 Passos</Text></TouchableOpacity>
-              </Link>
+              <TouchableOpacity accessibilityRole="link" onPress={() => router.push('/web/sono-plus')}>
+                <Text style={styles.footerLink}>Programa 21 Passos</Text>
+              </TouchableOpacity>
               <Text style={styles.footerSep}>·</Text>
               <TouchableOpacity
                 accessibilityRole="link"

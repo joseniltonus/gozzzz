@@ -17,7 +17,7 @@ import {
   View,
   useWindowDimensions,
 } from 'react-native';
-import { Link, useRouter } from 'expo-router';
+import { useRouter } from 'expo-router';
 import Head from 'expo-router/head';
 import { LinearGradient } from 'expo-linear-gradient';
 import { ArrowRight, BookOpen, Clock } from 'lucide-react-native';
@@ -94,20 +94,20 @@ export default function BlogIndexPage() {
       <ScrollView style={styles.page} showsVerticalScrollIndicator={false}>
         <LinearGradient colors={['#0c0a1f', ACCENT_DEEP]} style={styles.nav}>
           <View style={[styles.navInner, navStacked && styles.navInnerStacked, { paddingHorizontal: contentPadH }]}>
-            <Link href="/web" asChild>
-              <TouchableOpacity accessibilityRole="link">
-                <Text style={styles.brand}>GoZzzz</Text>
-              </TouchableOpacity>
-            </Link>
+            <TouchableOpacity accessibilityRole="link" onPress={() => router.push('/web')}>
+              <Text style={styles.brand}>GoZzzz</Text>
+            </TouchableOpacity>
             <View style={[styles.navRight, navStacked && styles.navRightStacked]}>
-              <Link href="/web/sono-plus" asChild>
-                <TouchableOpacity style={styles.navGhost} accessibilityRole="link">
-                  <BookOpen size={16} color={ACCENT_LIGHT} />
-                  <Text style={styles.navGhostTxt}>
-                    {navShort ? '21 passos' : 'Programa 21 Passos'}
-                  </Text>
-                </TouchableOpacity>
-              </Link>
+              <TouchableOpacity
+                style={styles.navGhost}
+                accessibilityRole="link"
+                onPress={() => router.push('/web/sono-plus')}
+              >
+                <BookOpen size={16} color={ACCENT_LIGHT} />
+                <Text style={styles.navGhostTxt}>
+                  {navShort ? '21 passos' : 'Programa 21 Passos'}
+                </Text>
+              </TouchableOpacity>
             </View>
           </View>
         </LinearGradient>
@@ -194,13 +194,13 @@ export default function BlogIndexPage() {
 
           <View style={styles.footer}>
             <View style={styles.footerNav}>
-              <Link href="/web" asChild>
-                <TouchableOpacity accessibilityRole="link"><Text style={styles.footerLink}>Início</Text></TouchableOpacity>
-              </Link>
+              <TouchableOpacity accessibilityRole="link" onPress={() => router.push('/web')}>
+                <Text style={styles.footerLink}>Início</Text>
+              </TouchableOpacity>
               <Text style={styles.footerSep}>·</Text>
-              <Link href="/web/sono-plus" asChild>
-                <TouchableOpacity accessibilityRole="link"><Text style={styles.footerLink}>Programa 21 Passos</Text></TouchableOpacity>
-              </Link>
+              <TouchableOpacity accessibilityRole="link" onPress={() => router.push('/web/sono-plus')}>
+                <Text style={styles.footerLink}>Programa 21 Passos</Text>
+              </TouchableOpacity>
               <Text style={styles.footerSep}>·</Text>
               <TouchableOpacity
                 accessibilityRole="link"

@@ -11,7 +11,7 @@ import {
   useWindowDimensions,
 } from 'react-native';
 import Head from 'expo-router/head';
-import { useRouter, Link } from 'expo-router';
+import { useRouter } from 'expo-router';
 import { LinearGradient } from 'expo-linear-gradient';
 import {
   ArrowRight,
@@ -609,35 +609,28 @@ export default function SonoPlusLandingPage() {
         {/* Nav — alinhado a /web/assinar */}
         <LinearGradient colors={['#0c0a1f', ACCENT_DEEP]} style={styles.navGrad}>
           <View style={[styles.navInner, navStacked && styles.navInnerStacked, { paddingHorizontal: contentPadH }]}>
-            <Link href="/web" asChild>
-              <TouchableOpacity
-                style={[styles.brand, navStacked && styles.brandStacked]}
-                accessibilityRole="link"
-              >
-                <Text style={styles.brandText}>GoZzzz</Text>
-              </TouchableOpacity>
-            </Link>
+            <TouchableOpacity
+              style={[styles.brand, navStacked && styles.brandStacked]}
+              accessibilityRole="link"
+              onPress={() => router.push('/web')}
+            >
+              <Text style={styles.brandText}>GoZzzz</Text>
+            </TouchableOpacity>
             <View style={[styles.navRight, navStacked && styles.navRightStacked]}>
-              <Link href="/blog" asChild>
-                <TouchableOpacity style={styles.navGhost} accessibilityRole="link">
-                  <Text style={styles.navGhostTxt}>Blog</Text>
-                </TouchableOpacity>
-              </Link>
-              <Link href="/web/sono-plus" asChild>
-                <TouchableOpacity style={styles.navGhost} accessibilityRole="link">
-                  <BookOpen size={16} color={ACCENT_LIGHT} />
-                  <Text style={styles.navGhostTxt}>
-                    {navShortLabels ? '21 passos' : 'Programa 21 Passos'}
-                  </Text>
-                </TouchableOpacity>
-              </Link>
-              <Link href="/web/assinar" asChild>
-                <TouchableOpacity style={styles.navGold} accessibilityRole="link">
-                  <Text style={styles.navGoldTxt}>
-                    {navShortLabels ? t('web.nav.subscribe') : t('coach.ctaSubscribe')}
-                  </Text>
-                </TouchableOpacity>
-              </Link>
+              <TouchableOpacity style={styles.navGhost} accessibilityRole="link" onPress={() => router.push('/blog')}>
+                <Text style={styles.navGhostTxt}>Blog</Text>
+              </TouchableOpacity>
+              <TouchableOpacity style={styles.navGhost} accessibilityRole="link" onPress={() => router.push('/web/sono-plus')}>
+                <BookOpen size={16} color={ACCENT_LIGHT} />
+                <Text style={styles.navGhostTxt}>
+                  {navShortLabels ? '21 passos' : 'Programa 21 Passos'}
+                </Text>
+              </TouchableOpacity>
+              <TouchableOpacity style={styles.navGold} accessibilityRole="link" onPress={() => router.push('/web/assinar')}>
+                <Text style={styles.navGoldTxt}>
+                  {navShortLabels ? t('web.nav.subscribe') : t('coach.ctaSubscribe')}
+                </Text>
+              </TouchableOpacity>
             </View>
           </View>
         </LinearGradient>
@@ -1355,35 +1348,25 @@ export default function SonoPlusLandingPage() {
           <View style={styles.footer}>
             {/* Internal linking para SEO — Google entende hierarquia entre as páginas */}
             <View style={styles.footerNav}>
-              <Link href="/web" asChild>
-                <TouchableOpacity accessibilityRole="link">
-                  <Text style={styles.footerLink}>GoZzzz — Início</Text>
-                </TouchableOpacity>
-              </Link>
+              <TouchableOpacity accessibilityRole="link" onPress={() => router.push('/web')}>
+                <Text style={styles.footerLink}>GoZzzz — Início</Text>
+              </TouchableOpacity>
               <Text style={styles.footerSep}>·</Text>
-              <Link href="/web/sono-plus" asChild>
-                <TouchableOpacity accessibilityRole="link">
-                  <Text style={styles.footerLink}>Programa 21 Passos</Text>
-                </TouchableOpacity>
-              </Link>
+              <TouchableOpacity accessibilityRole="link" onPress={() => router.push('/web/sono-plus')}>
+                <Text style={styles.footerLink}>Programa 21 Passos</Text>
+              </TouchableOpacity>
               <Text style={styles.footerSep}>·</Text>
-              <Link href="/web/programa" asChild>
-                <TouchableOpacity accessibilityRole="link">
-                  <Text style={styles.footerLink}>Todas as lições</Text>
-                </TouchableOpacity>
-              </Link>
+              <TouchableOpacity accessibilityRole="link" onPress={() => router.push('/web/programa')}>
+                <Text style={styles.footerLink}>Todas as lições</Text>
+              </TouchableOpacity>
               <Text style={styles.footerSep}>·</Text>
-              <Link href="/blog" asChild>
-                <TouchableOpacity accessibilityRole="link">
-                  <Text style={styles.footerLink}>Blog</Text>
-                </TouchableOpacity>
-              </Link>
+              <TouchableOpacity accessibilityRole="link" onPress={() => router.push('/blog')}>
+                <Text style={styles.footerLink}>Blog</Text>
+              </TouchableOpacity>
               <Text style={styles.footerSep}>·</Text>
-              <Link href="/web/assinar" asChild>
-                <TouchableOpacity accessibilityRole="link">
-                  <Text style={styles.footerLink}>Assinar</Text>
-                </TouchableOpacity>
-              </Link>
+              <TouchableOpacity accessibilityRole="link" onPress={() => router.push('/web/assinar')}>
+                <Text style={styles.footerLink}>Assinar</Text>
+              </TouchableOpacity>
               <Text style={styles.footerSep}>·</Text>
               <TouchableOpacity
                 accessibilityRole="link"
@@ -1660,7 +1643,9 @@ const styles = StyleSheet.create({
   },
   previewHead: { maxWidth: 1100, width: '100%', alignSelf: 'center', marginBottom: 16 },
   previewSub: { marginTop: 8, color: TEXT_MUTED, fontSize: 14, lineHeight: 21 },
-  previewScroll: { gap: 12, paddingBottom: 12 },
+  // Sem `gap` aqui: ScrollView horizontal + gap no contentContainerStyle costuma
+  // ser problemático no react-native-web (estilo no DOM).
+  previewScroll: { flexDirection: 'row', paddingBottom: 12 },
   previewCard: {
     width: 260,
     backgroundColor: BG_CARD,
@@ -1668,7 +1653,7 @@ const styles = StyleSheet.create({
     padding: 18,
     borderWidth: 1,
     borderColor: 'rgba(124,92,232,0.18)',
-    marginRight: 4,
+    marginRight: 12,
   },
   previewCardTop: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 },
   previewNum: { fontSize: 13, fontWeight: '800', color: GOLD },

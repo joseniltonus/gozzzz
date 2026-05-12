@@ -22,7 +22,9 @@ export function CookieConsentBanner() {
           toValue: 1,
           duration: 400,
           delay: 1500,
-          useNativeDriver: true,
+          // Web: useNativeDriver com opacity em Animated.View pode acionar caminhos
+          // de estilo que quebram em alguns Chrome (CSSStyleDeclaration).
+          useNativeDriver: Platform.OS !== 'web',
         }).start();
       }
     });
@@ -33,7 +35,7 @@ export function CookieConsentBanner() {
     Animated.timing(opacity, {
       toValue: 0,
       duration: 300,
-      useNativeDriver: true,
+      useNativeDriver: Platform.OS !== 'web',
     }).start(() => setVisible(false));
   };
 
