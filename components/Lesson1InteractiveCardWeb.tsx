@@ -9,6 +9,7 @@ import {
 import { useLanguage } from '@/contexts/LanguageContext';
 import { ArrowRight, Moon, Check, ChevronDown, ChevronUp, FlaskConical } from 'lucide-react-native';
 import { useState } from 'react';
+import { LESSON_FONT, LESSON_INK, LESSON_PAPER } from '@/constants/lessonPaperTheme';
 
 interface Lesson1InteractiveCardWebProps {
   renderCompleteButton?: (showButton: boolean) => React.ReactNode;
@@ -316,10 +317,7 @@ export const Lesson1InteractiveCardWeb = ({ renderCompleteButton, onStepChange }
       style={[
         styles.wrapper,
         {
-          marginTop: -6,
-          borderTopLeftRadius: 18,
-          borderTopRightRadius: 18,
-          maxWidth: windowWidth > 780 ? 640 : ('100%' as const),
+          maxWidth: windowWidth > 780 ? 648 : ('100%' as const),
         },
       ]}
     >
@@ -328,7 +326,7 @@ export const Lesson1InteractiveCardWeb = ({ renderCompleteButton, onStepChange }
       <View style={[styles.scrollContent, { paddingHorizontal: padH }]} key={currentStep}>
         <View style={styles.stepContainer}>
           <View style={styles.tagRow}>
-            <Moon size={14} color="#b45309" />
+            <Moon size={14} color={LESSON_PAPER.foil} />
             <Text style={styles.tag}>{step.tag}</Text>
           </View>
 
@@ -357,7 +355,7 @@ export const Lesson1InteractiveCardWeb = ({ renderCompleteButton, onStepChange }
               <TextInput
                 style={styles.commitmentInput}
                 placeholder={isPt ? 'escreva seu compromisso...' : 'write your commitment...'}
-                placeholderTextColor="#475569"
+                placeholderTextColor={LESSON_INK.label}
                 value={commitment}
                 onChangeText={setCommitment}
                 multiline
@@ -632,9 +630,21 @@ function SleepCycleDiagram({
 const styles = StyleSheet.create({
   wrapper: {
     width: '100%',
-    backgroundColor: '#f8fafc',
+    backgroundColor: LESSON_PAPER.canvas,
     alignSelf: 'center',
     overflow: 'hidden',
+    marginTop: -8,
+    borderTopLeftRadius: 22,
+    borderTopRightRadius: 22,
+    borderTopWidth: 1,
+    borderLeftWidth: 1,
+    borderRightWidth: 1,
+    borderColor: LESSON_PAPER.border,
+    shadowColor: LESSON_PAPER.shadow,
+    shadowOffset: { width: 0, height: -4 },
+    shadowOpacity: 0.09,
+    shadowRadius: 24,
+    elevation: 3,
   },
   scrollContent: {
     paddingTop: 28,
@@ -650,67 +660,76 @@ const styles = StyleSheet.create({
     marginBottom: 20,
   },
   tag: {
-    fontSize: 12,
+    fontSize: 11,
     fontWeight: '700',
-    color: '#b45309',
-    letterSpacing: 1.2,
+    color: '#6a5230',
+    letterSpacing: 1.5,
     textTransform: 'uppercase',
+    ...(LESSON_FONT.text ? { fontFamily: LESSON_FONT.text } : {}),
   },
   title: {
-    fontWeight: '800',
-    color: '#0f172a',
-    marginBottom: 20,
-    letterSpacing: -0.35,
+    fontWeight: '700',
+    color: LESSON_INK.display,
+    marginBottom: 22,
+    letterSpacing: -0.45,
+    ...(LESSON_FONT.display ? { fontFamily: LESSON_FONT.display } : {}),
   },
   body: {
-    color: '#334155',
-    marginBottom: 24,
-    letterSpacing: 0.12,
+    color: LESSON_INK.body,
+    marginBottom: 26,
+    letterSpacing: 0.02,
+    ...(LESSON_FONT.text ? { fontFamily: LESSON_FONT.text } : {}),
   },
   commitmentBox: {
-    backgroundColor: '#ffffff',
-    borderRadius: 16,
-    padding: 20,
+    backgroundColor: LESSON_PAPER.elevated,
+    borderRadius: 18,
+    padding: 22,
     borderWidth: 1,
-    borderColor: '#fde68a',
+    borderColor: LESSON_PAPER.foilSoft,
     gap: 16,
     marginBottom: 24,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.04,
-    shadowRadius: 6,
-    elevation: 1,
+    shadowColor: LESSON_PAPER.shadow,
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.07,
+    shadowRadius: 18,
+    elevation: 2,
   },
   commitmentLabel: {
     fontSize: 16,
     fontWeight: '700',
-    color: '#92400e',
+    color: '#5c4828',
     fontStyle: 'italic',
+    ...(LESSON_FONT.display ? { fontFamily: LESSON_FONT.display } : {}),
   },
   commitmentInput: {
-    backgroundColor: '#f8fafc',
-    borderRadius: 10,
-    padding: 14,
+    backgroundColor: LESSON_PAPER.inset,
+    borderRadius: 12,
+    padding: 16,
     fontSize: 16,
-    color: '#0f172a',
-    minHeight: 80,
+    color: LESSON_INK.display,
+    minHeight: 88,
     borderWidth: 1,
-    borderColor: '#e2e8f0',
+    borderColor: LESSON_PAPER.border,
     textAlignVertical: 'top',
+    ...(LESSON_FONT.text ? { fontFamily: LESSON_FONT.text } : {}),
   },
   commitBtn: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
     gap: 8,
-    backgroundColor: '#fbbf24',
-    paddingVertical: 14,
+    backgroundColor: LESSON_PAPER.foil,
+    paddingVertical: 15,
     borderRadius: 12,
+    borderWidth: 1,
+    borderColor: 'rgba(90, 70, 40, 0.25)',
   },
   commitBtnText: {
     fontSize: 15,
     fontWeight: '700',
-    color: '#0f172a',
+    color: '#1a1510',
+    letterSpacing: 0.2,
+    ...(LESSON_FONT.text ? { fontFamily: LESSON_FONT.text } : {}),
   },
   committedBox: {
     backgroundColor: '#ecfdf5',
@@ -733,10 +752,11 @@ const styles = StyleSheet.create({
   committedText: {
     fontSize: 18,
     fontWeight: '600',
-    color: '#0f172a',
+    color: LESSON_INK.display,
     textAlign: 'center',
     fontStyle: 'italic',
-    lineHeight: 28,
+    lineHeight: 30,
+    ...(LESSON_FONT.display ? { fontFamily: LESSON_FONT.display } : {}),
   },
   committedSub: {
     fontSize: 14,
@@ -746,9 +766,9 @@ const styles = StyleSheet.create({
   navRow: {
     paddingVertical: 18,
     borderTopWidth: 1,
-    borderTopColor: '#e2e8f0',
+    borderTopColor: LESSON_PAPER.border,
     alignItems: 'stretch',
-    backgroundColor: '#ffffff',
+    backgroundColor: LESSON_PAPER.elevated,
   },
   backBtn: {
     flexDirection: 'row',
@@ -758,43 +778,48 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
     borderRadius: 10,
     borderWidth: 1,
-    borderColor: '#e2e8f0',
+    borderColor: LESSON_PAPER.border,
   },
   backBtnText: {
     fontSize: 14,
-    color: '#64748b',
+    color: LESSON_INK.muted,
     fontWeight: '500',
+    ...(LESSON_FONT.text ? { fontFamily: LESSON_FONT.text } : {}),
   },
   nextBtn: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
     gap: 8,
-    backgroundColor: '#0f172a',
-    paddingVertical: 16,
+    backgroundColor: '#121018',
+    paddingVertical: 17,
     paddingHorizontal: 24,
     borderRadius: 14,
     width: '100%',
+    borderWidth: 1,
+    borderColor: LESSON_PAPER.foilSoft,
   },
   nextBtnText: {
-    fontSize: 16,
+    fontSize: 15,
     fontWeight: '700',
-    color: '#ffffff',
-    letterSpacing: 0.2,
+    color: '#faf7f0',
+    letterSpacing: 0.8,
+    ...(LESSON_FONT.text ? { fontFamily: LESSON_FONT.text } : {}),
   },
   nextBtnDisabled: {
     paddingVertical: 16,
     paddingHorizontal: 24,
     borderRadius: 14,
     borderWidth: 1,
-    borderColor: '#e2e8f0',
-    backgroundColor: '#f8fafc',
+    borderColor: LESSON_PAPER.border,
+    backgroundColor: LESSON_PAPER.canvas,
     width: '100%',
     alignItems: 'center',
   },
   nextBtnDisabledText: {
     fontSize: 14,
-    color: '#64748b',
+    color: LESSON_INK.label,
+    ...(LESSON_FONT.text ? { fontFamily: LESSON_FONT.text } : {}),
   },
 });
 
@@ -804,9 +829,9 @@ const pb = StyleSheet.create({
     paddingTop: 20,
     paddingBottom: 14,
     gap: 6,
-    backgroundColor: '#ffffff',
-    borderBottomWidth: 1,
-    borderBottomColor: '#e2e8f0',
+    backgroundColor: LESSON_PAPER.elevated,
+    borderBottomWidth: StyleSheet.hairlineWidth * 2,
+    borderBottomColor: LESSON_PAPER.divider,
   },
   segment: {
     flex: 1,
@@ -814,35 +839,35 @@ const pb = StyleSheet.create({
     borderRadius: 2,
   },
   done: {
-    backgroundColor: '#d4a96a',
-    opacity: 0.55,
+    backgroundColor: LESSON_PAPER.foil,
+    opacity: 0.45,
   },
   active: {
-    backgroundColor: '#d4a96a',
+    backgroundColor: LESSON_PAPER.foil,
   },
   pending: {
-    backgroundColor: '#e2e8f0',
+    backgroundColor: LESSON_PAPER.border,
   },
 });
 
 const proof = StyleSheet.create({
   wrapper: {
     flexDirection: 'row',
-    backgroundColor: '#ffffff',
-    borderRadius: 14,
-    marginBottom: 24,
+    backgroundColor: LESSON_PAPER.elevated,
+    borderRadius: 16,
+    marginBottom: 26,
     overflow: 'hidden',
     borderWidth: 1,
-    borderColor: '#e2e8f0',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.05,
-    shadowRadius: 6,
+    borderColor: LESSON_PAPER.border,
+    shadowColor: LESSON_PAPER.shadow,
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.07,
+    shadowRadius: 16,
     elevation: 2,
   },
   accent: {
-    width: 4,
-    backgroundColor: '#d4a96a',
+    width: 3,
+    backgroundColor: LESSON_PAPER.foil,
   },
   content: {
     flex: 1,
@@ -852,30 +877,32 @@ const proof = StyleSheet.create({
   stat: {
     fontSize: 15,
     fontWeight: '600',
-    color: '#0f172a',
-    lineHeight: 24,
+    color: LESSON_INK.display,
+    lineHeight: 25,
+    ...(LESSON_FONT.display ? { fontFamily: LESSON_FONT.display } : {}),
   },
   source: {
     fontSize: 13,
-    color: '#64748b',
+    color: LESSON_INK.label,
     fontStyle: 'italic',
-    lineHeight: 19,
+    lineHeight: 20,
+    ...(LESSON_FONT.text ? { fontFamily: LESSON_FONT.text } : {}),
   },
 });
 
 const proto = StyleSheet.create({
   wrapper: {
-    backgroundColor: '#ffffff',
-    borderRadius: 16,
+    backgroundColor: LESSON_PAPER.elevated,
+    borderRadius: 18,
     borderWidth: 1,
-    borderColor: '#e2e8f0',
-    padding: 20,
-    marginBottom: 24,
+    borderColor: LESSON_PAPER.border,
+    padding: 22,
+    marginBottom: 26,
     gap: 0,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.06,
-    shadowRadius: 8,
+    shadowColor: LESSON_PAPER.shadow,
+    shadowOffset: { width: 0, height: 6 },
+    shadowOpacity: 0.07,
+    shadowRadius: 20,
     elevation: 2,
   },
   headerRow: {
@@ -885,24 +912,26 @@ const proto = StyleSheet.create({
     marginBottom: 16,
   },
   headerLabel: {
-    fontSize: 11,
+    fontSize: 10,
     fontWeight: '700',
-    color: '#1e1b4b',
-    letterSpacing: 1.4,
+    color: LESSON_INK.display,
+    letterSpacing: 1.8,
     textTransform: 'uppercase',
+    ...(LESSON_FONT.text ? { fontFamily: LESSON_FONT.text } : {}),
   },
   difficultyTag: {
-    backgroundColor: '#f1f5f9',
+    backgroundColor: LESSON_PAPER.inset,
     borderRadius: 20,
     paddingHorizontal: 10,
     paddingVertical: 4,
     borderWidth: 1,
-    borderColor: '#e2e8f0',
+    borderColor: LESSON_PAPER.border,
   },
   difficultyText: {
     fontSize: 12,
-    color: '#475569',
+    color: LESSON_INK.muted,
     fontWeight: '500',
+    ...(LESSON_FONT.text ? { fontFamily: LESSON_FONT.text } : {}),
   },
   row: {
     flexDirection: 'row',
@@ -923,41 +952,45 @@ const proto = StyleSheet.create({
     gap: 4,
   },
   rowLabel: {
-    fontSize: 11,
+    fontSize: 10,
     fontWeight: '700',
-    color: '#64748b',
+    color: LESSON_INK.label,
     textTransform: 'uppercase',
-    letterSpacing: 0.8,
+    letterSpacing: 1,
+    ...(LESSON_FONT.text ? { fontFamily: LESSON_FONT.text } : {}),
   },
   rowText: {
     fontSize: 15,
-    color: '#334155',
-    lineHeight: 24,
+    color: LESSON_INK.body,
+    lineHeight: 25,
+    ...(LESSON_FONT.text ? { fontFamily: LESSON_FONT.text } : {}),
   },
   divider: {
     height: 1,
-    backgroundColor: '#f1f5f9',
+    backgroundColor: LESSON_PAPER.divider,
     marginVertical: 4,
   },
   whyRow: {
     marginTop: 12,
     paddingTop: 12,
     borderTopWidth: 1,
-    borderTopColor: '#f1f5f9',
+    borderTopColor: LESSON_PAPER.divider,
     gap: 4,
   },
   whyLabel: {
-    fontSize: 11,
+    fontSize: 10,
     fontWeight: '700',
-    color: '#64748b',
+    color: LESSON_INK.label,
     textTransform: 'uppercase',
-    letterSpacing: 0.8,
+    letterSpacing: 1,
+    ...(LESSON_FONT.text ? { fontFamily: LESSON_FONT.text } : {}),
   },
   whyText: {
     fontSize: 14,
-    color: '#475569',
-    lineHeight: 22,
+    color: LESSON_INK.muted,
+    lineHeight: 23,
     fontStyle: 'italic',
+    ...(LESSON_FONT.text ? { fontFamily: LESSON_FONT.text } : {}),
   },
 });
 
@@ -965,10 +998,10 @@ const sci = StyleSheet.create({
   wrapper: {
     borderRadius: 14,
     borderWidth: 1,
-    borderColor: '#bae6fd',
+    borderColor: 'rgba(71, 95, 119, 0.22)',
     overflow: 'hidden',
-    marginBottom: 8,
-    backgroundColor: '#ffffff',
+    marginBottom: 10,
+    backgroundColor: LESSON_PAPER.elevated,
   },
   header: {
     flexDirection: 'row',
@@ -976,7 +1009,7 @@ const sci = StyleSheet.create({
     justifyContent: 'space-between',
     paddingHorizontal: 16,
     paddingVertical: 12,
-    backgroundColor: '#f0f9ff',
+    backgroundColor: '#e4ebf2',
   },
   headerLeft: {
     flexDirection: 'row',
@@ -984,14 +1017,15 @@ const sci = StyleSheet.create({
     gap: 8,
   },
   headerText: {
-    fontSize: 12,
+    fontSize: 11,
     fontWeight: '600',
-    color: '#0369a1',
-    letterSpacing: 0.6,
+    color: '#3d5566',
+    letterSpacing: 0.8,
     textTransform: 'uppercase',
+    ...(LESSON_FONT.text ? { fontFamily: LESSON_FONT.text } : {}),
   },
   body: {
-    backgroundColor: '#ffffff',
+    backgroundColor: LESSON_PAPER.elevated,
     paddingHorizontal: 16,
     paddingTop: 16,
     paddingBottom: 16,
@@ -1003,23 +1037,26 @@ const sci = StyleSheet.create({
   entryBorder: {
     paddingTop: 12,
     borderTopWidth: 1,
-    borderTopColor: '#f1f5f9',
+    borderTopColor: LESSON_PAPER.divider,
   },
   citation: {
     fontSize: 14,
-    color: '#334155',
-    lineHeight: 22,
+    color: LESSON_INK.body,
+    lineHeight: 23,
+    ...(LESSON_FONT.display ? { fontFamily: LESSON_FONT.display } : {}),
   },
   entrySource: {
     fontSize: 12,
-    color: '#64748b',
+    color: LESSON_INK.label,
     fontStyle: 'italic',
+    ...(LESSON_FONT.text ? { fontFamily: LESSON_FONT.text } : {}),
   },
   disclaimer: {
     fontSize: 12,
-    color: '#64748b',
+    color: LESSON_INK.muted,
     lineHeight: 18,
     marginBottom: 2,
+    ...(LESSON_FONT.text ? { fontFamily: LESSON_FONT.text } : {}),
   },
   credibilityBadge: {
     alignSelf: 'flex-start',
@@ -1041,32 +1078,34 @@ const sci = StyleSheet.create({
   credibilityBadgeText: {
     fontSize: 11,
     fontWeight: '700',
-    color: '#0f172a',
+    color: LESSON_INK.display,
+    ...(LESSON_FONT.text ? { fontFamily: LESSON_FONT.text } : {}),
   },
 });
 
 const diag = StyleSheet.create({
   wrapper: {
-    backgroundColor: '#ffffff',
-    borderRadius: 16,
-    padding: 24,
-    marginBottom: 24,
+    backgroundColor: LESSON_PAPER.elevated,
+    borderRadius: 18,
+    padding: 26,
+    marginBottom: 26,
     borderWidth: 1,
-    borderColor: '#e2e8f0',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.05,
-    shadowRadius: 6,
+    borderColor: LESSON_PAPER.border,
+    shadowColor: LESSON_PAPER.shadow,
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.07,
+    shadowRadius: 16,
     elevation: 2,
   },
   label: {
-    fontSize: 12,
+    fontSize: 11,
     fontWeight: '600',
-    color: '#64748b',
+    color: LESSON_INK.label,
     textAlign: 'center',
-    letterSpacing: 0.8,
+    letterSpacing: 1.2,
     textTransform: 'uppercase',
     marginBottom: 20,
+    ...(LESSON_FONT.text ? { fontFamily: LESSON_FONT.text } : {}),
   },
   row: {
     flexDirection: 'row',
@@ -1092,22 +1131,24 @@ const diag = StyleSheet.create({
   stageLabel: {
     fontSize: 14,
     fontWeight: '700',
-    color: '#0f172a',
+    color: LESSON_INK.display,
+    ...(LESSON_FONT.text ? { fontFamily: LESSON_FONT.text } : {}),
   },
   remLabel: {
     color: '#b45309',
   },
   stageSub: {
     fontSize: 10,
-    color: '#64748b',
+    color: LESSON_INK.muted,
     textAlign: 'center',
+    ...(LESSON_FONT.text ? { fontFamily: LESSON_FONT.text } : {}),
   },
   footnoteRow: {
     flexDirection: 'row',
     justifyContent: 'center',
     gap: 24,
     borderTopWidth: 1,
-    borderTopColor: '#f1f5f9',
+    borderTopColor: LESSON_PAPER.divider,
     paddingTop: 16,
   },
   footnoteItem: {
@@ -1122,6 +1163,7 @@ const diag = StyleSheet.create({
   },
   footnoteText: {
     fontSize: 12,
-    color: '#475569',
+    color: LESSON_INK.muted,
+    ...(LESSON_FONT.text ? { fontFamily: LESSON_FONT.text } : {}),
   },
 });

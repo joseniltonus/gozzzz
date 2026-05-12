@@ -120,8 +120,8 @@ export default function WebProgramPage() {
         </View>
       </LinearGradient>
 
-      {/* HEADER */}
-      <LinearGradient colors={['#1e293b', '#334155']} style={styles.header}>
+      {/* HEADER — mesmo fundo escuro da página e dos cards de passos */}
+      <View style={styles.header}>
         <View style={styles.headerBadge}>
           <Sparkles size={14} color="#fbbf24" />
           <Text style={styles.headerBadgeText}>{t('web.badge.scienceBased')}</Text>
@@ -144,7 +144,7 @@ export default function WebProgramPage() {
             <Text style={styles.headerStatLabel}>{t('web.program.eachStep')}</Text>
           </View>
         </View>
-      </LinearGradient>
+      </View>
 
       {/* STEPS */}
       <View style={styles.content}>
@@ -353,7 +353,13 @@ const styles = StyleSheet.create({
   backBtn: { flexDirection: 'row', alignItems: 'center', gap: 6 },
   backBtnText: { fontSize: 14, color: '#94a3b8', fontWeight: '500' },
 
-  header: { paddingTop: 48, paddingBottom: 48, paddingHorizontal: 24, alignItems: 'center' },
+  header: {
+    paddingTop: 48,
+    paddingBottom: 48,
+    paddingHorizontal: 24,
+    alignItems: 'center',
+    backgroundColor: '#07070f',
+  },
   headerBadge: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -372,8 +378,10 @@ const styles = StyleSheet.create({
   headerStats: {
     flexDirection: 'row',
     gap: 28,
-    backgroundColor: 'rgba(255,255,255,0.08)',
-    borderRadius: 14,
+    backgroundColor: '#12121e',
+    borderRadius: 16,
+    borderWidth: 1,
+    borderColor: 'rgba(255,255,255,0.06)',
     paddingHorizontal: 32,
     paddingVertical: 16,
   },

@@ -4,6 +4,7 @@ import { useLanguage } from '@/contexts/LanguageContext';
 import { CircleCheck as CheckCircle } from 'lucide-react-native';
 import { LESSONS_DATA } from '@/data/lessons';
 import { LESSON_ENHANCEMENTS } from '@/data/lessonEnhancements';
+import { LESSON_FONT, LESSON_INK, LESSON_PAPER } from '@/constants/lessonPaperTheme';
 
 interface LessonInteractiveCardWebProps {
   lessonId: string;
@@ -95,7 +96,7 @@ export const LessonInteractiveCardWeb = ({ lessonId, onComplete }: LessonInterac
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#f8fafc',
+    backgroundColor: LESSON_PAPER.canvas,
     paddingVertical: 20,
     gap: 8,
   },
@@ -125,12 +126,12 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     gap: 12,
     marginBottom: 10,
-    backgroundColor: '#ffffff',
+    backgroundColor: LESSON_PAPER.elevated,
     padding: 18,
-    borderRadius: 14,
+    borderRadius: 16,
     alignItems: 'flex-start',
     borderWidth: 1,
-    borderColor: '#f1f5f9',
+    borderColor: LESSON_PAPER.border,
   },
   keyPointCheckmark: {
     marginTop: 2,
@@ -138,33 +139,36 @@ const styles = StyleSheet.create({
   },
   keyPointText: {
     fontSize: 15,
-    color: '#334155',
-    lineHeight: 24,
+    color: LESSON_INK.body,
+    lineHeight: 25,
     flex: 1,
-    letterSpacing: 0.1,
+    letterSpacing: 0.02,
+    ...(LESSON_FONT.text ? { fontFamily: LESSON_FONT.text } : {}),
   },
   descriptionSection: {
     paddingVertical: 20,
-    backgroundColor: '#ffffff',
-    borderRadius: 14,
+    backgroundColor: LESSON_PAPER.elevated,
+    borderRadius: 16,
     marginBottom: 16,
     paddingHorizontal: 18,
     borderWidth: 1,
-    borderColor: '#f1f5f9',
+    borderColor: LESSON_PAPER.border,
   },
   descriptionText: {
     fontSize: 16,
-    color: '#334155',
-    lineHeight: 27,
+    color: LESSON_INK.body,
+    lineHeight: 28,
     marginBottom: 8,
-    letterSpacing: 0.1,
+    letterSpacing: 0.02,
+    ...(LESSON_FONT.text ? { fontFamily: LESSON_FONT.text } : {}),
   },
   sectionTitle: {
-    fontSize: 19,
+    fontSize: 20,
     fontWeight: '700',
-    color: '#0f172a',
+    color: LESSON_INK.display,
     marginBottom: 14,
-    letterSpacing: -0.2,
+    letterSpacing: -0.35,
+    ...(LESSON_FONT.display ? { fontFamily: LESSON_FONT.display } : {}),
   },
   expertTipsSection: {
     paddingVertical: 16,
@@ -177,14 +181,14 @@ const styles = StyleSheet.create({
   },
   expertTipItem: {
     width: '100%',
-    backgroundColor: '#ffffff',
+    backgroundColor: LESSON_PAPER.elevated,
     padding: 18,
-    borderRadius: 14,
+    borderRadius: 16,
     marginBottom: 10,
-    borderLeftWidth: 4,
-    borderLeftColor: '#6366f1',
+    borderLeftWidth: 3,
+    borderLeftColor: LESSON_PAPER.foil,
     borderWidth: 1,
-    borderColor: '#f1f5f9',
+    borderColor: LESSON_PAPER.border,
   },
   expertTipHeader: {
     marginBottom: 10,
@@ -192,13 +196,16 @@ const styles = StyleSheet.create({
   expertName: {
     fontSize: 14,
     fontWeight: '700',
-    color: '#0f172a',
+    color: LESSON_INK.display,
+    marginBottom: 6,
+    ...(LESSON_FONT.text ? { fontFamily: LESSON_FONT.text } : {}),
   },
   expertTipText: {
     fontSize: 15,
-    color: '#475569',
-    lineHeight: 24,
+    color: LESSON_INK.muted,
+    lineHeight: 25,
     fontStyle: 'italic',
+    ...(LESSON_FONT.display ? { fontFamily: LESSON_FONT.display } : {}),
   },
   spacer: {
     height: 20,

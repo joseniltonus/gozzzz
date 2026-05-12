@@ -27,6 +27,7 @@ import { useEffectiveChronotype } from '@/hooks/useEffectiveChronotype';
 import { useProgress } from '@/contexts/ProgressContext';
 import { supabase } from '@/lib/supabase';
 import { hasPremiumProgramAccess } from '@/lib/subscriptionAccess';
+import { LESSON_FONT, LESSON_INK, LESSON_PAPER } from '@/constants/lessonPaperTheme';
 import { useState, useEffect, useRef } from 'react';
 import { Lesson1InteractiveCardWeb } from '@/components/Lesson1InteractiveCardWeb';
 import { LessonInteractiveCardWeb } from '@/components/LessonInteractiveCardWeb';
@@ -706,10 +707,10 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: '#94a3b8',
   },
-  page: { flex: 1, backgroundColor: '#f8fafc' },
+  page: { flex: 1, backgroundColor: LESSON_PAPER.page },
   lessonPageScroll: {
     flex: 1,
-    backgroundColor: '#f8fafc',
+    backgroundColor: LESSON_PAPER.page,
     maxWidth: '100%',
     alignSelf: 'stretch',
   },
@@ -763,7 +764,13 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: 'rgba(251,191,36,0.3)',
   },
-  stepBadgeText: { fontSize: 13, fontWeight: '700', color: '#fbbf24' },
+  stepBadgeText: {
+    fontSize: 13,
+    fontWeight: '700',
+    color: '#e8d5b0',
+    letterSpacing: 0.6,
+    ...(LESSON_FONT.text ? { fontFamily: LESSON_FONT.text } : {}),
+  },
   stepBadgeMicro: {
     paddingHorizontal: 12,
     paddingVertical: 4,
@@ -773,13 +780,14 @@ const styles = StyleSheet.create({
   stepBadgeTextMicro: { fontSize: 12 },
   headerTitle: {
     fontSize: 28,
-    fontWeight: '800',
+    fontWeight: '700',
     color: '#ffffff',
     textAlign: 'center',
     maxWidth: 640,
     lineHeight: 34,
     paddingHorizontal: 8,
-    letterSpacing: -0.3,
+    letterSpacing: -0.35,
+    ...(LESSON_FONT.display ? { fontFamily: LESSON_FONT.display } : {}),
   },
   headerTitleWide: {
     fontSize: 40,
@@ -793,14 +801,15 @@ const styles = StyleSheet.create({
   oneLinerText: {
     fontSize: 14,
     fontStyle: 'italic',
-    color: '#c4b5fd',
+    color: '#ddd5f0',
     textAlign: 'center',
     marginBottom: 8,
     marginTop: 6,
     maxWidth: 560,
     paddingHorizontal: 12,
-    lineHeight: 22,
-    opacity: 0.95,
+    lineHeight: 24,
+    opacity: 0.96,
+    ...(LESSON_FONT.display ? { fontFamily: LESSON_FONT.display } : {}),
   },
   oneLinerCompact: {
     fontSize: 13,
@@ -824,13 +833,15 @@ const styles = StyleSheet.create({
   },
 
   card: {
-    backgroundColor: '#ffffff',
-    borderRadius: 16,
+    backgroundColor: LESSON_PAPER.elevated,
+    borderRadius: 18,
     padding: 24,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.06,
-    shadowRadius: 8,
+    borderWidth: 1,
+    borderColor: LESSON_PAPER.border,
+    shadowColor: LESSON_PAPER.shadow,
+    shadowOffset: { width: 0, height: 6 },
+    shadowOpacity: 0.08,
+    shadowRadius: 22,
     elevation: 3,
   },
   cardYellow: {
@@ -844,7 +855,13 @@ const styles = StyleSheet.create({
     borderColor: '#bfdbfe',
   },
   cardHeader: { flexDirection: 'row', alignItems: 'center', gap: 10, marginBottom: 16 },
-  cardTitle: { fontSize: 18, fontWeight: '700', color: '#0f172a', marginBottom: 16 },
+  cardTitle: {
+    fontSize: 18,
+    fontWeight: '700',
+    color: LESSON_INK.display,
+    marginBottom: 16,
+    ...(LESSON_FONT.display ? { fontFamily: LESSON_FONT.display } : {}),
+  },
 
   resourceBtn: {
     flexDirection: 'row',
@@ -881,34 +898,75 @@ const styles = StyleSheet.create({
   },
   bulletText: { flex: 1, fontSize: 15, color: '#78350f', lineHeight: 22, fontWeight: '500' },
 
-  descText: { fontSize: 16, color: '#475569', lineHeight: 28, marginBottom: 16 },
-  durationInfo: { marginTop: 16, paddingTop: 16, borderTopWidth: 1, borderTopColor: '#e2e8f0', flexDirection: 'row', alignItems: 'center', gap: 8 },
-  durationLabel: { fontSize: 14, fontWeight: '600', color: '#64748b' },
-  durationValue: { fontSize: 14, fontWeight: '700', color: '#0f172a' },
+  descText: {
+    fontSize: 16,
+    color: LESSON_INK.body,
+    lineHeight: 29,
+    marginBottom: 16,
+    letterSpacing: 0.02,
+    ...(LESSON_FONT.text ? { fontFamily: LESSON_FONT.text } : {}),
+  },
+  durationInfo: {
+    marginTop: 16,
+    paddingTop: 16,
+    borderTopWidth: 1,
+    borderTopColor: LESSON_PAPER.divider,
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+  },
+  durationLabel: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: LESSON_INK.label,
+    ...(LESSON_FONT.text ? { fontFamily: LESSON_FONT.text } : {}),
+  },
+  durationValue: {
+    fontSize: 14,
+    fontWeight: '700',
+    color: LESSON_INK.display,
+    ...(LESSON_FONT.text ? { fontFamily: LESSON_FONT.text } : {}),
+  },
 
   expertTip: {
-    backgroundColor: '#ffffff',
-    borderRadius: 12,
+    backgroundColor: LESSON_PAPER.elevated,
+    borderRadius: 14,
     padding: 16,
     marginBottom: 12,
+    borderWidth: 1,
+    borderColor: LESSON_PAPER.border,
   },
-  expertName: { fontSize: 13, fontWeight: '700', color: '#2563eb', marginBottom: 6 },
-  expertQuote: { fontSize: 15, color: '#1e40af', lineHeight: 22, fontStyle: 'italic' },
+  expertName: {
+    fontSize: 13,
+    fontWeight: '700',
+    color: LESSON_INK.display,
+    marginBottom: 6,
+    ...(LESSON_FONT.text ? { fontFamily: LESSON_FONT.text } : {}),
+  },
+  expertQuote: {
+    fontSize: 15,
+    color: LESSON_INK.muted,
+    lineHeight: 24,
+    fontStyle: 'italic',
+    ...(LESSON_FONT.display ? { fontFamily: LESSON_FONT.display } : {}),
+  },
 
   completeButton: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
     gap: 8,
-    backgroundColor: '#d4a96a',
-    borderRadius: 16,
+    backgroundColor: LESSON_PAPER.foil,
+    borderRadius: 14,
     paddingVertical: 18,
     minHeight: 54,
     marginBottom: 24,
-    shadowColor: '#d4a96a',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.3,
-    shadowRadius: 8,
+    borderWidth: 1,
+    borderColor: 'rgba(90, 70, 40, 0.28)',
+    shadowColor: LESSON_PAPER.shadow,
+    shadowOffset: { width: 0, height: 6 },
+    shadowOpacity: 0.12,
+    shadowRadius: 16,
     elevation: 4,
   },
   completeButtonDisabled: {
@@ -917,18 +975,19 @@ const styles = StyleSheet.create({
   completeButtonText: {
     fontSize: 17,
     fontWeight: '700',
-    color: '#0f172a',
-    letterSpacing: 0.2,
+    color: '#14110d',
+    letterSpacing: 0.35,
+    ...(LESSON_FONT.text ? { fontFamily: LESSON_FONT.text } : {}),
   },
   lesson1ButtonContainer: {
     paddingVertical: 24,
     paddingBottom: 32,
-    backgroundColor: '#f8fafc',
+    backgroundColor: LESSON_PAPER.page,
   },
   lesson2ButtonContainer: {
     paddingVertical: 24,
     paddingBottom: 32,
-    backgroundColor: '#f8fafc',
+    backgroundColor: LESSON_PAPER.page,
   },
   navBtns: {
     flexDirection: 'row',
@@ -960,7 +1019,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     padding: 40,
-    backgroundColor: '#f8fafc',
+    backgroundColor: LESSON_PAPER.page,
   },
   errorText: { fontSize: 18, color: '#dc2626', marginBottom: 20 },
   errorBtn: {
