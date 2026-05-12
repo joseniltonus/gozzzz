@@ -13,7 +13,6 @@ import Head from 'expo-router/head';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { LinearGradient } from 'expo-linear-gradient';
 import {
-  Moon,
   ArrowLeft,
   Lock,
   BookOpen,
@@ -112,9 +111,6 @@ export default function WebProgramPage() {
         <LinearGradient colors={['#0f172a', '#1e293b']} style={styles.nav}>
         <View style={styles.navInner}>
           <TouchableOpacity onPress={() => router.push('/web')} style={styles.navBrand}>
-            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: 22, height: 22 }}>
-              <Moon size={22} color="#fbbf24" strokeWidth={2} />
-            </div>
             <Text style={styles.navBrandText}>GoZzzz</Text>
           </TouchableOpacity>
           <TouchableOpacity onPress={() => router.back()} style={styles.backBtn}>
@@ -155,7 +151,7 @@ export default function WebProgramPage() {
         <View style={styles.container}>
           {/* Banner de personalização — adapta CTA ou confirmação conforme cronótipo */}
           {meta && !showQuizPanel ? (
-            <View style={[styles.personalizedBanner, { backgroundColor: meta.tintBg, borderColor: meta.tintBorder }]}>
+            <View style={[styles.personalizedBanner, { borderColor: meta.tintBorder }]}>
               <Text style={styles.personalizedBannerEmoji}>{meta.emoji}</Text>
               <View style={styles.personalizedBannerCol}>
                 <Text style={[styles.personalizedBannerTitle, { color: meta.tint }]}>
@@ -434,6 +430,8 @@ const styles = StyleSheet.create({
     gap: 14,
     borderRadius: 14,
     borderWidth: 1,
+    /** Mesmo tom dos cards de lição — o tintBg do cronótipo clareava demais o bloco */
+    backgroundColor: '#12121e',
     paddingVertical: 14,
     paddingHorizontal: 18,
     marginBottom: 32,
