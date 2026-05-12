@@ -5,13 +5,13 @@ import {
   ScrollView,
   TouchableOpacity,
   Image,
-  Platform,
   ActivityIndicator,
+  useWindowDimensions,
+  LayoutChangeEvent,
 } from 'react-native';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { LinearGradient } from 'expo-linear-gradient';
 import {
-  Moon,
   ArrowLeft,
   Lightbulb,
   Lock,
@@ -27,7 +27,7 @@ import { useEffectiveChronotype } from '@/hooks/useEffectiveChronotype';
 import { useProgress } from '@/contexts/ProgressContext';
 import { supabase } from '@/lib/supabase';
 import { hasPremiumProgramAccess } from '@/lib/subscriptionAccess';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Lesson1InteractiveCardWeb } from '@/components/Lesson1InteractiveCardWeb';
 import { LessonInteractiveCardWeb } from '@/components/LessonInteractiveCardWeb';
 import { SleepLessonCardWeb } from '@/components/SleepLessonCardWeb';
@@ -42,7 +42,9 @@ const CHRONOTYPE_LABELS: Record<'dolphin' | 'lion' | 'bear' | 'wolf', { emoji: s
   wolf: { emoji: '🐺', label: 'Lobo', tint: '#4a9eff' },
 };
 
-const isWeb = Platform.OS === 'web';
+/** Mesmo nav da landing `/web/sono-plus` (marca só texto + roxo profundo). */
+const NAV_GRAD_COLORS = ['#0c0a1f', '#1e1b4b'] as const;
+const LESSON_HERO_GRAD_COLORS = ['#1e1b4b', '#0c0a1f'] as const;
 
 export default function WebLessonPage() {
   const { id } = useLocalSearchParams();
@@ -58,6 +60,28 @@ export default function WebLessonPage() {
   const [accessChecked, setAccessChecked] = useState(false);
   const [completingLesson, setCompletingLesson] = useState(false);
   const [sleepLessonComplete, setSleepLessonComplete] = useState(false);
+  const { width: windowWidth } = useWindowDimensions();
+  const lessonScrollRef = useRef<ScrollView>(null);
+  const lessonBodyScrollY = useRef(0);
+  const compactLessonHero = windowWidth < 540;
+  const microLessonHero = windowWidth < 380;
+  const wideLessonHero = windowWidth >= 640;
+  const contentPadH = windowWidth < 400 ? 16 : 24;
+
+  const onLessonReadingZoneLayout = (e: LayoutChangeEvent) => {
+    lessonBodyScrollY.current = e.nativeEvent.layout.y;
+  };
+
+  /** Rola até ao início do conteúdo da lição (após o hero), não até ao topo absoluto — melhor para leitura entre passos. */
+  const scrollLessonToReadingStart = () => {
+    requestAnimationFrame(() => {
+      const y = lessonBodyScrollY.current;
+      lessonScrollRef.current?.scrollTo({
+        y: Math.max(0, y - 12),
+        animated: true,
+      });
+    });
+  };
 
   // Check premium / gift access: wait for profile hook, then direct fetch fallback
   useEffect(() => {
@@ -122,10 +146,9 @@ export default function WebLessonPage() {
   if (accessPending) {
     return (
       <View style={styles.lockedPage}>
-        <LinearGradient colors={['#0f172a', '#1e293b']} style={styles.nav}>
+        <LinearGradient colors={NAV_GRAD_COLORS} style={styles.nav}>
           <View style={styles.navInner}>
             <TouchableOpacity onPress={() => router.push('/web')} style={styles.navBrand}>
-              <Moon size={22} color="#fbbf24" />
               <Text style={styles.navBrandText}>GoZzzz</Text>
             </TouchableOpacity>
             <TouchableOpacity onPress={() => router.push('/web/programa')} style={styles.backBtn}>
@@ -144,10 +167,9 @@ export default function WebLessonPage() {
   if (isLocked) {
     return (
       <View style={styles.lockedPage}>
-        <LinearGradient colors={['#0f172a', '#1e293b']} style={styles.nav}>
+        <LinearGradient colors={NAV_GRAD_COLORS} style={styles.nav}>
           <View style={styles.navInner}>
             <TouchableOpacity onPress={() => router.push('/web')} style={styles.navBrand}>
-              <Moon size={22} color="#fbbf24" />
               <Text style={styles.navBrandText}>GoZzzz</Text>
             </TouchableOpacity>
             <TouchableOpacity onPress={() => router.push('/web/programa')} style={styles.backBtn}>
@@ -286,11 +308,16 @@ export default function WebLessonPage() {
   if (!isLocked) {
     if (lesson.id === '1') {
       return (
-        <View style={styles.page}>
-          <LinearGradient colors={['#0f172a', '#1e293b']} style={styles.nav}>
-            <View style={styles.navInner}>
+        <ScrollView
+          ref={lessonScrollRef}
+          style={styles.lessonPageScroll}
+          contentContainerStyle={styles.lessonPageScrollContent}
+          showsVerticalScrollIndicator
+          keyboardShouldPersistTaps="handled"
+        >
+          <LinearGradient colors={NAV_GRAD_COLORS} style={styles.nav}>
+            <View style={[styles.navInner, { paddingHorizontal: contentPadH }]}>
               <TouchableOpacity onPress={() => router.push('/web')} style={styles.navBrand}>
-                <Moon size={22} color="#fbbf24" />
                 <Text style={styles.navBrandText}>GoZzzz</Text>
               </TouchableOpacity>
               <TouchableOpacity onPress={navigateToPrevLesson} style={styles.backBtn}>
@@ -300,19 +327,41 @@ export default function WebLessonPage() {
             </View>
           </LinearGradient>
 
-          <LinearGradient colors={['#1e293b', '#0f172a']} style={styles.header}>
-            <View style={styles.stepBadge}>
-              <Text style={styles.stepBadgeText}>{t('web.lesson.step')} {lesson.step_number}</Text>
+          <LinearGradient
+            colors={LESSON_HERO_GRAD_COLORS}
+            style={[
+              styles.header,
+              compactLessonHero && styles.headerCompact,
+              microLessonHero && styles.headerMicro,
+              { paddingHorizontal: contentPadH },
+            ]}
+          >
+            <View style={[styles.stepBadge, microLessonHero && styles.stepBadgeMicro]}>
+              <Text style={[styles.stepBadgeText, microLessonHero && styles.stepBadgeTextMicro]}>
+                {t('web.lesson.step')} {lesson.step_number}
+              </Text>
             </View>
-            <Text style={styles.headerTitle}>{getTitle()}</Text>
-            {oneLiner && <Text style={styles.oneLinerText}>{oneLiner}</Text>}
+            <Text
+              style={[
+                styles.headerTitle,
+                wideLessonHero && styles.headerTitleWide,
+                microLessonHero && styles.headerTitleMicro,
+              ]}
+            >
+              {getTitle()}
+            </Text>
+            {oneLiner && (
+              <Text style={[styles.oneLinerText, compactLessonHero && styles.oneLinerCompact]}>{oneLiner}</Text>
+            )}
           </LinearGradient>
 
-          <View style={{ flex: 1, flexDirection: 'column' }}>
-            <Lesson1InteractiveCardWeb
-              key={`lesson1web-${id as string}`}
-              renderCompleteButton={(isLast) => isLast ? (
-                <View style={styles.lesson1ButtonContainer}>
+          <View style={styles.lessonReadingZone} onLayout={onLessonReadingZoneLayout}>
+          <Lesson1InteractiveCardWeb
+            key={`lesson1web-${id as string}`}
+            onStepChange={scrollLessonToReadingStart}
+            renderCompleteButton={(isLast) =>
+              isLast ? (
+                <View style={[styles.lesson1ButtonContainer, { paddingHorizontal: contentPadH }]}>
                   <TouchableOpacity
                     style={[styles.completeButton, completingLesson && styles.completeButtonDisabled]}
                     onPress={handleMarkComplete}
@@ -331,19 +380,25 @@ export default function WebLessonPage() {
                     )}
                   </TouchableOpacity>
                 </View>
-              ) : null}
-            />
+              ) : null
+            }
+          />
           </View>
-        </View>
+        </ScrollView>
       );
     }
 
     return (
-      <View style={styles.page}>
-        <LinearGradient colors={['#0f172a', '#1e293b']} style={styles.nav}>
-          <View style={styles.navInner}>
+      <ScrollView
+        ref={lessonScrollRef}
+        style={styles.lessonPageScroll}
+        contentContainerStyle={styles.lessonPageScrollContent}
+        showsVerticalScrollIndicator
+        keyboardShouldPersistTaps="handled"
+      >
+        <LinearGradient colors={NAV_GRAD_COLORS} style={styles.nav}>
+          <View style={[styles.navInner, { paddingHorizontal: contentPadH }]}>
             <TouchableOpacity onPress={() => router.push('/web')} style={styles.navBrand}>
-              <Moon size={22} color="#fbbf24" />
               <Text style={styles.navBrandText}>GoZzzz</Text>
             </TouchableOpacity>
             <TouchableOpacity onPress={() => router.push('/web/programa')} style={styles.backBtn}>
@@ -353,55 +408,83 @@ export default function WebLessonPage() {
           </View>
         </LinearGradient>
 
-        <LinearGradient colors={['#1e293b', '#0f172a']} style={styles.header}>
-          <View style={styles.stepBadge}>
-            <Text style={styles.stepBadgeText}>{t('web.lesson.step')} {lesson.step_number}</Text>
+        <LinearGradient
+          colors={LESSON_HERO_GRAD_COLORS}
+          style={[
+            styles.header,
+            compactLessonHero && styles.headerCompact,
+            microLessonHero && styles.headerMicro,
+            { paddingHorizontal: contentPadH },
+          ]}
+        >
+          <View style={[styles.stepBadge, microLessonHero && styles.stepBadgeMicro]}>
+            <Text style={[styles.stepBadgeText, microLessonHero && styles.stepBadgeTextMicro]}>
+              {t('web.lesson.step')} {lesson.step_number}
+            </Text>
           </View>
-          <Text style={styles.headerTitle}>{getTitle()}</Text>
-          {oneLiner && <Text style={styles.oneLinerText}>{oneLiner}</Text>}
+          <Text
+            style={[
+              styles.headerTitle,
+              wideLessonHero && styles.headerTitleWide,
+              microLessonHero && styles.headerTitleMicro,
+            ]}
+          >
+            {getTitle()}
+          </Text>
+          {oneLiner && (
+            <Text style={[styles.oneLinerText, compactLessonHero && styles.oneLinerCompact]}>{oneLiner}</Text>
+          )}
         </LinearGradient>
 
-        <View style={{ flex: 1, flexDirection: 'column' }}>
-          {protocolCallout && (
-            <View style={styles.protocolCalloutContainer}>{protocolCallout}</View>
-          )}
-          {SLEEP_LESSON_CONTENT.find((l) => l.id === id) ? (
-            <SleepLessonCardWeb key={`sleepweb-${id as string}`} lessonId={id as string} onComplete={() => setSleepLessonComplete(true)} />
-          ) : (
-            <LessonInteractiveCardWeb key={`interactiveweb-${id as string}`} lessonId={id as string} onComplete={() => setSleepLessonComplete(true)} />
-          )}
-          {(SLEEP_LESSON_CONTENT.find((l) => l.id === id) ? sleepLessonComplete : true) && (
-            <View style={styles.lesson2ButtonContainer}>
-              <TouchableOpacity
-                style={[styles.completeButton, completingLesson && styles.completeButtonDisabled]}
-                onPress={handleMarkComplete}
-                disabled={completingLesson}
-              >
-                {completingLesson ? (
-                  <>
-                    <CheckCircle size={20} color="#0f172a" />
-                    <Text style={styles.completeButtonText}>{t('lesson.continuing')}</Text>
-                  </>
-                ) : (
-                  <>
-                    <CheckCircle size={20} color="#0f172a" />
-                    <Text style={styles.completeButtonText}>{t('lesson.markComplete')}</Text>
-                  </>
-                )}
-              </TouchableOpacity>
-            </View>
-          )}
+        <View style={styles.lessonReadingZone} onLayout={onLessonReadingZoneLayout}>
+        {protocolCallout && (
+          <View style={[styles.protocolCalloutContainer, { paddingHorizontal: contentPadH }]}>{protocolCallout}</View>
+        )}
+        {SLEEP_LESSON_CONTENT.find((l) => l.id === id) ? (
+          <SleepLessonCardWeb
+            key={`sleepweb-${id as string}`}
+            lessonId={id as string}
+            onStepChange={scrollLessonToReadingStart}
+            onComplete={() => setSleepLessonComplete(true)}
+          />
+        ) : (
+          <LessonInteractiveCardWeb
+            key={`interactiveweb-${id as string}`}
+            lessonId={id as string}
+            onComplete={() => setSleepLessonComplete(true)}
+          />
+        )}
+        {(SLEEP_LESSON_CONTENT.find((l) => l.id === id) ? sleepLessonComplete : true) && (
+          <View style={[styles.lesson2ButtonContainer, { paddingHorizontal: contentPadH }]}>
+            <TouchableOpacity
+              style={[styles.completeButton, completingLesson && styles.completeButtonDisabled]}
+              onPress={handleMarkComplete}
+              disabled={completingLesson}
+            >
+              {completingLesson ? (
+                <>
+                  <CheckCircle size={20} color="#0f172a" />
+                  <Text style={styles.completeButtonText}>{t('lesson.continuing')}</Text>
+                </>
+              ) : (
+                <>
+                  <CheckCircle size={20} color="#0f172a" />
+                  <Text style={styles.completeButtonText}>{t('lesson.markComplete')}</Text>
+                </>
+              )}
+            </TouchableOpacity>
+          </View>
+        )}
         </View>
-      </View>
+      </ScrollView>
     );
   }
 
   return (
     <ScrollView style={styles.page} showsVerticalScrollIndicator={false}>
-      <LinearGradient colors={['#0f172a', '#1e293b']} style={styles.nav}>
+      <LinearGradient colors={NAV_GRAD_COLORS} style={styles.nav}>
         <View style={styles.navInner}>
           <TouchableOpacity onPress={() => router.push('/web')} style={styles.navBrand}>
-            <Moon size={22} color="#fbbf24" />
             <Text style={styles.navBrandText}>GoZzzz</Text>
           </TouchableOpacity>
           <TouchableOpacity onPress={() => router.push('/web/programa')} style={styles.backBtn}>
@@ -411,7 +494,7 @@ export default function WebLessonPage() {
         </View>
       </LinearGradient>
 
-      <LinearGradient colors={['#1e293b', '#0f172a']} style={styles.header}>
+      <LinearGradient colors={LESSON_HERO_GRAD_COLORS} style={styles.header}>
         <View style={styles.stepBadge}>
           <Text style={styles.stepBadgeText}>{t('web.lesson.step')} {lesson.step_number}</Text>
         </View>
@@ -517,8 +600,7 @@ export default function WebLessonPage() {
 
 const styles = StyleSheet.create({
   protocolCalloutContainer: {
-    paddingHorizontal: 24,
-    paddingTop: 24,
+    paddingTop: 20,
     maxWidth: 760,
     alignSelf: 'center',
     width: '100%',
@@ -550,9 +632,9 @@ const styles = StyleSheet.create({
     letterSpacing: 0.2,
   },
   protocolCalloutBody: {
-    fontSize: 14,
-    lineHeight: 21,
-    color: '#cbd5e1',
+    fontSize: 15,
+    lineHeight: 24,
+    color: '#e2e8f0',
     marginBottom: 14,
   },
   protocolCalloutLimitRow: {
@@ -625,28 +707,52 @@ const styles = StyleSheet.create({
     color: '#94a3b8',
   },
   page: { flex: 1, backgroundColor: '#f8fafc' },
+  lessonPageScroll: {
+    flex: 1,
+    backgroundColor: '#f8fafc',
+    maxWidth: '100%',
+    alignSelf: 'stretch',
+  },
+  lessonPageScrollContent: {
+    flexGrow: 1,
+    paddingBottom: 52,
+  },
+  lessonReadingZone: {
+    width: '100%',
+  },
 
-  nav: { paddingTop: 0, paddingBottom: 0 },
+  nav: {
+    paddingTop: 0,
+    paddingBottom: 0,
+    borderBottomWidth: StyleSheet.hairlineWidth,
+    borderBottomColor: 'rgba(255,255,255,0.08)',
+  },
   navInner: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    paddingHorizontal: 32,
     paddingVertical: 16,
     maxWidth: 1100,
     alignSelf: 'center',
     width: '100%',
   },
-  navBrand: { flexDirection: 'row', alignItems: 'center', gap: 8 },
+  navBrand: { flexDirection: 'row', alignItems: 'center', gap: 10 },
   navBrandText: { fontSize: 20, fontWeight: '800', color: '#ffffff' },
   backBtn: { flexDirection: 'row', alignItems: 'center', gap: 6 },
   backBtnText: { fontSize: 14, color: '#94a3b8', fontWeight: '500' },
 
   header: {
-    paddingTop: 48,
-    paddingBottom: 48,
-    paddingHorizontal: 24,
+    paddingTop: 40,
+    paddingBottom: 40,
     alignItems: 'center',
+  },
+  headerCompact: {
+    paddingTop: 20,
+    paddingBottom: 22,
+  },
+  headerMicro: {
+    paddingTop: 14,
+    paddingBottom: 16,
   },
   stepBadge: {
     backgroundColor: 'rgba(251,191,36,0.15)',
@@ -658,22 +764,48 @@ const styles = StyleSheet.create({
     borderColor: 'rgba(251,191,36,0.3)',
   },
   stepBadgeText: { fontSize: 13, fontWeight: '700', color: '#fbbf24' },
+  stepBadgeMicro: {
+    paddingHorizontal: 12,
+    paddingVertical: 4,
+    marginBottom: 10,
+    borderRadius: 14,
+  },
+  stepBadgeTextMicro: { fontSize: 12 },
   headerTitle: {
-    fontSize: isWeb ? 40 : 28,
+    fontSize: 28,
     fontWeight: '800',
     color: '#ffffff',
     textAlign: 'center',
-    maxWidth: 700,
+    maxWidth: 640,
+    lineHeight: 34,
+    paddingHorizontal: 8,
+    letterSpacing: -0.3,
+  },
+  headerTitleWide: {
+    fontSize: 40,
+    lineHeight: 46,
+  },
+  headerTitleMicro: {
+    fontSize: 24,
+    lineHeight: 30,
+    maxWidth: '100%',
   },
   oneLinerText: {
-    fontSize: 13,
+    fontSize: 14,
     fontStyle: 'italic',
-    color: '#a89fff',
+    color: '#c4b5fd',
     textAlign: 'center',
-    marginBottom: 16,
-    marginTop: 4,
-    maxWidth: 600,
-    paddingHorizontal: 16,
+    marginBottom: 8,
+    marginTop: 6,
+    maxWidth: 560,
+    paddingHorizontal: 12,
+    lineHeight: 22,
+    opacity: 0.95,
+  },
+  oneLinerCompact: {
+    fontSize: 13,
+    lineHeight: 20,
+    paddingHorizontal: 8,
   },
 
   content: { paddingVertical: 48 },
@@ -771,6 +903,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#d4a96a',
     borderRadius: 16,
     paddingVertical: 18,
+    minHeight: 54,
     marginBottom: 24,
     shadowColor: '#d4a96a',
     shadowOffset: { width: 0, height: 4 },
@@ -782,18 +915,19 @@ const styles = StyleSheet.create({
     opacity: 0.6,
   },
   completeButtonText: {
-    fontSize: 16,
+    fontSize: 17,
     fontWeight: '700',
     color: '#0f172a',
+    letterSpacing: 0.2,
   },
   lesson1ButtonContainer: {
-    paddingHorizontal: 24,
     paddingVertical: 24,
+    paddingBottom: 32,
     backgroundColor: '#f8fafc',
   },
   lesson2ButtonContainer: {
-    paddingHorizontal: 24,
     paddingVertical: 24,
+    paddingBottom: 32,
     backgroundColor: '#f8fafc',
   },
   navBtns: {

@@ -1,11 +1,10 @@
-import { useState, useRef } from 'react';
+import { useState } from 'react';
 import {
   View,
   Text,
   StyleSheet,
-  ScrollView,
   TouchableOpacity,
-  Platform,
+  useWindowDimensions,
 } from 'react-native';
 import { useLanguage } from '@/contexts/LanguageContext';
 import {
@@ -13,11 +12,11 @@ import {
 } from '@/data/sleepLessonContent';
 import { ChronotypeGrid } from '@/components/ChronotypeGrid';
 
-const isWeb = Platform.OS === 'web';
-
 interface Props {
   lessonId: string;
   onComplete?: () => void;
+  /** Quando o passo interno muda — a página rola até à zona de leitura (hero fica acima). */
+  onStepChange?: () => void;
 }
 
 const STEPS = ['hook', 'insight', 'mechanism', 'application', 'commit'];
@@ -61,10 +60,17 @@ function TagLabel({ tag }: { tag: string }) {
   );
 }
 
-export function SleepLessonCardWeb({ lessonId, onComplete }: Props) {
+const READING_INNER_MAX = 580;
+
+export function SleepLessonCardWeb({ lessonId, onComplete, onStepChange }: Props) {
   const { language } = useLanguage();
+  const { width: windowWidth } = useWindowDimensions();
   const isPt = language === 'pt';
-  const scrollRef = useRef<ScrollView>(null);
+  const padH = windowWidth < 400 ? 16 : 22;
+  const bodySize = windowWidth < 400 ? 17 : 18;
+  const bodyLine = windowWidth < 400 ? 29 : 31;
+  const titleSize = windowWidth < 400 ? 22 : 24;
+  const titleLine = windowWidth < 400 ? 30 : 32;
 
   const [currentStep, setCurrentStep] = useState(0);
   const [scienceOpen, setScienceOpen] = useState(false);
@@ -82,37 +88,33 @@ export function SleepLessonCardWeb({ lessonId, onComplete }: Props) {
 
   const goNext = () => {
     if (currentStep < STEPS.length - 1) {
-      console.log("SLEEP LESSON CARD WEB goNext, current:", currentStep, "next:", currentStep + 1);
       setCurrentStep((p) => p + 1);
       setScienceOpen(false);
-      scrollRef.current?.scrollTo({ y: 0, animated: false });
+      onStepChange?.();
     }
   };
 
   const nextLabel = isPt ? 'Próximo' : 'Next';
 
+  const readingTitle = { fontSize: titleSize, lineHeight: titleLine };
+  const readingBody = { fontSize: bodySize, lineHeight: bodyLine };
+
   return (
     <View style={sw.root}>
-      <View style={sw.progressBar}>
+      <View style={[sw.progressBar, { paddingHorizontal: padH }]}>
         <StepDots current={currentStep} total={STEPS.length} />
         <Text style={sw.stepCount}>{currentStep + 1} / {STEPS.length}</Text>
       </View>
 
-      <ScrollView
-        ref={scrollRef}
-        key={currentStep}
-        style={sw.scroll}
-        showsVerticalScrollIndicator={false}
-        contentContainerStyle={sw.scrollContent}
-      >
-        <View style={sw.inner}>
+      <View key={currentStep} style={[sw.stepBody, { paddingHorizontal: padH }]}>
+        <View style={[sw.inner, { maxWidth: READING_INNER_MAX }]}>
           {currentStep === 0 && (
             <>
               <TagLabel tag={data.hook.tag} />
-              <Text style={sw.cardTitle}>{data.hook.title}</Text>
-              <Text style={sw.cardBody}>{data.hook.body}</Text>
+              <Text style={[sw.cardTitle, readingTitle]}>{data.hook.title}</Text>
+              <Text style={[sw.cardBody, readingBody]}>{data.hook.body}</Text>
               <View style={sw.statCard}>
-                <Text style={sw.statNumber}>{data.dataPoint.stat}</Text>
+                <Text style={[sw.statNumber, { fontSize: windowWidth < 420 ? 28 : 32 }]}>{data.dataPoint.stat}</Text>
                 <Text style={sw.statSource}>{data.dataPoint.source}</Text>
               </View>
             </>
@@ -121,8 +123,8 @@ export function SleepLessonCardWeb({ lessonId, onComplete }: Props) {
           {currentStep === 1 && (
             <>
               <TagLabel tag={data.insight.tag} />
-              <Text style={sw.cardTitle}>{data.insight.title}</Text>
-              <Text style={sw.cardBody}>{data.insight.body}</Text>
+              <Text style={[sw.cardTitle, readingTitle]}>{data.insight.title}</Text>
+              <Text style={[sw.cardBody, readingBody]}>{data.insight.body}</Text>
               {lessonId === '2' && <ChronotypeGrid variant="light" />}
             </>
           )}
@@ -130,16 +132,16 @@ export function SleepLessonCardWeb({ lessonId, onComplete }: Props) {
           {currentStep === 2 && (
             <>
               <TagLabel tag={data.mechanism.tag} />
-              <Text style={sw.cardTitle}>{data.mechanism.title}</Text>
-              <Text style={sw.cardBody}>{data.mechanism.body}</Text>
+              <Text style={[sw.cardTitle, readingTitle]}>{data.mechanism.title}</Text>
+              <Text style={[sw.cardBody, readingBody]}>{data.mechanism.body}</Text>
             </>
           )}
 
           {currentStep === 3 && (
             <>
               <TagLabel tag={data.application.tag} />
-              <Text style={sw.cardTitle}>{data.application.title}</Text>
-              <Text style={sw.cardBody}>{data.application.body}</Text>
+              <Text style={[sw.cardTitle, readingTitle]}>{data.application.title}</Text>
+              <Text style={[sw.cardBody, readingBody]}>{data.application.body}</Text>
 
               <View style={sw.protocolCard}>
                 <View style={sw.protocolHeader}>
@@ -153,7 +155,7 @@ export function SleepLessonCardWeb({ lessonId, onComplete }: Props) {
                   <Text style={sw.protocolIcon}>🌙</Text>
                   <View style={sw.protocolRowContent}>
                     <Text style={sw.protocolRowLabel}>{isPt ? 'Hoje à noite' : 'Tonight'}</Text>
-                    <Text style={sw.protocolRowText}>{data.protocol.tonight}</Text>
+                    <Text style={[sw.protocolRowText, { fontSize: bodySize, lineHeight: bodyLine }]}>{data.protocol.tonight}</Text>
                   </View>
                 </View>
 
@@ -163,7 +165,7 @@ export function SleepLessonCardWeb({ lessonId, onComplete }: Props) {
                   <Text style={sw.protocolIcon}>☀️</Text>
                   <View style={sw.protocolRowContent}>
                     <Text style={sw.protocolRowLabel}>{isPt ? 'Amanhã de manhã' : 'Tomorrow morning'}</Text>
-                    <Text style={sw.protocolRowText}>{data.protocol.morning}</Text>
+                    <Text style={[sw.protocolRowText, { fontSize: bodySize, lineHeight: bodyLine }]}>{data.protocol.morning}</Text>
                   </View>
                 </View>
 
@@ -223,16 +225,13 @@ export function SleepLessonCardWeb({ lessonId, onComplete }: Props) {
 
           <View style={sw.spacer} />
         </View>
-      </ScrollView>
+      </View>
 
       {currentStep < STEPS.length - 1 && (
-        <View style={sw.navBar}>
-          <View style={sw.navInner}>
-            <View style={sw.navPlaceholder} />
-            <TouchableOpacity style={sw.nextBtn} onPress={goNext} activeOpacity={0.8}>
-              <Text style={sw.nextBtnText}>{nextLabel}</Text>
-            </TouchableOpacity>
-          </View>
+        <View style={[sw.navBar, { paddingHorizontal: padH }]}>
+          <TouchableOpacity style={[sw.nextBtn, { maxWidth: READING_INNER_MAX }]} onPress={goNext} activeOpacity={0.8}>
+            <Text style={sw.nextBtnText}>{nextLabel}</Text>
+          </TouchableOpacity>
         </View>
       )}
     </View>
@@ -241,8 +240,17 @@ export function SleepLessonCardWeb({ lessonId, onComplete }: Props) {
 
 const sw = StyleSheet.create({
   root: {
-    flex: 1,
+    width: '100%',
     backgroundColor: '#f8fafc',
+    borderTopLeftRadius: 18,
+    borderTopRightRadius: 18,
+    marginTop: -6,
+    overflow: 'hidden',
+    shadowColor: '#0f172a',
+    shadowOffset: { width: 0, height: -2 },
+    shadowOpacity: 0.06,
+    shadowRadius: 12,
+    elevation: 2,
   },
   errorBox: {
     flex: 1,
@@ -260,8 +268,7 @@ const sw = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    paddingHorizontal: 32,
-    paddingTop: 20,
+    paddingTop: 14,
     paddingBottom: 12,
     backgroundColor: '#ffffff',
     borderBottomWidth: 1,
@@ -288,20 +295,17 @@ const sw = StyleSheet.create({
     backgroundColor: '#e2e8f0',
   },
   stepCount: {
-    fontSize: 13,
+    fontSize: 14,
     fontWeight: '600',
-    color: '#94a3b8',
+    color: '#64748b',
+    letterSpacing: 0.2,
   },
 
-  scroll: {
-    flex: 1,
-  },
-  scrollContent: {
-    paddingVertical: 40,
-    paddingHorizontal: 24,
+  stepBody: {
+    width: '100%',
+    paddingVertical: 28,
   },
   inner: {
-    maxWidth: 720,
     alignSelf: 'center',
     width: '100%',
   },
@@ -325,17 +329,15 @@ const sw = StyleSheet.create({
   },
 
   cardTitle: {
-    fontSize: isWeb ? 30 : 22,
     fontWeight: '800',
     color: '#0f172a',
-    marginBottom: 16,
-    lineHeight: isWeb ? 40 : 30,
+    marginBottom: 12,
+    letterSpacing: -0.2,
   },
   cardBody: {
-    fontSize: isWeb ? 17 : 16,
-    color: '#475569',
-    lineHeight: 28,
-    marginBottom: 28,
+    color: '#1e293b',
+    marginBottom: 22,
+    letterSpacing: 0.15,
   },
 
   statCard: {
@@ -346,16 +348,16 @@ const sw = StyleSheet.create({
     marginBottom: 8,
   },
   statNumber: {
-    fontSize: isWeb ? 32 : 26,
     fontWeight: '800',
     color: '#fbbf24',
     textAlign: 'center',
     marginBottom: 10,
   },
   statSource: {
-    fontSize: 12,
+    fontSize: 13,
     color: '#94a3b8',
     textAlign: 'center',
+    lineHeight: 19,
   },
 
   protocolCard: {
@@ -421,9 +423,7 @@ const sw = StyleSheet.create({
     marginBottom: 4,
   },
   protocolRowText: {
-    fontSize: 15,
-    color: '#0f172a',
-    lineHeight: 22,
+    color: '#1e293b',
     fontWeight: '500',
   },
   protocolDivider: {
@@ -445,10 +445,10 @@ const sw = StyleSheet.create({
     color: '#0f172a',
   },
   protocolWhyText: {
-    fontSize: 12,
-    color: '#64748b',
+    fontSize: 13,
+    color: '#475569',
     fontStyle: 'italic',
-    lineHeight: 18,
+    lineHeight: 21,
     flex: 1,
   },
 
@@ -486,10 +486,10 @@ const sw = StyleSheet.create({
     paddingLeft: 14,
   },
   citationText: {
-    fontSize: 14,
+    fontSize: 15,
     color: '#334155',
-    lineHeight: 20,
-    marginBottom: 4,
+    lineHeight: 24,
+    marginBottom: 6,
     fontStyle: 'italic',
   },
   citationSource: {
@@ -570,10 +570,10 @@ const sw = StyleSheet.create({
     textAlign: 'center',
   },
   resultBody: {
-    fontSize: 16,
+    fontSize: 17,
     color: '#64748b',
     textAlign: 'center',
-    lineHeight: 24,
+    lineHeight: 27,
     marginBottom: 28,
     maxWidth: 420,
   },
@@ -606,18 +606,9 @@ const sw = StyleSheet.create({
     backgroundColor: '#ffffff',
     borderTopWidth: 1,
     borderTopColor: '#e2e8f0',
-    paddingVertical: 16,
-    paddingHorizontal: 24,
-  },
-  navInner: {
-    maxWidth: 720,
-    alignSelf: 'center',
-    width: '100%',
-    flexDirection: 'row',
-    gap: 12,
-  },
-  navPlaceholder: {
-    flex: 1,
+    paddingTop: 14,
+    paddingBottom: 22,
+    alignItems: 'center',
   },
   prevBtn: {
     flex: 1,
@@ -634,16 +625,20 @@ const sw = StyleSheet.create({
     color: '#475569',
   },
   nextBtn: {
-    flex: 2,
-    paddingVertical: 14,
-    borderRadius: 12,
+    width: '100%',
+    maxWidth: 720,
+    alignSelf: 'center',
+    paddingVertical: 16,
+    borderRadius: 14,
     alignItems: 'center',
+    justifyContent: 'center',
     backgroundColor: '#0f172a',
   },
   nextBtnText: {
-    fontSize: 15,
+    fontSize: 16,
     fontWeight: '800',
     color: '#ffffff',
+    letterSpacing: 0.2,
   },
   continueBtn: {
     paddingVertical: 14,

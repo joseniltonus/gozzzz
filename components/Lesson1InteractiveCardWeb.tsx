@@ -2,10 +2,9 @@ import {
   View,
   Text,
   StyleSheet,
-  ScrollView,
   TouchableOpacity,
   TextInput,
-  Platform,
+  useWindowDimensions,
 } from 'react-native';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { ArrowRight, Moon, Check, ChevronDown, ChevronUp, FlaskConical } from 'lucide-react-native';
@@ -13,9 +12,8 @@ import { useState } from 'react';
 
 interface Lesson1InteractiveCardWebProps {
   renderCompleteButton?: (showButton: boolean) => React.ReactNode;
+  onStepChange?: () => void;
 }
-
-const isWeb = Platform.OS === 'web';
 
 const STEPS_PT = [
   {
@@ -281,8 +279,10 @@ function classifySource(source: string): SourceKind {
   return secondaryHints.some((hint) => s.includes(hint)) ? 'secondary' : 'peer';
 }
 
-export const Lesson1InteractiveCardWeb = ({ renderCompleteButton }: Lesson1InteractiveCardWebProps) => {
+export const Lesson1InteractiveCardWeb = ({ renderCompleteButton, onStepChange }: Lesson1InteractiveCardWebProps) => {
   const { language } = useLanguage();
+  const { width: windowWidth } = useWindowDimensions();
+  const padH = windowWidth < 400 ? 16 : windowWidth < 640 ? 22 : 48;
   const isPt = language === 'pt';
   const steps = isPt ? STEPS_PT : STEPS_EN;
   const stages = isPt ? STAGES_PT : STAGES_EN;
@@ -295,31 +295,45 @@ export const Lesson1InteractiveCardWeb = ({ renderCompleteButton }: Lesson1Inter
   const totalSteps = steps.length;
   const isLast = currentStep === totalSteps - 1;
 
+  const titleRead =
+    windowWidth < 400
+      ? { fontSize: 26, lineHeight: 34 }
+      : windowWidth < 640
+        ? { fontSize: 30, lineHeight: 40 }
+        : { fontSize: 34, lineHeight: 44 };
+  const bodyRead =
+    windowWidth < 400 ? { fontSize: 17, lineHeight: 29 } : { fontSize: 18, lineHeight: 31 };
+
   const handleNext = () => {
     if (currentStep < totalSteps - 1) {
-      console.log("LESSON1 WEB handleNext pressed, current:", currentStep, "next:", currentStep + 1);
       setCurrentStep(currentStep + 1);
       setScienceOpen(false);
+      onStepChange?.();
     }
   };
   return (
-    <View style={styles.wrapper}>
-      <ProgressBar current={currentStep} total={totalSteps} />
+    <View
+      style={[
+        styles.wrapper,
+        {
+          marginTop: -6,
+          borderTopLeftRadius: 18,
+          borderTopRightRadius: 18,
+          maxWidth: windowWidth > 780 ? 640 : ('100%' as const),
+        },
+      ]}
+    >
+      <ProgressBar current={currentStep} total={totalSteps} padH={padH} />
 
-      <ScrollView
-        style={styles.scroll}
-        contentContainerStyle={styles.scrollContent}
-        showsVerticalScrollIndicator={false}
-        key={currentStep}
-      >
+      <View style={[styles.scrollContent, { paddingHorizontal: padH }]} key={currentStep}>
         <View style={styles.stepContainer}>
           <View style={styles.tagRow}>
-            <Moon size={14} color="#fbbf24" />
+            <Moon size={14} color="#b45309" />
             <Text style={styles.tag}>{step.tag}</Text>
           </View>
 
-          <Text style={styles.title}>{step.title}</Text>
-          <Text style={styles.body}>{step.body}</Text>
+          <Text style={[styles.title, titleRead]}>{step.title}</Text>
+          <Text style={[styles.body, bodyRead]}>{step.body}</Text>
 
           {step.type === 'mechanism' && (
             <SleepCycleDiagram stages={stages} isPt={isPt} />
@@ -384,15 +398,13 @@ export const Lesson1InteractiveCardWeb = ({ renderCompleteButton }: Lesson1Inter
           />
         </View>
 
-      </ScrollView>
+      </View>
 
-      <View style={styles.navRow}>
-        <View />
-
+      <View style={[styles.navRow, { paddingHorizontal: padH }]}>
         {!isLast && (
           <TouchableOpacity style={styles.nextBtn} onPress={handleNext}>
             <Text style={styles.nextBtnText}>{step.cta}</Text>
-            <ArrowRight size={18} color="#0f172a" />
+            <ArrowRight size={18} color="#ffffff" />
           </TouchableOpacity>
         )}
 
@@ -498,15 +510,15 @@ function ScienceExpander({
     <View style={sci.wrapper}>
       <TouchableOpacity style={sci.header} onPress={onToggle} activeOpacity={0.7}>
         <View style={sci.headerLeft}>
-          <FlaskConical size={14} color="#0ea5e9" />
+          <FlaskConical size={14} color="#0369a1" />
           <Text style={sci.headerText}>
             {isPt ? 'A Ciência Por Trás Disso' : 'The Science Behind This'}
           </Text>
         </View>
         {open ? (
-          <ChevronUp size={16} color="#0ea5e9" />
+          <ChevronUp size={16} color="#0369a1" />
         ) : (
-          <ChevronDown size={16} color="#0ea5e9" />
+          <ChevronDown size={16} color="#0369a1" />
         )}
       </TouchableOpacity>
 
@@ -545,9 +557,9 @@ function ScienceExpander({
   );
 }
 
-function ProgressBar({ current, total }: { current: number; total: number }) {
+function ProgressBar({ current, total, padH }: { current: number; total: number; padH: number }) {
   return (
-    <View style={pb.wrapper}>
+    <View style={[pb.wrapper, { paddingHorizontal: padH }]}>
       {Array.from({ length: total }).map((_, i) => (
         <View
           key={i}
@@ -619,24 +631,17 @@ function SleepCycleDiagram({
 
 const styles = StyleSheet.create({
   wrapper: {
-    flex: 1,
-    backgroundColor: '#0f172a',
-    maxWidth: isWeb ? 680 : '100%',
-    alignSelf: 'center',
     width: '100%',
-  },
-  scroll: {
-    flex: 1,
+    backgroundColor: '#f8fafc',
+    alignSelf: 'center',
+    overflow: 'hidden',
   },
   scrollContent: {
-    paddingHorizontal: isWeb ? 48 : 24,
-    paddingTop: 40,
-    paddingBottom: 24,
-    flexGrow: 1,
+    paddingTop: 28,
+    paddingBottom: 20,
   },
   stepContainer: {
-    flex: 1,
-    minHeight: isWeb ? 420 : 360,
+    minHeight: 220,
   },
   tagRow: {
     flexDirection: 'row',
@@ -647,47 +652,50 @@ const styles = StyleSheet.create({
   tag: {
     fontSize: 12,
     fontWeight: '700',
-    color: '#fbbf24',
+    color: '#b45309',
     letterSpacing: 1.2,
     textTransform: 'uppercase',
   },
   title: {
-    fontSize: isWeb ? 36 : 28,
     fontWeight: '800',
-    color: '#f8fafc',
-    lineHeight: isWeb ? 46 : 36,
-    marginBottom: 24,
+    color: '#0f172a',
+    marginBottom: 20,
+    letterSpacing: -0.35,
   },
   body: {
-    fontSize: isWeb ? 18 : 16,
-    color: '#94a3b8',
-    lineHeight: isWeb ? 30 : 26,
+    color: '#334155',
     marginBottom: 24,
+    letterSpacing: 0.12,
   },
   commitmentBox: {
-    backgroundColor: '#1e293b',
+    backgroundColor: '#ffffff',
     borderRadius: 16,
     padding: 20,
     borderWidth: 1,
-    borderColor: 'rgba(251,191,36,0.2)',
+    borderColor: '#fde68a',
     gap: 16,
     marginBottom: 24,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.04,
+    shadowRadius: 6,
+    elevation: 1,
   },
   commitmentLabel: {
     fontSize: 16,
     fontWeight: '700',
-    color: '#fbbf24',
+    color: '#92400e',
     fontStyle: 'italic',
   },
   commitmentInput: {
-    backgroundColor: '#0f172a',
+    backgroundColor: '#f8fafc',
     borderRadius: 10,
     padding: 14,
     fontSize: 16,
-    color: '#f8fafc',
+    color: '#0f172a',
     minHeight: 80,
     borderWidth: 1,
-    borderColor: '#334155',
+    borderColor: '#e2e8f0',
     textAlignVertical: 'top',
   },
   commitBtn: {
@@ -705,11 +713,11 @@ const styles = StyleSheet.create({
     color: '#0f172a',
   },
   committedBox: {
-    backgroundColor: '#1e293b',
+    backgroundColor: '#ecfdf5',
     borderRadius: 16,
     padding: 24,
     borderWidth: 1,
-    borderColor: 'rgba(16,185,129,0.3)',
+    borderColor: 'rgba(16,185,129,0.35)',
     alignItems: 'center',
     gap: 12,
     marginBottom: 24,
@@ -725,24 +733,22 @@ const styles = StyleSheet.create({
   committedText: {
     fontSize: 18,
     fontWeight: '600',
-    color: '#f8fafc',
+    color: '#0f172a',
     textAlign: 'center',
     fontStyle: 'italic',
     lineHeight: 28,
   },
   committedSub: {
     fontSize: 14,
-    color: '#10b981',
+    color: '#047857',
     fontWeight: '600',
   },
   navRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    paddingHorizontal: isWeb ? 48 : 24,
-    paddingVertical: 20,
+    paddingVertical: 18,
     borderTopWidth: 1,
-    borderTopColor: '#1e293b',
+    borderTopColor: '#e2e8f0',
+    alignItems: 'stretch',
+    backgroundColor: '#ffffff',
   },
   backBtn: {
     flexDirection: 'row',
@@ -752,76 +758,91 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
     borderRadius: 10,
     borderWidth: 1,
-    borderColor: '#1e293b',
+    borderColor: '#e2e8f0',
   },
   backBtnText: {
     fontSize: 14,
-    color: '#94a3b8',
+    color: '#64748b',
     fontWeight: '500',
   },
   nextBtn: {
     flexDirection: 'row',
     alignItems: 'center',
+    justifyContent: 'center',
     gap: 8,
-    backgroundColor: '#fbbf24',
-    paddingVertical: 14,
+    backgroundColor: '#0f172a',
+    paddingVertical: 16,
     paddingHorizontal: 24,
-    borderRadius: 12,
+    borderRadius: 14,
+    width: '100%',
   },
   nextBtnText: {
-    fontSize: 15,
+    fontSize: 16,
     fontWeight: '700',
-    color: '#0f172a',
+    color: '#ffffff',
+    letterSpacing: 0.2,
   },
   nextBtnDisabled: {
-    paddingVertical: 14,
+    paddingVertical: 16,
     paddingHorizontal: 24,
-    borderRadius: 12,
+    borderRadius: 14,
     borderWidth: 1,
-    borderColor: '#1e293b',
+    borderColor: '#e2e8f0',
+    backgroundColor: '#f8fafc',
+    width: '100%',
+    alignItems: 'center',
   },
   nextBtnDisabledText: {
     fontSize: 14,
-    color: '#475569',
+    color: '#64748b',
   },
 });
 
 const pb = StyleSheet.create({
   wrapper: {
     flexDirection: 'row',
-    paddingHorizontal: isWeb ? 48 : 24,
-    paddingTop: 24,
-    paddingBottom: 0,
+    paddingTop: 20,
+    paddingBottom: 14,
     gap: 6,
+    backgroundColor: '#ffffff',
+    borderBottomWidth: 1,
+    borderBottomColor: '#e2e8f0',
   },
   segment: {
     flex: 1,
-    height: 3,
+    height: 4,
     borderRadius: 2,
   },
   done: {
-    backgroundColor: '#fbbf24',
-    opacity: 0.5,
+    backgroundColor: '#d4a96a',
+    opacity: 0.55,
   },
   active: {
-    backgroundColor: '#fbbf24',
+    backgroundColor: '#d4a96a',
   },
   pending: {
-    backgroundColor: '#1e293b',
+    backgroundColor: '#e2e8f0',
   },
 });
 
 const proof = StyleSheet.create({
   wrapper: {
     flexDirection: 'row',
-    backgroundColor: '#1e293b',
-    borderRadius: 12,
+    backgroundColor: '#ffffff',
+    borderRadius: 14,
     marginBottom: 24,
     overflow: 'hidden',
+    borderWidth: 1,
+    borderColor: '#e2e8f0',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.05,
+    shadowRadius: 6,
+    elevation: 2,
   },
   accent: {
-    width: 3,
-    backgroundColor: '#fbbf24',
+    width: 4,
+    backgroundColor: '#d4a96a',
   },
   content: {
     flex: 1,
@@ -829,27 +850,33 @@ const proof = StyleSheet.create({
     gap: 6,
   },
   stat: {
-    fontSize: isWeb ? 15 : 14,
+    fontSize: 15,
     fontWeight: '600',
-    color: '#e2e8f0',
-    lineHeight: isWeb ? 24 : 22,
+    color: '#0f172a',
+    lineHeight: 24,
   },
   source: {
-    fontSize: 12,
-    color: '#475569',
+    fontSize: 13,
+    color: '#64748b',
     fontStyle: 'italic',
+    lineHeight: 19,
   },
 });
 
 const proto = StyleSheet.create({
   wrapper: {
-    backgroundColor: '#0c1a2e',
+    backgroundColor: '#ffffff',
     borderRadius: 16,
     borderWidth: 1,
-    borderColor: '#1e3a5f',
+    borderColor: '#e2e8f0',
     padding: 20,
     marginBottom: 24,
     gap: 0,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.06,
+    shadowRadius: 8,
+    elevation: 2,
   },
   headerRow: {
     flexDirection: 'row',
@@ -860,19 +887,21 @@ const proto = StyleSheet.create({
   headerLabel: {
     fontSize: 11,
     fontWeight: '700',
-    color: '#3b82f6',
+    color: '#1e1b4b',
     letterSpacing: 1.4,
     textTransform: 'uppercase',
   },
   difficultyTag: {
-    backgroundColor: '#1e293b',
+    backgroundColor: '#f1f5f9',
     borderRadius: 20,
     paddingHorizontal: 10,
     paddingVertical: 4,
+    borderWidth: 1,
+    borderColor: '#e2e8f0',
   },
   difficultyText: {
     fontSize: 12,
-    color: '#94a3b8',
+    color: '#475569',
     fontWeight: '500',
   },
   row: {
@@ -896,49 +925,50 @@ const proto = StyleSheet.create({
   rowLabel: {
     fontSize: 11,
     fontWeight: '700',
-    color: '#3b82f6',
+    color: '#64748b',
     textTransform: 'uppercase',
     letterSpacing: 0.8,
   },
   rowText: {
-    fontSize: isWeb ? 15 : 14,
-    color: '#cbd5e1',
-    lineHeight: isWeb ? 24 : 22,
+    fontSize: 15,
+    color: '#334155',
+    lineHeight: 24,
   },
   divider: {
     height: 1,
-    backgroundColor: '#1e3a5f',
+    backgroundColor: '#f1f5f9',
     marginVertical: 4,
   },
   whyRow: {
     marginTop: 12,
     paddingTop: 12,
     borderTopWidth: 1,
-    borderTopColor: '#1e3a5f',
+    borderTopColor: '#f1f5f9',
     gap: 4,
   },
   whyLabel: {
     fontSize: 11,
     fontWeight: '700',
-    color: '#475569',
+    color: '#64748b',
     textTransform: 'uppercase',
     letterSpacing: 0.8,
   },
   whyText: {
-    fontSize: isWeb ? 14 : 13,
-    color: '#64748b',
-    lineHeight: isWeb ? 22 : 20,
+    fontSize: 14,
+    color: '#475569',
+    lineHeight: 22,
     fontStyle: 'italic',
   },
 });
 
 const sci = StyleSheet.create({
   wrapper: {
-    borderRadius: 12,
+    borderRadius: 14,
     borderWidth: 1,
-    borderColor: '#0ea5e9',
+    borderColor: '#bae6fd',
     overflow: 'hidden',
     marginBottom: 8,
+    backgroundColor: '#ffffff',
   },
   header: {
     flexDirection: 'row',
@@ -946,7 +976,7 @@ const sci = StyleSheet.create({
     justifyContent: 'space-between',
     paddingHorizontal: 16,
     paddingVertical: 12,
-    backgroundColor: 'rgba(14, 165, 233, 0.08)',
+    backgroundColor: '#f0f9ff',
   },
   headerLeft: {
     flexDirection: 'row',
@@ -956,12 +986,12 @@ const sci = StyleSheet.create({
   headerText: {
     fontSize: 12,
     fontWeight: '600',
-    color: '#0ea5e9',
+    color: '#0369a1',
     letterSpacing: 0.6,
     textTransform: 'uppercase',
   },
   body: {
-    backgroundColor: '#111827',
+    backgroundColor: '#ffffff',
     paddingHorizontal: 16,
     paddingTop: 16,
     paddingBottom: 16,
@@ -973,21 +1003,21 @@ const sci = StyleSheet.create({
   entryBorder: {
     paddingTop: 12,
     borderTopWidth: 1,
-    borderTopColor: '#1e293b',
+    borderTopColor: '#f1f5f9',
   },
   citation: {
-    fontSize: isWeb ? 14 : 13,
-    color: '#94a3b8',
-    lineHeight: isWeb ? 22 : 20,
+    fontSize: 14,
+    color: '#334155',
+    lineHeight: 22,
   },
   entrySource: {
     fontSize: 12,
-    color: '#475569',
+    color: '#64748b',
     fontStyle: 'italic',
   },
   disclaimer: {
     fontSize: 12,
-    color: '#7aa6bf',
+    color: '#64748b',
     lineHeight: 18,
     marginBottom: 2,
   },
@@ -999,30 +1029,35 @@ const sci = StyleSheet.create({
     marginBottom: 6,
   },
   credibilityPeer: {
-    backgroundColor: 'rgba(16,185,129,0.18)',
+    backgroundColor: 'rgba(16,185,129,0.12)',
     borderWidth: 1,
-    borderColor: 'rgba(16,185,129,0.45)',
+    borderColor: 'rgba(16,185,129,0.35)',
   },
   credibilitySecondary: {
-    backgroundColor: 'rgba(251,191,36,0.16)',
+    backgroundColor: 'rgba(251,191,36,0.14)',
     borderWidth: 1,
-    borderColor: 'rgba(251,191,36,0.45)',
+    borderColor: 'rgba(251,191,36,0.4)',
   },
   credibilityBadgeText: {
     fontSize: 11,
     fontWeight: '700',
-    color: '#d5e9f5',
+    color: '#0f172a',
   },
 });
 
 const diag = StyleSheet.create({
   wrapper: {
-    backgroundColor: '#1e293b',
+    backgroundColor: '#ffffff',
     borderRadius: 16,
     padding: 24,
     marginBottom: 24,
     borderWidth: 1,
-    borderColor: '#334155',
+    borderColor: '#e2e8f0',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.05,
+    shadowRadius: 6,
+    elevation: 2,
   },
   label: {
     fontSize: 12,
@@ -1057,10 +1092,10 @@ const diag = StyleSheet.create({
   stageLabel: {
     fontSize: 14,
     fontWeight: '700',
-    color: '#f8fafc',
+    color: '#0f172a',
   },
   remLabel: {
-    color: '#fbbf24',
+    color: '#b45309',
   },
   stageSub: {
     fontSize: 10,
@@ -1072,7 +1107,7 @@ const diag = StyleSheet.create({
     justifyContent: 'center',
     gap: 24,
     borderTopWidth: 1,
-    borderTopColor: '#334155',
+    borderTopColor: '#f1f5f9',
     paddingTop: 16,
   },
   footnoteItem: {
@@ -1087,6 +1122,6 @@ const diag = StyleSheet.create({
   },
   footnoteText: {
     fontSize: 12,
-    color: '#64748b',
+    color: '#475569',
   },
 });

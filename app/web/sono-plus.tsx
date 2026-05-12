@@ -8,6 +8,7 @@ import {
   TextInput,
   Platform,
   Linking,
+  useWindowDimensions,
 } from 'react-native';
 import Head from 'expo-router/head';
 import { useRouter, Link } from 'expo-router';
@@ -221,11 +222,23 @@ function calcQuizChronotype(answers: string[][]): QuizChronotype {
 /** Landing web: programa 21 passos como produto principal; Sono+ como opcional premium. Sem depoimentos inventados. */
 export default function SonoPlusLandingPage() {
   const router = useRouter();
+  const { width } = useWindowDimensions();
   const { t: translate } = useLanguage();
   const language: 'pt' = 'pt';
   const t = (key: string) => translate(key, 'pt');
   const isPt = true;
   const [pricing, setPricing] = useState<PricingData>(DEFAULT_WEB_PRICING[language]);
+
+  /** Mobile browser ainda é `Platform.OS === 'web'` — layout precisa seguir a largura real. */
+  const contentPadH = width < 400 ? 16 : 24;
+  const navStacked = width < 640;
+  const navShortLabels = width < 520;
+  const heroRowLayout = width >= 640;
+  const layoutWide = width >= 720;
+  const chronoStack = width < 520;
+  const quizEmailStack = width < 480;
+  const founderStack = width < 520;
+  const sonoPlusStack = width < 540;
 
   // ─── Quiz inline ────────────────────────────────────────────────
   // O quiz vive dentro desta landing — sem redirect — para fechar a jornada
@@ -595,13 +608,16 @@ export default function SonoPlusLandingPage() {
       <ScrollView style={styles.page} showsVerticalScrollIndicator={false}>
         {/* Nav — alinhado a /web/assinar */}
         <LinearGradient colors={['#0c0a1f', ACCENT_DEEP]} style={styles.navGrad}>
-          <View style={styles.navInner}>
+          <View style={[styles.navInner, navStacked && styles.navInnerStacked, { paddingHorizontal: contentPadH }]}>
             <Link href="/web" asChild>
-              <TouchableOpacity style={styles.brand} accessibilityRole="link">
+              <TouchableOpacity
+                style={[styles.brand, navStacked && styles.brandStacked]}
+                accessibilityRole="link"
+              >
                 <Text style={styles.brandText}>GoZzzz</Text>
               </TouchableOpacity>
             </Link>
-            <View style={styles.navRight}>
+            <View style={[styles.navRight, navStacked && styles.navRightStacked]}>
               <Link href="/blog" asChild>
                 <TouchableOpacity style={styles.navGhost} accessibilityRole="link">
                   <Text style={styles.navGhostTxt}>Blog</Text>
@@ -610,12 +626,16 @@ export default function SonoPlusLandingPage() {
               <Link href="/web/sono-plus" asChild>
                 <TouchableOpacity style={styles.navGhost} accessibilityRole="link">
                   <BookOpen size={16} color={ACCENT_LIGHT} />
-                  <Text style={styles.navGhostTxt}>Programa 21 Passos</Text>
+                  <Text style={styles.navGhostTxt}>
+                    {navShortLabels ? '21 passos' : 'Programa 21 Passos'}
+                  </Text>
                 </TouchableOpacity>
               </Link>
               <Link href="/web/assinar" asChild>
                 <TouchableOpacity style={styles.navGold} accessibilityRole="link">
-                  <Text style={styles.navGoldTxt}>{t('coach.ctaSubscribe')}</Text>
+                  <Text style={styles.navGoldTxt}>
+                    {navShortLabels ? t('web.nav.subscribe') : t('coach.ctaSubscribe')}
+                  </Text>
                 </TouchableOpacity>
               </Link>
             </View>
@@ -624,9 +644,15 @@ export default function SonoPlusLandingPage() {
 
         {/* Banner de personalização — aparece se o visitante chegou aqui depois do quiz */}
         {userChronotype && chronotypeBannerData[userChronotype] && (
-          <View style={styles.chronoBanner}>
+          <View
+            style={[
+              styles.chronoBanner,
+              { paddingHorizontal: contentPadH },
+              chronoStack && styles.chronoBannerStacked,
+            ]}
+          >
             <Text style={styles.chronoBannerEmoji}>{chronotypeBannerData[userChronotype].emoji}</Text>
-            <View style={{ flex: 1 }}>
+            <View style={styles.chronoBannerTextCol}>
               <Text style={styles.chronoBannerKicker}>
                 SEU PLANO {chronotypeBannerData[userChronotype].name.toUpperCase()}
               </Text>
@@ -640,8 +666,13 @@ export default function SonoPlusLandingPage() {
         {/* Hero — paleta dark/roxo. Sem ícone decorativo (logo é só texto). */}
         <LinearGradient colors={[ACCENT_DEEP, '#0c0a1f', BG]} style={styles.heroGradTop}>
           <View style={styles.heroGlow} />
-          <View style={[styles.heroInner, { paddingTop: 36, paddingBottom: 8 }]}>
-            <Text role="heading" aria-level={1} nativeID="speakable-headline" style={styles.heroH1}>
+          <View style={[styles.heroInner, { paddingTop: 36, paddingBottom: 8, paddingHorizontal: contentPadH }]}>
+            <Text
+              role="heading"
+              aria-level={1}
+              nativeID="speakable-headline"
+              style={[styles.heroH1, heroRowLayout && styles.heroH1Wide]}
+            >
               {isPt ? 'Programa de Sono em 21 Passos' : t('web.program.title')}
             </Text>
             <Text style={styles.heroKicker}>
@@ -653,14 +684,17 @@ export default function SonoPlusLandingPage() {
                 : 'A 21-step path for people who want to stop guessing and start moving — with clarity, rhythm, and evidence-informed structure.'}
             </Text>
 
-            <View style={styles.heroBtns}>
-              <TouchableOpacity style={styles.btnGoldFill} onPress={() => router.push('/web/programa')}>
+            <View style={[styles.heroBtns, heroRowLayout && styles.heroBtnsRow]}>
+              <TouchableOpacity
+                style={[styles.btnGoldFill, heroRowLayout && styles.btnGoldFillRow]}
+                onPress={() => router.push('/web/programa')}
+              >
                 <BookOpen size={18} color="#ffffff" />
                 <Text style={styles.btnGoldFillTxt}>
                   {isPt ? 'Começar grátis → ver as 3 primeiras lições' : 'Start free → see the 3 first lessons'}
                 </Text>
               </TouchableOpacity>
-              <TouchableOpacity style={styles.btnGhost} onPress={() => router.push('/web/assinar')}>
+              <TouchableOpacity style={[styles.btnGhost, heroRowLayout && styles.btnGoldFillRow]} onPress={() => router.push('/web/assinar')}>
                 <Text style={styles.btnGhostTxt}>
                   {isPt ? 'Ou desbloqueie todos os 21 passos por R$ 147' : 'Unlock all 21 steps'}
                 </Text>
@@ -682,7 +716,7 @@ export default function SonoPlusLandingPage() {
         {/* Âncoras científicas — acima da dobra, sem infringir direitos autorais.
             Nome completo + instituição + área de pesquisa de cada referência, em
             cards uniformes. Disclaimer de não-afiliação obrigatório no rodapé. */}
-        <View style={styles.researchersBand}>
+        <View style={[styles.researchersBand, { paddingHorizontal: contentPadH }]}>
           <View style={styles.researchersInner}>
             <Text style={styles.researchersKicker}>
               Baseado em pesquisas publicadas de
@@ -733,7 +767,7 @@ export default function SonoPlusLandingPage() {
                       {researcher.initial}
                     </Text>
                   </View>
-                  <View style={{ flex: 1 }}>
+                  <View style={{ flex: 1, minWidth: 0 }}>
                     <Text style={styles.researcherName}>{researcher.name}</Text>
                     <Text style={styles.researcherRole}>{researcher.role}</Text>
                     <Text style={[styles.researcherField, { color: researcher.color }]}>
@@ -758,7 +792,7 @@ export default function SonoPlusLandingPage() {
              nativeID="quiz" expõe a âncora `#quiz` para deep-linking — o
              e-mail de boas-vindas (send-welcome-email) usa essa âncora para
              estimular quem ainda não fez o teste a abrir direto na seção. */}
-        <View nativeID="quiz" style={styles.quizSection}>
+        <View nativeID="quiz" style={[styles.quizSection, { paddingHorizontal: contentPadH }]}>
           {quizStep === 'idle' && (
             <View style={styles.quizIdleCard}>
               <Text style={styles.quizIdleEmoji}>🧬</Text>
@@ -867,7 +901,7 @@ export default function SonoPlusLandingPage() {
                     <Text style={styles.quizEmailLabel}>
                       📩 Receba seu plano personalizado por e-mail
                     </Text>
-                    <View style={styles.quizEmailRow}>
+                    <View style={[styles.quizEmailRow, quizEmailStack && styles.quizEmailRowStack]}>
                       <TextInput
                         value={quizEmail}
                         onChangeText={setQuizEmail}
@@ -876,11 +910,11 @@ export default function SonoPlusLandingPage() {
                         keyboardType="email-address"
                         autoCapitalize="none"
                         onSubmitEditing={handleQuizEmail}
-                        style={styles.quizEmailInput}
+                        style={[styles.quizEmailInput, quizEmailStack && styles.quizEmailInputStack]}
                       />
                       <TouchableOpacity
                         onPress={handleQuizEmail}
-                        style={styles.quizEmailBtn}
+                        style={[styles.quizEmailBtn, quizEmailStack && styles.quizEmailBtnStack]}
                         activeOpacity={0.88}
                       >
                         <Text style={styles.quizEmailBtnTxt}>Enviar</Text>
@@ -922,7 +956,7 @@ export default function SonoPlusLandingPage() {
 
         {/* Prévia horizontal — lições gratuitas */}
         <View style={styles.previewSection}>
-          <View style={styles.previewHead}>
+          <View style={[styles.previewHead, { paddingHorizontal: contentPadH }]}>
             <Text style={styles.sectionKicker}>Antes de assinar</Text>
             <Text role="heading" aria-level={2} style={styles.h2Tight}>Os primeiros tópicos da sua trilha</Text>
             <Text style={styles.previewSub}>
@@ -932,7 +966,7 @@ export default function SonoPlusLandingPage() {
           <ScrollView
             horizontal
             showsHorizontalScrollIndicator={false}
-            contentContainerStyle={styles.previewScroll}
+            contentContainerStyle={[styles.previewScroll, { paddingHorizontal: contentPadH }]}
           >
             {previewLessons.map((lesson) => (
               <View key={lesson.id} style={styles.previewCard}>
@@ -960,16 +994,16 @@ export default function SonoPlusLandingPage() {
           </ScrollView>
         </View>
 
-        <View style={styles.body}>
+        <View style={[styles.body, { paddingHorizontal: contentPadH }]}>
           {/* Ganchos visuais */}
           <View style={styles.block}>
             <Text style={styles.sectionKicker}>Por que abrir o próximo bloco?</Text>
             <Text role="heading" aria-level={2} style={styles.h2}>Feito para leitura curiosa, não enrolação</Text>
-            <View style={styles.bentoGrid}>
+            <View style={[styles.bentoGrid, layoutWide && styles.bentoGridWide]}>
               {curiosity.map((c, idx) => {
                 const { Ico } = c;
                 return (
-                  <View key={idx} style={styles.bentoCard}>
+                  <View key={idx} style={[styles.bentoCard, layoutWide && styles.bentoCardWide]}>
                     <LinearGradient colors={['rgba(124,92,232,0.12)', 'rgba(255,255,255,0.02)']} style={styles.bentoIcon}>
                       <Ico size={22} color={GOLD} strokeWidth={2} />
                     </LinearGradient>
@@ -1026,18 +1060,18 @@ export default function SonoPlusLandingPage() {
             <Text style={styles.sectionKicker}>{t('web.program.title')}</Text>
             <Text role="heading" aria-level={2} style={[styles.h2, { marginBottom: 12 }]}>Números que definem o ritual</Text>
             <Text style={[styles.para, { marginBottom: 20 }]}>{webProgramBridgePt}</Text>
-            <View style={styles.statRow}>
-              <View style={styles.stat}>
+            <View style={[styles.statRow, layoutWide && styles.statRowWide]}>
+              <View style={[styles.stat, layoutWide && styles.statWide]}>
                 <Text style={styles.statNum}>21</Text>
                 <Text style={styles.statLbl}>{t('web.program.steps')}</Text>
               </View>
-              <View style={styles.statDivider} />
-              <View style={styles.stat}>
+              <View style={[styles.statDivider, layoutWide && styles.statDividerWide]} />
+              <View style={[styles.stat, layoutWide && styles.statWide]}>
                 <Text style={styles.statNum}>3</Text>
                 <Text style={styles.statLbl}>{t('web.program.freeLessons')}</Text>
               </View>
-              <View style={styles.statDivider} />
-              <View style={styles.stat}>
+              <View style={[styles.statDivider, layoutWide && styles.statDividerWide]} />
+              <View style={[styles.stat, layoutWide && styles.statWide]}>
                 <Text style={styles.statNum}>~5 min</Text>
                 <Text style={styles.statLbl}>{t('web.program.stat3')}</Text>
               </View>
@@ -1048,9 +1082,9 @@ export default function SonoPlusLandingPage() {
           <View style={[styles.block, styles.sectionBand]}>
             <Text style={styles.sectionKicker}>Ao seguir os passos</Text>
             <Text role="heading" aria-level={2} style={[styles.h2, { marginBottom: 16 }]}>O que você treina ao longo do programa</Text>
-            <View style={styles.benefGrid}>
+            <View style={[styles.benefGrid, layoutWide && styles.benefGridWide]}>
               {benefitLines.map((line, idx) => (
-                <View key={idx} style={styles.benefCard}>
+                <View key={idx} style={[styles.benefCard, layoutWide && styles.benefCardWide]}>
                   <Check size={16} color="#22c55e" />
                   <Text style={styles.benefTxt}>{line}</Text>
                 </View>
@@ -1060,16 +1094,16 @@ export default function SonoPlusLandingPage() {
 
           {/* História do fundador — credibilidade humana imediatamente antes do paywall.
               Crítico para conversão: preço entra depois de "por que confiar". */}
-          <View style={styles.founderBlock}>
-            <View style={styles.founderCard}>
+          <View style={[styles.founderBlock, { paddingHorizontal: contentPadH }]}>
+            <View style={[styles.founderCard, founderStack && styles.founderCardStack]}>
               <View style={styles.founderAvatar}>
                 <Text style={styles.founderAvatarTxt}>J</Text>
               </View>
-              <View style={styles.founderTextCol}>
-                <Text style={styles.founderQuote}>
+              <View style={[styles.founderTextCol, founderStack && styles.founderTextColStack]}>
+                <Text style={[styles.founderQuote, founderStack && styles.founderQuoteStack]}>
                   &ldquo;Por quase 10 anos mal conseguia dormir. Passei mais 10 estudando a ciência. GoZzzz é o programa que eu queria ter encontrado no início da jornada.&rdquo;
                 </Text>
-                <Text style={styles.founderSign}>José Nilton — Fundador do GoZzzz</Text>
+                <Text style={[styles.founderSign, founderStack && styles.founderQuoteStack]}>José Nilton — Fundador do GoZzzz</Text>
               </View>
             </View>
           </View>
@@ -1083,12 +1117,14 @@ export default function SonoPlusLandingPage() {
             <Text role="heading" aria-level={2} style={[styles.h2, { marginBottom: 8 }]}>
               Acesse o programa completo
             </Text>
-            <View style={styles.checkoutGrid}>
-              <View style={styles.checkoutCol}>
+            <View style={[styles.checkoutGrid, layoutWide && styles.checkoutGridWide]}>
+              <View style={[styles.checkoutCol, layoutWide && styles.checkoutColWide]}>
                 <View style={[styles.planCardCk, styles.planCardCkSelected]}>
                   {/* Fallback defensivo: se o Supabase devolver label vazia, ainda
                       assim mostramos R$ 147 — preço hardcoded da oferta atual. */}
-                  <Text style={styles.priceHeadline}>{pricing.annual.label || 'R$ 147'}</Text>
+                  <Text style={[styles.priceHeadline, layoutWide && styles.priceHeadlineWide]}>
+                    {pricing.annual.label || 'R$ 147'}
+                  </Text>
                   <Text style={styles.priceLaunchTag}>Preço de lançamento</Text>
                   <Text style={styles.priceCaption}>
                     {pricing.annual.note} · {pricing.annual.equiv}
@@ -1192,7 +1228,7 @@ export default function SonoPlusLandingPage() {
                   </View>
                 </View>
               </View>
-              <View style={styles.featuresColCk}>
+              <View style={[styles.featuresColCk, layoutWide && styles.featuresColWide]}>
                 <Text style={styles.colTitleCk}>O que está incluído</Text>
                 <View style={styles.featuresCardCk}>
                   {[
@@ -1226,9 +1262,11 @@ export default function SonoPlusLandingPage() {
 
           {/* Sono+ — opcional, secundário */}
           <LinearGradient colors={['#120f0a', '#1a1610']} style={styles.sonoPlusBand}>
-            <View style={styles.sonoPlusRow}>
-              <Crown size={28} color={GOLD} />
-              <View style={{ flex: 1 }}>
+            <View style={[styles.sonoPlusRow, sonoPlusStack && styles.sonoPlusRowStack]}>
+              <View style={sonoPlusStack ? { alignSelf: 'center', marginBottom: 4 } : {}}>
+                <Crown size={28} color={GOLD} />
+              </View>
+              <View style={[styles.sonoPlusTextCol, sonoPlusStack && styles.sonoPlusTextColStack]}>
                 <Text style={styles.sonoPlusKicker}>Opcional · Sono+</Text>
                 <Text role="heading" aria-level={2} style={styles.sonoPlusTitle}>
                   Coaching Individual
@@ -1377,7 +1415,7 @@ const webProgramBridgeEn =
   'Each step condenses sleep-science protocols into moves you repeat the next day — aligned with how the app teaches.';
 
 const styles = StyleSheet.create({
-  page: { flex: 1, backgroundColor: BG },
+  page: { flex: 1, backgroundColor: BG, maxWidth: '100%', alignSelf: 'stretch' },
   navGrad: {
     borderBottomWidth: StyleSheet.hairlineWidth,
     borderBottomColor: 'rgba(255,255,255,0.08)',
@@ -1389,12 +1427,31 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    paddingHorizontal: 24,
     minHeight: NAV_H,
   },
+  navInnerStacked: {
+    flexDirection: 'column',
+    alignItems: 'stretch',
+    gap: 12,
+    paddingVertical: 12,
+  },
   brand: { flexDirection: 'row', gap: 10, alignItems: 'center' },
+  brandStacked: { alignSelf: 'flex-start' },
   brandText: { fontSize: 20, fontWeight: '800', color: '#ffffff' },
-  navRight: { flexDirection: 'row', gap: 10, alignItems: 'center' },
+  navRight: {
+    flexDirection: 'row',
+    gap: 10,
+    alignItems: 'center',
+    flexShrink: 1,
+    minWidth: 0,
+    justifyContent: 'flex-end',
+  },
+  navRightStacked: {
+    width: '100%',
+    flexWrap: 'wrap',
+    justifyContent: 'center',
+    alignSelf: 'center',
+  },
   navGhost: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -1420,16 +1477,17 @@ const styles = StyleSheet.create({
     borderRadius: 200,
     backgroundColor: 'rgba(124,92,232,0.08)',
   },
-  heroInner: { maxWidth: 720, width: '100%', alignSelf: 'center', paddingHorizontal: 24, alignItems: 'center', zIndex: 1 },
+  heroInner: { maxWidth: 720, width: '100%', alignSelf: 'center', alignItems: 'center', zIndex: 1 },
   heroH1: {
     marginTop: 16,
-    fontSize: isWeb ? 34 : 28,
+    fontSize: 28,
     fontWeight: '800',
     color: '#ffffff',
     textAlign: 'center',
-    lineHeight: isWeb ? 40 : 34,
+    lineHeight: 34,
     letterSpacing: -0.5,
   },
+  heroH1Wide: { fontSize: 34, lineHeight: 40 },
   heroKicker: {
     marginTop: 10,
     fontSize: 17,
@@ -1449,12 +1507,19 @@ const styles = StyleSheet.create({
   },
   heroBtns: {
     marginTop: 24,
-    flexDirection: isWeb ? 'row' : 'column',
+    flexDirection: 'column',
+    alignItems: 'stretch',
     gap: 10,
     width: '100%',
+    maxWidth: '100%',
     justifyContent: 'center',
+    paddingHorizontal: 0,
+  },
+  heroBtnsRow: {
+    flexDirection: 'row',
     flexWrap: 'wrap',
-    paddingHorizontal: 4,
+    alignItems: 'stretch',
+    justifyContent: 'center',
   },
   btnGoldFill: {
     flexDirection: 'row',
@@ -1463,11 +1528,18 @@ const styles = StyleSheet.create({
     gap: 8,
     backgroundColor: GOLD,
     paddingVertical: 15,
-    paddingHorizontal: 20,
+    paddingHorizontal: 16,
     borderRadius: 14,
-    minWidth: isWeb ? 220 : undefined,
+    alignSelf: 'stretch',
+    maxWidth: '100%',
   },
-  btnGoldFillTxt: { color: '#ffffff', fontWeight: '800', fontSize: 15 },
+  btnGoldFillRow: {
+    flex: 1,
+    minWidth: 0,
+    maxWidth: 420,
+    alignSelf: 'auto',
+  },
+  btnGoldFillTxt: { color: '#ffffff', fontWeight: '800', fontSize: 15, flexShrink: 1, textAlign: 'center' },
   btnGhost: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -1476,9 +1548,11 @@ const styles = StyleSheet.create({
     borderWidth: 2,
     borderColor: GOLD,
     paddingVertical: 13,
-    paddingHorizontal: 18,
+    paddingHorizontal: 16,
     borderRadius: 14,
     backgroundColor: 'transparent',
+    alignSelf: 'stretch',
+    maxWidth: '100%',
   },
   btnGhostTxt: { color: GOLD, fontWeight: '700', fontSize: 15 },
   pillWrap: { flexDirection: 'row', flexWrap: 'wrap', gap: 8, justifyContent: 'center', marginTop: 22 },
@@ -1501,7 +1575,6 @@ const styles = StyleSheet.create({
     borderBottomWidth: 1,
     borderColor: 'rgba(124,92,232,0.10)',
     paddingVertical: 20,
-    paddingHorizontal: 24,
     width: '100%',
   },
   researchersInner: {
@@ -1534,8 +1607,10 @@ const styles = StyleSheet.create({
     borderColor: 'rgba(255,255,255,0.06)',
     paddingVertical: 10,
     paddingHorizontal: 14,
-    minWidth: 240,
-    maxWidth: 280,
+    width: '100%',
+    maxWidth: 360,
+    minWidth: 0,
+    alignSelf: 'center',
   },
   researcherAvatar: {
     width: 36,
@@ -1546,8 +1621,8 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   researcherInitial: { fontSize: 15, fontWeight: '800' },
-  researcherName: { fontSize: 13, fontWeight: '700', color: '#e8e5df', marginBottom: 1 },
-  researcherRole: { fontSize: 11, color: '#64748b', fontWeight: '500' },
+  researcherName: { fontSize: 13, fontWeight: '700', color: '#e8e5df', marginBottom: 1, flexShrink: 1 },
+  researcherRole: { fontSize: 11, color: '#64748b', fontWeight: '500', flexShrink: 1 },
   researcherField: { fontSize: 10, fontWeight: '700', marginTop: 2 },
   researchersDisclaimer: {
     fontSize: 11,
@@ -1583,9 +1658,9 @@ const styles = StyleSheet.create({
     borderBottomWidth: 1,
     borderBottomColor: 'rgba(124,92,232,0.06)',
   },
-  previewHead: { paddingHorizontal: 24, maxWidth: 1100, width: '100%', alignSelf: 'center', marginBottom: 16 },
+  previewHead: { maxWidth: 1100, width: '100%', alignSelf: 'center', marginBottom: 16 },
   previewSub: { marginTop: 8, color: TEXT_MUTED, fontSize: 14, lineHeight: 21 },
-  previewScroll: { paddingHorizontal: 24, gap: 12, paddingBottom: 12 },
+  previewScroll: { gap: 12, paddingBottom: 12 },
   previewCard: {
     width: 260,
     backgroundColor: BG_CARD,
@@ -1613,7 +1688,7 @@ const styles = StyleSheet.create({
   previewLink: { marginTop: 14 },
   previewLinkTxt: { color: GOLD, fontSize: 13, fontWeight: '700' },
 
-  body: { maxWidth: 1100, width: '100%', alignSelf: 'center', paddingHorizontal: 24, paddingBottom: 48 },
+  body: { maxWidth: 1100, width: '100%', alignSelf: 'center', paddingBottom: 48 },
   block: { marginTop: 36 },
   sectionBand: { paddingTop: 8, borderTopWidth: 1, borderTopColor: 'rgba(124,92,232,0.08)' },
   sectionBandMuted: {
@@ -1632,18 +1707,20 @@ const styles = StyleSheet.create({
 
   bentoGrid: {
     marginTop: 18,
-    flexDirection: isWeb ? 'row' : 'column',
+    flexDirection: 'column',
     flexWrap: 'wrap',
     gap: 12,
   },
+  bentoGridWide: { flexDirection: 'row' },
   bentoCard: {
-    width: isWeb ? '48%' : '100%',
+    width: '100%',
     backgroundColor: BG_CARD,
     borderRadius: 16,
     padding: 18,
     borderWidth: 1,
     borderColor: 'rgba(255,255,255,0.06)',
   },
+  bentoCardWide: { width: '48%', minWidth: 0 },
   bentoIcon: {
     width: 48,
     height: 48,
@@ -1686,7 +1763,9 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     gap: 8,
-    alignSelf: 'flex-start',
+    alignSelf: 'stretch',
+    maxWidth: '100%',
+    flexWrap: 'wrap',
     borderWidth: 1,
     borderColor: 'rgba(124,92,232,0.35)',
     paddingVertical: 12,
@@ -1717,30 +1796,43 @@ const styles = StyleSheet.create({
   stepDesc: { color: TEXT_MUTED, fontSize: 15, lineHeight: 23 },
 
   statRow: {
-    flexDirection: isWeb ? 'row' : 'column',
-    gap: isWeb ? 0 : 10,
+    flexDirection: 'column',
+    gap: 10,
     marginTop: 6,
     backgroundColor: BG_CARD,
     borderRadius: 16,
     borderWidth: 1,
     borderColor: 'rgba(124,92,232,0.12)',
-    paddingVertical: isWeb ? 18 : 14,
+    paddingVertical: 14,
     paddingHorizontal: 10,
+    alignItems: 'stretch',
+  },
+  statRowWide: {
+    flexDirection: 'row',
+    gap: 0,
+    paddingVertical: 18,
     alignItems: 'center',
   },
-  stat: { flex: 1, alignItems: 'center', minWidth: isWeb ? 110 : undefined },
+  stat: { flex: 1, alignItems: 'center' },
+  statWide: { minWidth: 110 },
   statDivider: {
-    width: isWeb ? StyleSheet.hairlineWidth : '80%',
-    height: isWeb ? undefined : StyleSheet.hairlineWidth,
+    width: '80%',
+    height: StyleSheet.hairlineWidth,
     backgroundColor: 'rgba(124,92,232,0.2)',
+    alignSelf: 'center',
+  },
+  statDividerWide: {
+    width: StyleSheet.hairlineWidth,
     alignSelf: 'stretch',
+    minHeight: 40,
   },
   statNum: { color: TEXT_MAIN, fontSize: 26, fontWeight: '800' },
   statLbl: { color: TEXT_MUTED, fontSize: 11, marginTop: 4, textAlign: 'center' },
 
-  benefGrid: { flexDirection: isWeb ? 'row' : 'column', flexWrap: 'wrap', gap: 10, marginTop: 8 },
+  benefGrid: { flexDirection: 'column', flexWrap: 'wrap', gap: 10, marginTop: 8 },
+  benefGridWide: { flexDirection: 'row' },
   benefCard: {
-    width: isWeb ? '48%' : '100%',
+    width: '100%',
     flexDirection: 'row',
     gap: 10,
     alignItems: 'flex-start',
@@ -1750,18 +1842,22 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: 'rgba(255,255,255,0.05)',
   },
+  benefCardWide: { width: '48%', minWidth: 0 },
   benefTxt: { flex: 1, color: TEXT_MUTED, fontSize: 14, lineHeight: 21 },
 
   checkoutSection: { marginTop: 8 },
   checkoutGrid: {
-    flexDirection: isWeb ? 'row' : 'column',
-    gap: isWeb ? 36 : 24,
-    alignItems: 'flex-start',
+    flexDirection: 'column',
+    gap: 24,
+    alignItems: 'stretch',
     marginTop: 20,
     width: '100%',
   },
-  checkoutCol: { flex: isWeb ? 1 : undefined, width: isWeb ? undefined : '100%' },
-  featuresColCk: { flex: isWeb ? 1 : undefined, width: isWeb ? undefined : '100%' },
+  checkoutGridWide: { flexDirection: 'row', gap: 36, alignItems: 'flex-start' },
+  checkoutCol: { width: '100%' },
+  checkoutColWide: { flex: 1, minWidth: 0 },
+  featuresColCk: { width: '100%', marginTop: 8 },
+  featuresColWide: { flex: 1, minWidth: 0, marginTop: 0 },
   planCardCk: {
     backgroundColor: BG_CARD,
     borderRadius: 16,
@@ -1780,13 +1876,14 @@ const styles = StyleSheet.create({
   },
   planTotalCk: { fontSize: 15, color: '#8892a4', fontWeight: '600', lineHeight: 22 },
   priceHeadline: {
-    fontSize: isWeb ? 44 : 36,
+    fontSize: 34,
     fontWeight: '800',
     color: '#ffffff',
     textAlign: 'center',
     letterSpacing: -1,
-    lineHeight: isWeb ? 50 : 42,
+    lineHeight: 40,
   },
+  priceHeadlineWide: { fontSize: 44, lineHeight: 50 },
   priceLaunchTag: {
     color: '#EF9F27',
     fontSize: 13,
@@ -1804,33 +1901,43 @@ const styles = StyleSheet.create({
   },
   chronoBanner: {
     flexDirection: 'row',
-    alignItems: 'center',
+    alignItems: 'flex-start',
     gap: 10,
     paddingVertical: 12,
-    paddingHorizontal: 24,
+    width: '100%',
+    maxWidth: '100%',
     backgroundColor: 'rgba(124,92,232,0.12)',
     borderBottomWidth: 1,
     borderBottomColor: 'rgba(124,92,232,0.2)',
   },
+  chronoBannerStacked: {
+    flexDirection: 'column',
+    alignItems: 'flex-start',
+  },
+  chronoBannerTextCol: { flex: 1, minWidth: 0, maxWidth: '100%' },
   chronoBannerEmoji: { fontSize: 22 },
   chronoBannerKicker: {
     color: ACCENT_LIGHT,
     fontSize: 12,
     fontWeight: '800',
     letterSpacing: 0.4,
+    flexShrink: 1,
   },
   chronoBannerTip: {
     color: '#94a3b8',
     fontSize: 12,
     marginTop: 1,
+    flexShrink: 1,
   },
   checkoutBtnL: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
     gap: 10,
+    flexWrap: 'wrap',
     backgroundColor: GOLD,
     paddingVertical: 18,
+    paddingHorizontal: 14,
     borderRadius: 16,
     marginBottom: 12,
     shadowColor: GOLD,
@@ -1839,7 +1946,7 @@ const styles = StyleSheet.create({
     shadowRadius: 12,
     elevation: 6,
   },
-  checkoutBtnLTxt: { fontSize: 17, fontWeight: '800', color: '#ffffff' },
+  checkoutBtnLTxt: { fontSize: 16, fontWeight: '800', color: '#ffffff', textAlign: 'center', flexShrink: 1 },
   payDivider: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -1909,7 +2016,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     flexShrink: 0,
   },
-  featureTextCk: { fontSize: 14, color: '#94a3b8', flex: 1, lineHeight: 21 },
+  featureTextCk: { fontSize: 14, color: '#94a3b8', flex: 1, minWidth: 0, lineHeight: 21 },
   guaranteeCardCk: {
     flexDirection: 'row',
     alignItems: 'flex-start',
@@ -1935,6 +2042,9 @@ const styles = StyleSheet.create({
     borderRadius: 0,
   },
   sonoPlusRow: { flexDirection: 'row', gap: 16, alignItems: 'flex-start', marginBottom: 20 },
+  sonoPlusRowStack: { flexDirection: 'column', alignItems: 'stretch' },
+  sonoPlusTextCol: { flex: 1, minWidth: 0 },
+  sonoPlusTextColStack: { alignSelf: 'stretch', width: '100%' },
   sonoPlusKicker: { color: GOLD, fontSize: 11, fontWeight: '800', letterSpacing: 1, marginBottom: 4 },
   sonoPlusTitle: { color: TEXT_MAIN, fontSize: 17, fontWeight: '700', marginBottom: 8 },
   sonoPlusBody: { color: TEXT_MUTED, fontSize: 14, lineHeight: 22 },
@@ -2048,7 +2158,6 @@ const styles = StyleSheet.create({
     maxWidth: 1100,
     width: '100%',
     alignSelf: 'center',
-    paddingHorizontal: 24,
   },
   quizIdleCard: {
     backgroundColor: BG_CARD,
@@ -2189,7 +2298,8 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     marginBottom: 10,
   },
-  quizEmailRow: { flexDirection: 'row', gap: 8 },
+  quizEmailRow: { flexDirection: 'row', gap: 8, alignItems: 'stretch' },
+  quizEmailRowStack: { flexDirection: 'column' },
   quizEmailInput: {
     flex: 1,
     backgroundColor: 'rgba(255,255,255,0.06)',
@@ -2201,12 +2311,14 @@ const styles = StyleSheet.create({
     paddingHorizontal: 14,
     paddingVertical: 12,
   },
+  quizEmailInputStack: { width: '100%', minHeight: 48 },
   quizEmailBtn: {
     backgroundColor: '#6366f1',
     borderRadius: 10,
     paddingHorizontal: 16,
     justifyContent: 'center',
   },
+  quizEmailBtnStack: { width: '100%', paddingVertical: 14, alignItems: 'center' },
   quizEmailBtnTxt: { color: '#ffffff', fontWeight: '800', fontSize: 13 },
   quizEmailDisclaimer: {
     color: '#4a5568',
@@ -2228,14 +2340,16 @@ const styles = StyleSheet.create({
     backgroundColor: GOLD,
     borderRadius: 14,
     paddingVertical: 15,
-    paddingHorizontal: 24,
+    paddingHorizontal: 16,
     width: '100%',
+    maxWidth: '100%',
     alignItems: 'center',
     flexDirection: 'row',
     justifyContent: 'center',
+    flexWrap: 'wrap',
     gap: 8,
   },
-  quizCtaCheckoutTxt: { color: '#ffffff', fontWeight: '800', fontSize: 15 },
+  quizCtaCheckoutTxt: { color: '#ffffff', fontWeight: '800', fontSize: 15, textAlign: 'center', flexShrink: 1 },
   quizResetBtn: { marginTop: 12, paddingVertical: 8 },
   quizResetTxt: { color: '#64748b', fontSize: 12 },
 
@@ -2244,7 +2358,6 @@ const styles = StyleSheet.create({
     maxWidth: 1100,
     width: '100%',
     alignSelf: 'center',
-    paddingHorizontal: 24,
     marginTop: 32,
     marginBottom: 8,
   },
@@ -2258,6 +2371,10 @@ const styles = StyleSheet.create({
     gap: 16,
     alignItems: 'flex-start',
   },
+  founderCardStack: {
+    flexDirection: 'column',
+    alignItems: 'center',
+  },
   founderAvatar: {
     width: 44,
     height: 44,
@@ -2268,12 +2385,14 @@ const styles = StyleSheet.create({
     flexShrink: 0,
   },
   founderAvatarTxt: { fontSize: 20, fontWeight: '800', color: BG },
-  founderTextCol: { flex: 1 },
+  founderTextCol: { flex: 1, minWidth: 0 },
+  founderTextColStack: { width: '100%', alignItems: 'center' },
   founderQuote: {
     color: '#e8d5b7',
     fontSize: 14,
     fontWeight: '600',
     lineHeight: 22,
   },
+  founderQuoteStack: { textAlign: 'center' },
   founderSign: { color: GOLD, fontSize: 12, fontWeight: '700', marginTop: 8 },
 });

@@ -40,6 +40,7 @@ function WebNav() {
   const router = useRouter();
   const { t } = useLanguage();
   const { width } = useWindowDimensions();
+  const navPadH = width < 400 ? 16 : 24;
   const [scrolled, setScrolled] = useState(false);
   const showLinks = width >= 768;
 
@@ -52,7 +53,7 @@ function WebNav() {
 
   return (
     <View style={[styles.nav, scrolled && styles.navScrolled]}>
-      <View style={styles.navInner}>
+      <View style={[styles.navInner, { paddingHorizontal: navPadH }]}>
         <TouchableOpacity onPress={() => router.push('/web')} style={styles.navBrand}>
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: 24, height: 24 }}>
             <Moon size={24} color="#fbbf24" strokeWidth={2} />
@@ -100,6 +101,10 @@ export default function WebLandingPage() {
 
   const isDesktop = windowWidth >= 1024;
   const isTablet = windowWidth >= 768 && windowWidth < 1024;
+  const typographyWide = windowWidth >= 768;
+  const pricingWide = windowWidth >= 720;
+  const founderLayoutWide = windowWidth >= 640;
+  const contentPadH = windowWidth < 400 ? 16 : 24;
 
   const steps = language === 'pt'
     ? [
@@ -153,25 +158,25 @@ export default function WebLandingPage() {
 
   const dynamicStyles = useMemo(() => {
     const contentMax = 1100;
-    const pad = 48;
-    const usable = Math.min(windowWidth - pad, contentMax);
+    const horizontalPad = windowWidth < 400 ? 32 : 48;
+    const usable = Math.min(windowWidth - horizontalPad, contentMax);
 
     return {
       problemItemWidth: isDesktop
         ? (usable - 32) / 3
         : isTablet
           ? (usable - 16) / 2
-          : windowWidth - pad,
+          : windowWidth - horizontalPad,
       stepCardWidth: isDesktop
         ? (usable - 40) / 3
         : isTablet
           ? (usable - 20) / 2
-          : windowWidth - pad,
+          : windowWidth - horizontalPad,
       expertCardWidth: isDesktop
         ? (usable - 60) / 4
         : isTablet
           ? (usable - 40) / 3
-          : windowWidth - pad,
+          : windowWidth - horizontalPad,
     };
   }, [windowWidth, isDesktop, isTablet]);
 
@@ -265,9 +270,9 @@ export default function WebLandingPage() {
 
       {/* PROBLEM */}
       <View style={styles.problemSection}>
-        <View style={styles.container}>
+        <View style={[styles.container, { paddingHorizontal: contentPadH }]}>
           <Text style={styles.sectionLabel}>{t('web.problem.label')}</Text>
-          <Text style={styles.sectionTitle}>{t('web.problem.title')}</Text>
+          <Text style={[styles.sectionTitle, typographyWide && styles.sectionTitleWide]}>{t('web.problem.title')}</Text>
           <View style={styles.problemGrid}>
             {[
               t('web.problem.item1'),
@@ -288,9 +293,9 @@ export default function WebLandingPage() {
 
       {/* SOLUTION */}
       <LinearGradient colors={['#07070f', '#0d0d16']} style={styles.solutionSection}>
-        <View style={styles.container}>
+        <View style={[styles.container, { paddingHorizontal: contentPadH }]}>
           <Text style={styles.sectionLabel}>{t('web.solution.label')}</Text>
-          <Text style={styles.sectionTitle}>{t('web.solution.title')}</Text>
+          <Text style={[styles.sectionTitle, typographyWide && styles.sectionTitleWide]}>{t('web.solution.title')}</Text>
           <Text style={styles.sectionDesc}>{t('web.solution.desc')}</Text>
 
           <View style={styles.stepsGrid}>
@@ -324,9 +329,9 @@ export default function WebLandingPage() {
 
       {/* SCIENCE METHODOLOGY */}
       <View style={styles.expertsSection}>
-        <View style={styles.container}>
+        <View style={[styles.container, { paddingHorizontal: contentPadH }]}>
           <Text style={styles.sectionLabel}>{language === 'pt' ? 'NOSSA METODOLOGIA' : 'OUR METHODOLOGY'}</Text>
-          <Text style={styles.sectionTitle}>{language === 'pt' ? 'Baseado em Ciência Publicada' : 'Built on Published Science'}</Text>
+          <Text style={[styles.sectionTitle, typographyWide && styles.sectionTitleWide]}>{language === 'pt' ? 'Baseado em Ciência Publicada' : 'Built on Published Science'}</Text>
           <Text style={styles.sectionDesc}>{t('about.credibilityLine')}</Text>
           <View style={styles.expertsGrid}>
             {sciencePillars.map((p, i) => (
@@ -348,12 +353,19 @@ export default function WebLandingPage() {
 
       {/* PRICING */}
       <View style={styles.pricingSection}>
-        <View style={styles.container}>
+        <View style={[styles.container, { paddingHorizontal: contentPadH }]}>
           <Text style={styles.sectionLabel}>{t('web.pricing.label')}</Text>
-          <Text style={styles.sectionTitle}>{t('web.pricing.title')}</Text>
+          <Text style={[styles.sectionTitle, typographyWide && styles.sectionTitleWide]}>{t('web.pricing.title')}</Text>
 
-          <View style={styles.pricingGrid}>
-            <View style={[styles.pricingCard, styles.pricingCardFeatured]}>
+          <View style={[styles.pricingGrid, pricingWide && styles.pricingGridWide]}>
+            <View
+              style={[
+                styles.pricingCard,
+                pricingWide && styles.pricingCardWide,
+                styles.pricingCardFeatured,
+                pricingWide && styles.pricingCardFeaturedWide,
+              ]}
+            >
               <View style={styles.pricingBadge}>
                 <Crown size={12} color="#ffffff" />
                 <Text style={styles.pricingBadgeText}>{language === 'pt' ? 'ACESSO VITALÍCIO' : 'LIFETIME ACCESS'}</Text>
@@ -402,7 +414,7 @@ export default function WebLandingPage() {
 
       {/* DISCLAIMER */}
       <View style={styles.disclaimerSection}>
-        <View style={styles.container}>
+        <View style={[styles.container, { paddingHorizontal: contentPadH }]}>
           <View style={styles.disclaimerBox}>
             <Shield size={20} color="#64748b" />
             <Text style={styles.disclaimerTitle}>{t('web.disclaimer.title')}</Text>
@@ -414,9 +426,9 @@ export default function WebLandingPage() {
       {/* FINAL CTA */}
       <View style={styles.ctaSection}>
         {isWeb && <View style={styles.ctaRadialGlow} />}
-        <View style={styles.container}>
+        <View style={[styles.container, { paddingHorizontal: contentPadH }]}>
           <View style={{ alignItems: 'center' }}>
-            <Text style={styles.ctaTitle}>{t('web.cta.title')}</Text>
+            <Text style={[styles.ctaTitle, typographyWide && styles.ctaTitleWide]}>{t('web.cta.title')}</Text>
             <Text style={styles.ctaSubtitle}>{t('web.cta.subtitle')}</Text>
             <TouchableOpacity
               style={[styles.ctaBtn, hoveredCtaBtn && styles.ctaBtnHovered]}
@@ -453,16 +465,20 @@ export default function WebLandingPage() {
 
       {/* FOUNDER MOMENT */}
       <View style={styles.founderSection}>
-        <View style={styles.container}>
-          <View style={styles.founderCard}>
+        <View style={[styles.container, { paddingHorizontal: contentPadH }]}>
+          <View style={[styles.founderCard, founderLayoutWide && styles.founderCardWide]}>
             <Text style={styles.founderLabel}>{founderContent.label}</Text>
-            <Text style={styles.founderHeadline}>{founderContent.headline}</Text>
+            <Text style={[styles.founderHeadline, typographyWide && styles.founderHeadlineWide]}>
+              {founderContent.headline}
+            </Text>
 
             <View style={styles.founderDividerTop} />
 
             <View style={styles.founderBody}>
               {founderContent.paragraphs.map((para, i) => (
-                <Text key={i} style={styles.founderParagraph}>{para}</Text>
+                <Text key={i} style={[styles.founderParagraph, typographyWide && styles.founderParagraphWide]}>
+                  {para}
+                </Text>
               ))}
             </View>
 
@@ -471,12 +487,16 @@ export default function WebLandingPage() {
                 <Text style={styles.founderAvatarInitial}>J</Text>
               </View>
               <View style={styles.founderSignatureBlock}>
-                <Text style={styles.founderSignature}>{founderContent.signature}</Text>
+                <Text style={[styles.founderSignature, typographyWide && styles.founderSignatureWide]}>
+                  {founderContent.signature}
+                </Text>
               </View>
             </View>
 
             <View style={styles.founderResultBox}>
-              <Text style={styles.founderResultText}>{founderContent.result}</Text>
+              <Text style={[styles.founderResultText, typographyWide && styles.founderResultTextWide]}>
+                {founderContent.result}
+              </Text>
             </View>
           </View>
         </View>
@@ -484,7 +504,7 @@ export default function WebLandingPage() {
 
       {/* FOOTER */}
       <View style={styles.footer}>
-        <View style={styles.footerInner}>
+        <View style={[styles.footerInner, { paddingHorizontal: contentPadH }]}>
           <Text style={styles.footerBrandText}>GoZzzz</Text>
           <View style={styles.footerLinks}>
             <TouchableOpacity onPress={() => router.push('/web/programa')}>
@@ -520,7 +540,7 @@ export default function WebLandingPage() {
 }
 
 const styles = StyleSheet.create({
-  page: { flex: 1, backgroundColor: '#07070f' },
+  page: { flex: 1, backgroundColor: '#07070f', maxWidth: '100%', alignSelf: 'stretch' },
 
   nav: {
     position: isWeb ? ('fixed' as any) : 'relative',
@@ -540,7 +560,6 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    paddingHorizontal: 40,
     paddingVertical: 16,
     maxWidth: 1200,
     alignSelf: 'center',
@@ -579,7 +598,7 @@ const styles = StyleSheet.create({
     color: '#ffffff',
   },
 
-  container: { maxWidth: 1100, alignSelf: 'center', width: '100%', paddingHorizontal: 24 },
+  container: { maxWidth: 1100, alignSelf: 'center', width: '100%' },
 
   problemSection: { paddingVertical: 80, backgroundColor: '#0d0d16' },
   sectionLabel: {
@@ -592,13 +611,14 @@ const styles = StyleSheet.create({
     textAlign: 'center',
   },
   sectionTitle: {
-    fontSize: isWeb ? 40 : 28,
+    fontSize: 28,
     fontWeight: '800',
     color: '#e8d5b7',
     textAlign: 'center',
     marginBottom: 16,
-    lineHeight: isWeb ? 48 : 36,
+    lineHeight: 36,
   },
+  sectionTitleWide: { fontSize: 40, lineHeight: 48 },
   sectionDesc: {
     fontSize: 17,
     color: '#8892a4',
@@ -721,29 +741,41 @@ const styles = StyleSheet.create({
 
   pricingSection: { paddingVertical: 80 },
   pricingGrid: {
-    flexDirection: isWeb ? 'row' : 'column',
+    flexDirection: 'column',
     gap: 20,
     justifyContent: 'center',
-    alignItems: 'center',
+    alignItems: 'stretch',
     marginTop: 40,
     flexWrap: 'wrap',
+  } as any,
+  pricingGridWide: {
+    flexDirection: 'row',
+    alignItems: 'center',
   } as any,
   pricingCard: {
     backgroundColor: '#12121e',
     borderRadius: 24,
-    padding: 32,
-    width: isWeb ? 400 : '100%',
+    padding: 24,
+    width: '100%',
     maxWidth: 440,
     borderWidth: 2,
     borderColor: 'rgba(255,255,255,0.08)',
     alignItems: 'center',
     transition: isWeb ? 'transform 0.3s ease, box-shadow 0.3s ease' : undefined,
   } as any,
+  pricingCardWide: {
+    padding: 32,
+    width: '100%',
+    maxWidth: 400,
+    alignSelf: 'center',
+  } as any,
   pricingCardFeatured: {
     backgroundColor: '#0f172a',
     borderColor: GOLD,
+  } as any,
+  pricingCardFeaturedWide: {
     boxShadow: isWeb ? `0 8px 32px rgba(212,169,106,0.18)` : undefined,
-    transform: [{ scale: isWeb ? 1.05 : 1 }],
+    transform: [{ scale: 1.05 }],
   } as any,
   pricingBadge: {
     flexDirection: 'row',
@@ -854,14 +886,18 @@ const styles = StyleSheet.create({
     pointerEvents: 'none',
   } as any,
   ctaTitle: {
-    fontSize: isWeb ? 48 : 32,
+    fontSize: 32,
     fontWeight: '800',
     color: '#ffffff',
     textAlign: 'center',
-    lineHeight: isWeb ? 58 : 42,
+    lineHeight: 42,
     marginBottom: 18,
     maxWidth: 680,
-    fontFamily: isWeb ? 'Georgia, "Times New Roman", serif' : undefined,
+  } as any,
+  ctaTitleWide: {
+    fontSize: 48,
+    lineHeight: 58,
+    fontFamily: 'Georgia, "Times New Roman", serif',
   } as any,
   ctaSubtitle: {
     fontSize: 18,
@@ -905,7 +941,7 @@ const styles = StyleSheet.create({
   founderCard: {
     backgroundColor: '#0e0e1c',
     borderRadius: 24,
-    padding: isWeb ? 56 : 32,
+    padding: 32,
     borderWidth: 1,
     borderColor: 'rgba(212,169,106,0.18)',
     maxWidth: 780,
@@ -917,6 +953,7 @@ const styles = StyleSheet.create({
     shadowRadius: 40,
     boxShadow: isWeb ? '0 4px 60px rgba(212,169,106,0.07)' : undefined,
   } as any,
+  founderCardWide: { padding: 56 } as any,
   founderLabel: {
     fontSize: 12,
     fontWeight: '700',
@@ -927,13 +964,17 @@ const styles = StyleSheet.create({
     textAlign: 'center',
   },
   founderHeadline: {
-    fontSize: isWeb ? 36 : 26,
+    fontSize: 26,
     fontWeight: '800',
     color: '#e8d5b7',
     textAlign: 'center',
-    lineHeight: isWeb ? 46 : 34,
+    lineHeight: 34,
     marginBottom: 32,
-    fontFamily: isWeb ? 'Georgia, "Times New Roman", serif' : undefined,
+  } as any,
+  founderHeadlineWide: {
+    fontSize: 36,
+    lineHeight: 46,
+    fontFamily: 'Georgia, "Times New Roman", serif',
   } as any,
   founderDividerTop: {
     height: 1,
@@ -945,12 +986,16 @@ const styles = StyleSheet.create({
     marginBottom: 40,
   },
   founderParagraph: {
-    fontSize: isWeb ? 18 : 16,
+    fontSize: 16,
     color: '#a8b3c4',
-    lineHeight: isWeb ? 30 : 26,
+    lineHeight: 26,
     textAlign: 'center',
-    fontFamily: isWeb ? 'Georgia, "Times New Roman", serif' : undefined,
     fontStyle: 'italic',
+  } as any,
+  founderParagraphWide: {
+    fontSize: 18,
+    lineHeight: 30,
+    fontFamily: 'Georgia, "Times New Roman", serif',
   } as any,
   founderSignatureRow: {
     flexDirection: 'row',
@@ -976,10 +1021,13 @@ const styles = StyleSheet.create({
     gap: 2,
   },
   founderSignature: {
-    fontSize: isWeb ? 22 : 18,
+    fontSize: 18,
     color: GOLD,
-    fontFamily: isWeb ? '"Brush Script MT", "Segoe Script", cursive' : undefined,
     letterSpacing: 0.5,
+  } as any,
+  founderSignatureWide: {
+    fontSize: 22,
+    fontFamily: '"Brush Script MT", "Segoe Script", cursive',
   } as any,
   founderResultBox: {
     backgroundColor: 'rgba(212,169,106,0.07)',
@@ -991,15 +1039,16 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   founderResultText: {
-    fontSize: isWeb ? 18 : 16,
+    fontSize: 16,
     color: '#e8d5b7',
     fontWeight: '600',
     textAlign: 'center',
-    lineHeight: isWeb ? 28 : 24,
+    lineHeight: 24,
   },
+  founderResultTextWide: { fontSize: 18, lineHeight: 28 },
 
   footer: { backgroundColor: '#07070f', paddingVertical: 44, borderTopWidth: 1, borderTopColor: 'rgba(212,169,106,0.12)' },
-  footerInner: { maxWidth: 1100, alignSelf: 'center', width: '100%', paddingHorizontal: 24, alignItems: 'center', gap: 20 },
+  footerInner: { maxWidth: 1100, alignSelf: 'center', width: '100%', alignItems: 'center', gap: 20 },
   footerBrandText: { fontSize: 22, fontWeight: '800', color: GOLD, letterSpacing: 1.5 },
   footerLinks: { flexDirection: 'row', gap: 24, flexWrap: 'wrap', justifyContent: 'center' },
   footerLink: {

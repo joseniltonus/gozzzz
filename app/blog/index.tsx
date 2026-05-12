@@ -6,7 +6,17 @@
  */
 
 import { useMemo } from 'react';
-import { Image, Linking, Platform, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import {
+  Image,
+  Linking,
+  Platform,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
+  useWindowDimensions,
+} from 'react-native';
 import { Link, useRouter } from 'expo-router';
 import Head from 'expo-router/head';
 import { LinearGradient } from 'expo-linear-gradient';
@@ -33,6 +43,10 @@ const HEAD_DESC =
 
 export default function BlogIndexPage() {
   const router = useRouter();
+  const { width } = useWindowDimensions();
+  const contentPadH = width < 400 ? 16 : 24;
+  const navStacked = width < 560;
+  const navShort = width < 420;
 
   const sortedPosts = useMemo(
     () => [...BLOG_POSTS].sort((a, b) => (a.publishedAt < b.publishedAt ? 1 : -1)),
@@ -79,17 +93,19 @@ export default function BlogIndexPage() {
 
       <ScrollView style={styles.page} showsVerticalScrollIndicator={false}>
         <LinearGradient colors={['#0c0a1f', ACCENT_DEEP]} style={styles.nav}>
-          <View style={styles.navInner}>
+          <View style={[styles.navInner, navStacked && styles.navInnerStacked, { paddingHorizontal: contentPadH }]}>
             <Link href="/web" asChild>
               <TouchableOpacity accessibilityRole="link">
                 <Text style={styles.brand}>GoZzzz</Text>
               </TouchableOpacity>
             </Link>
-            <View style={styles.navRight}>
+            <View style={[styles.navRight, navStacked && styles.navRightStacked]}>
               <Link href="/web/sono-plus" asChild>
                 <TouchableOpacity style={styles.navGhost} accessibilityRole="link">
                   <BookOpen size={16} color={ACCENT_LIGHT} />
-                  <Text style={styles.navGhostTxt}>Programa 21 Passos</Text>
+                  <Text style={styles.navGhostTxt}>
+                    {navShort ? '21 passos' : 'Programa 21 Passos'}
+                  </Text>
                 </TouchableOpacity>
               </Link>
             </View>
@@ -97,7 +113,7 @@ export default function BlogIndexPage() {
         </LinearGradient>
 
         <LinearGradient colors={[ACCENT_DEEP, '#0c0a1f', BG]} style={styles.hero}>
-          <View style={styles.heroInner}>
+          <View style={[styles.heroInner, { paddingHorizontal: contentPadH }]}>
             <Text style={styles.kicker}>· BLOG GOZZZZ</Text>
             <Text role="heading" aria-level={1} style={styles.h1}>
               Ciência do sono, em português
@@ -109,7 +125,7 @@ export default function BlogIndexPage() {
           </View>
         </LinearGradient>
 
-        <View style={styles.contentWrap}>
+        <View style={[styles.contentWrap, { paddingHorizontal: contentPadH }]}>
           {(Object.keys(BLOG_CATEGORIES) as BlogCategoryId[]).map((catId) => {
             const cat = BLOG_CATEGORIES[catId];
             const posts = grouped[catId];
@@ -207,8 +223,8 @@ export default function BlogIndexPage() {
 }
 
 const styles = StyleSheet.create({
-  page: { flex: 1, backgroundColor: BG },
-  nav: { paddingTop: 16, paddingBottom: 16, paddingHorizontal: 16 },
+  page: { flex: 1, backgroundColor: BG, maxWidth: '100%', alignSelf: 'stretch' },
+  nav: { paddingTop: 16, paddingBottom: 16 },
   navInner: {
     maxWidth: 1100,
     width: '100%',
@@ -216,9 +232,26 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
+    gap: 12,
+  },
+  navInnerStacked: {
+    flexDirection: 'column',
+    alignItems: 'stretch',
   },
   brand: { color: '#ffffff', fontSize: 20, fontWeight: '800' },
-  navRight: { flexDirection: 'row', alignItems: 'center', gap: 8 },
+  navRight: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+    flexShrink: 1,
+    minWidth: 0,
+    justifyContent: 'flex-end',
+  },
+  navRightStacked: {
+    width: '100%',
+    flexWrap: 'wrap',
+    justifyContent: 'flex-start',
+  },
   navGhost: {
     paddingHorizontal: 12,
     paddingVertical: 8,
@@ -229,7 +262,7 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(255,255,255,0.06)',
   },
   navGhostTxt: { color: '#94a3b8', fontWeight: '600', fontSize: 13 },
-  hero: { paddingTop: 48, paddingBottom: 40, paddingHorizontal: 24 },
+  hero: { paddingTop: 48, paddingBottom: 40 },
   heroInner: { maxWidth: 800, width: '100%', alignSelf: 'center' },
   kicker: {
     color: ACCENT_LIGHT,
@@ -240,7 +273,7 @@ const styles = StyleSheet.create({
   },
   h1: { color: TEXT_MAIN, fontSize: 36, fontWeight: '800', lineHeight: 42, letterSpacing: -0.5 },
   lead: { color: TEXT_MUTED, fontSize: 16, lineHeight: 24, marginTop: 16 },
-  contentWrap: { maxWidth: 1100, width: '100%', alignSelf: 'center', paddingHorizontal: 24, paddingVertical: 32 },
+  contentWrap: { maxWidth: 1100, width: '100%', alignSelf: 'center', paddingVertical: 32 },
   categorySection: { marginBottom: 40 },
   categoryHeader: { flexDirection: 'row', alignItems: 'center', gap: 12, marginBottom: 16 },
   categoryDot: { width: 8, height: 8, borderRadius: 4 },
@@ -253,10 +286,10 @@ const styles = StyleSheet.create({
   categoryDesc: { color: TEXT_MUTED, fontSize: 13, marginTop: 2 },
   cardsGrid: { flexDirection: 'row', flexWrap: 'wrap', gap: 16 },
   card: {
-    flexBasis: 320,
+    flexBasis: '100%',
     flexGrow: 1,
     flexShrink: 1,
-    minWidth: 280,
+    minWidth: 0,
     maxWidth: 360,
     backgroundColor: BG_CARD,
     borderRadius: 14,

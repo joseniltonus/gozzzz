@@ -1,4 +1,4 @@
-import { View, Text, StyleSheet, ScrollView, Image, Platform } from 'react-native';
+import { View, Text, StyleSheet, Image, useWindowDimensions } from 'react-native';
 import { useEffect } from 'react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { CircleCheck as CheckCircle } from 'lucide-react-native';
@@ -10,9 +10,11 @@ interface LessonInteractiveCardWebProps {
   onComplete?: () => void;
 }
 
-const isWeb = Platform.OS === 'web';
+const READ_MAX = 600;
 
 export const LessonInteractiveCardWeb = ({ lessonId, onComplete }: LessonInteractiveCardWebProps) => {
+  const { width: windowWidth } = useWindowDimensions();
+  const padH = windowWidth < 400 ? 16 : 22;
   useEffect(() => {
     onComplete?.();
   }, [onComplete]);
@@ -37,7 +39,7 @@ export const LessonInteractiveCardWeb = ({ lessonId, onComplete }: LessonInterac
   const expertTips = enhancement?.expertTips[lang] || [];
 
   return (
-    <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
+    <View style={[styles.container, { paddingHorizontal: padH, maxWidth: READ_MAX, alignSelf: 'center', width: '100%' }]}>
       {enhancement?.imageUrl && (
         <Image
           source={{ uri: enhancement.imageUrl }}
@@ -86,7 +88,7 @@ export const LessonInteractiveCardWeb = ({ lessonId, onComplete }: LessonInterac
       )}
 
       <View style={styles.spacer} />
-    </ScrollView>
+    </View>
   );
 };
 
@@ -94,6 +96,8 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#f8fafc',
+    paddingVertical: 20,
+    gap: 8,
   },
   errorText: {
     fontSize: 16,
@@ -103,12 +107,12 @@ const styles = StyleSheet.create({
   },
   heroImage: {
     width: '100%',
-    height: isWeb ? 340 : 240,
-    marginBottom: 20,
+    height: 220,
+    marginBottom: 16,
+    borderRadius: 14,
   },
   keyPointsSection: {
-    paddingHorizontal: isWeb ? 48 : 16,
-    paddingVertical: isWeb ? 40 : 20,
+    paddingVertical: 16,
   },
   keyPointsGrid: {
     flexDirection: 'row',
@@ -117,50 +121,53 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   keyPointItem: {
-    width: isWeb ? '48%' : '100%',
+    width: '100%',
     flexDirection: 'row',
     gap: 12,
-    marginBottom: 8,
+    marginBottom: 10,
     backgroundColor: '#ffffff',
-    padding: 16,
-    borderRadius: 10,
+    padding: 18,
+    borderRadius: 14,
     alignItems: 'flex-start',
+    borderWidth: 1,
+    borderColor: '#f1f5f9',
   },
   keyPointCheckmark: {
     marginTop: 2,
     flexShrink: 0,
   },
   keyPointText: {
-    fontSize: isWeb ? 14 : 13,
-    color: '#475569',
-    lineHeight: 20,
+    fontSize: 15,
+    color: '#334155',
+    lineHeight: 24,
     flex: 1,
+    letterSpacing: 0.1,
   },
   descriptionSection: {
-    paddingHorizontal: isWeb ? 48 : 16,
-    paddingVertical: isWeb ? 40 : 20,
+    paddingVertical: 20,
     backgroundColor: '#ffffff',
-    marginHorizontal: isWeb ? 48 : 16,
-    borderRadius: 12,
-    marginBottom: isWeb ? 40 : 20,
-    maxWidth: isWeb ? 900 : undefined,
-    alignSelf: 'center',
+    borderRadius: 14,
+    marginBottom: 16,
+    paddingHorizontal: 18,
+    borderWidth: 1,
+    borderColor: '#f1f5f9',
   },
   descriptionText: {
-    fontSize: isWeb ? 15 : 14,
-    color: '#475569',
-    lineHeight: 24,
-    marginBottom: 12,
+    fontSize: 16,
+    color: '#334155',
+    lineHeight: 27,
+    marginBottom: 8,
+    letterSpacing: 0.1,
   },
   sectionTitle: {
-    fontSize: isWeb ? 22 : 18,
+    fontSize: 19,
     fontWeight: '700',
     color: '#0f172a',
-    marginBottom: 16,
+    marginBottom: 14,
+    letterSpacing: -0.2,
   },
   expertTipsSection: {
-    paddingHorizontal: isWeb ? 48 : 16,
-    paddingVertical: isWeb ? 40 : 20,
+    paddingVertical: 16,
   },
   expertTipsGrid: {
     flexDirection: 'row',
@@ -169,26 +176,28 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   expertTipItem: {
-    width: isWeb ? '48%' : '100%',
+    width: '100%',
     backgroundColor: '#ffffff',
     padding: 18,
-    borderRadius: 10,
-    marginBottom: 8,
+    borderRadius: 14,
+    marginBottom: 10,
     borderLeftWidth: 4,
     borderLeftColor: '#6366f1',
+    borderWidth: 1,
+    borderColor: '#f1f5f9',
   },
   expertTipHeader: {
     marginBottom: 10,
   },
   expertName: {
-    fontSize: isWeb ? 14 : 13,
+    fontSize: 14,
     fontWeight: '700',
     color: '#0f172a',
   },
   expertTipText: {
-    fontSize: isWeb ? 14 : 13,
-    color: '#64748b',
-    lineHeight: 20,
+    fontSize: 15,
+    color: '#475569',
+    lineHeight: 24,
     fontStyle: 'italic',
   },
   spacer: {

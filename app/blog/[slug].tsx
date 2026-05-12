@@ -14,7 +14,7 @@
  */
 
 import { useEffect, useMemo, useState } from 'react';
-import { Image, Linking, Platform, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { Image, Linking, Platform, ScrollView, StyleSheet, Text, TouchableOpacity, View, useWindowDimensions } from 'react-native';
 import Head from 'expo-router/head';
 import { Link, useLocalSearchParams, useRouter } from 'expo-router';
 import { LinearGradient } from 'expo-linear-gradient';
@@ -53,6 +53,10 @@ export function generateStaticParams(): { slug: string }[] {
 
 export default function BlogPostPage() {
   const router = useRouter();
+  const { width } = useWindowDimensions();
+  const contentPadH = width < 400 ? 16 : 24;
+  const navStacked = width < 520;
+  const navBackShort = width < 380;
   const { slug: rawSlug } = useLocalSearchParams<{ slug?: string | string[] }>();
   const slug = Array.isArray(rawSlug) ? rawSlug[0] : rawSlug ?? '';
   const post = useMemo(() => getPostBySlug(slug), [slug]);
@@ -105,23 +109,26 @@ export default function BlogPostPage() {
 
       <ScrollView style={styles.page} showsVerticalScrollIndicator={false}>
         <LinearGradient colors={['#0c0a1f', ACCENT_DEEP]} style={styles.nav}>
-          <View style={styles.navInner}>
+          <View style={[styles.navInner, navStacked && styles.navInnerStacked, { paddingHorizontal: contentPadH }]}>
             <Link href="/web" asChild>
               <TouchableOpacity accessibilityRole="link">
                 <Text style={styles.brand}>GoZzzz</Text>
               </TouchableOpacity>
             </Link>
             <Link href="/blog" asChild>
-              <TouchableOpacity style={styles.navGhost} accessibilityRole="link">
+              <TouchableOpacity
+                style={[styles.navGhost, navStacked && styles.navGhostStacked]}
+                accessibilityRole="link"
+              >
                 <ArrowLeft size={16} color={ACCENT_LIGHT} />
-                <Text style={styles.navGhostTxt}>Todos os artigos</Text>
+                <Text style={styles.navGhostTxt}>{navBackShort ? 'Blog' : 'Todos os artigos'}</Text>
               </TouchableOpacity>
             </Link>
           </View>
         </LinearGradient>
 
         <LinearGradient colors={[ACCENT_DEEP, '#0c0a1f', BG]} style={styles.hero}>
-          <View style={styles.heroInner}>
+          <View style={[styles.heroInner, { paddingHorizontal: contentPadH }]}>
             {post.heroImage ? (
               <View
                 style={[
@@ -172,7 +179,7 @@ export default function BlogPostPage() {
           </View>
         </LinearGradient>
 
-        <View style={styles.contentWrap}>
+        <View style={[styles.contentWrap, { paddingHorizontal: contentPadH }]}>
           <Text nativeID="post-intro" style={styles.intro}>
             {post.intro}
           </Text>
@@ -491,8 +498,8 @@ function formatDateBR(iso: string): string {
 }
 
 const styles = StyleSheet.create({
-  page: { flex: 1, backgroundColor: BG },
-  nav: { paddingTop: 16, paddingBottom: 16, paddingHorizontal: 16 },
+  page: { flex: 1, backgroundColor: BG, maxWidth: '100%', alignSelf: 'stretch' },
+  nav: { paddingTop: 16, paddingBottom: 16 },
   navInner: {
     maxWidth: 1100,
     width: '100%',
@@ -500,6 +507,11 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
+    gap: 12,
+  },
+  navInnerStacked: {
+    flexDirection: 'column',
+    alignItems: 'stretch',
   },
   brand: { color: '#ffffff', fontSize: 20, fontWeight: '800' },
   navGhost: {
@@ -510,9 +522,12 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     gap: 6,
     backgroundColor: 'rgba(255,255,255,0.06)',
+    flexShrink: 1,
+    minWidth: 0,
   },
+  navGhostStacked: { alignSelf: 'flex-start' },
   navGhostTxt: { color: '#94a3b8', fontWeight: '600', fontSize: 13 },
-  hero: { paddingTop: 36, paddingBottom: 32, paddingHorizontal: 24 },
+  hero: { paddingTop: 36, paddingBottom: 32 },
   heroInner: { maxWidth: 720, width: '100%', alignSelf: 'center' },
   heroEmojiWrap: {
     width: 64,
@@ -560,7 +575,6 @@ const styles = StyleSheet.create({
     maxWidth: 720,
     width: '100%',
     alignSelf: 'center',
-    paddingHorizontal: 24,
     paddingTop: 24,
     paddingBottom: 64,
   },

@@ -7,6 +7,7 @@ import {
   Platform,
   ActivityIndicator,
   Linking,
+  useWindowDimensions,
 } from 'react-native';
 import { useState, useEffect } from 'react';
 import { useRouter } from 'expo-router';
@@ -91,6 +92,10 @@ export default function WebAssinarPage() {
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
   const [pricing, setPricing] = useState<PricingData>(DEFAULT_PRICING.pt);
+  const { width } = useWindowDimensions();
+  const contentPadH = width < 400 ? 16 : 24;
+  const layoutWide = width >= 720;
+  const navStacked = width < 520;
 
   useEffect(() => {
     if (isWeb) {
@@ -197,26 +202,26 @@ export default function WebAssinarPage() {
       </Head>
       <ScrollView style={styles.page} showsVerticalScrollIndicator={false}>
         <LinearGradient colors={['#0c0a1f', '#1e1b4b']} style={styles.nav}>
-        <View style={styles.navInner}>
-          <TouchableOpacity onPress={() => router.push('/web')} style={styles.navBrand}>
-            <Text style={styles.navBrandText}>GoZzzz</Text>
-          </TouchableOpacity>
-          <View style={styles.navRight}>
-            <TouchableOpacity onPress={() => router.back()} style={styles.backBtn}>
-              <ArrowLeft size={18} color="#94a3b8" />
-              <Text style={styles.backBtnText}>{t(c.back)}</Text>
+          <View style={[styles.navInner, navStacked && styles.navInnerStacked, { paddingHorizontal: contentPadH }]}>
+            <TouchableOpacity onPress={() => router.push('/web')} style={styles.navBrand}>
+              <Text style={styles.navBrandText}>GoZzzz</Text>
             </TouchableOpacity>
+            <View style={[styles.navRight, navStacked && styles.navRightStacked]}>
+              <TouchableOpacity onPress={() => router.back()} style={styles.backBtn}>
+                <ArrowLeft size={18} color="#94a3b8" />
+                <Text style={styles.backBtnText}>{t(c.back)}</Text>
+              </TouchableOpacity>
+            </View>
           </View>
-        </View>
-      </LinearGradient>
+        </LinearGradient>
 
-      <LinearGradient colors={['#1e1b4b', '#0c0a1f']} style={styles.header}>
-        <Text style={styles.headerTitle}>{t(c.headerTitle)}</Text>
+      <LinearGradient colors={['#1e1b4b', '#0c0a1f']} style={[styles.header, { paddingHorizontal: contentPadH }]}>
+        <Text style={[styles.headerTitle, layoutWide && styles.headerTitleWide]}>{t(c.headerTitle)}</Text>
         <Text style={styles.headerSubtitle}>{t(c.headerSubtitle)}</Text>
       </LinearGradient>
 
       <View style={styles.content}>
-        <View style={styles.container}>
+        <View style={[styles.container, { paddingHorizontal: contentPadH }]}>
           {success ? (
             <View style={styles.successBox}>
               <View style={styles.successIcon}>
@@ -229,13 +234,15 @@ export default function WebAssinarPage() {
               </TouchableOpacity>
             </View>
           ) : (
-            <View style={styles.grid}>
-              <View style={styles.checkoutCol}>
+            <View style={[styles.grid, layoutWide && styles.gridWide]}>
+              <View style={[styles.checkoutCol, layoutWide && styles.checkoutColWide]}>
                 <View style={[styles.planCard, styles.planCardSelected]}>
                   {/* Preço prominente: antes ficava com display:none — visitantes
                       não viam quanto custava antes do botão. Agora R$ 147 lidera
                       o card e o caption resume o modelo (one-time / lifetime). */}
-                  <Text style={styles.planPriceHero}>{p.annual.label || 'R$ 147'}</Text>
+                  <Text style={[styles.planPriceHero, layoutWide && styles.planPriceHeroWide]}>
+                    {p.annual.label || 'R$ 147'}
+                  </Text>
                   <Text style={styles.planPriceCaption}>
                     {p.annual.note} · {p.annual.equiv}
                   </Text>
@@ -345,7 +352,7 @@ export default function WebAssinarPage() {
                 </View>
               </View>
 
-              <View style={styles.featuresCol}>
+              <View style={[styles.featuresCol, layoutWide && styles.featuresColWide]}>
                 <Text style={styles.colTitle}>{t(c.included)}</Text>
                 <View style={styles.featuresCard}>
                   {c.features.map((feature, i) => (
@@ -384,22 +391,27 @@ export default function WebAssinarPage() {
 }
 
 const styles = StyleSheet.create({
-  page: { flex: 1, backgroundColor: '#0a0a1a' },
+  page: { flex: 1, backgroundColor: '#0a0a1a', maxWidth: '100%', alignSelf: 'stretch' },
 
   nav: {},
   navInner: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    paddingHorizontal: 32,
     paddingVertical: 16,
     maxWidth: 1100,
     alignSelf: 'center',
     width: '100%',
   },
+  navInnerStacked: {
+    flexDirection: 'column',
+    alignItems: 'stretch',
+    gap: 12,
+  },
   navBrand: { flexDirection: 'row', alignItems: 'center', gap: 8 },
   navBrandText: { fontSize: 20, fontWeight: '800', color: '#ffffff' },
-  navRight: { flexDirection: 'row', alignItems: 'center', gap: 16 },
+  navRight: { flexDirection: 'row', alignItems: 'center', gap: 16, flexShrink: 1, minWidth: 0 },
+  navRightStacked: { width: '100%', justifyContent: 'flex-start' },
   localeBadge: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -415,15 +427,16 @@ const styles = StyleSheet.create({
   backBtn: { flexDirection: 'row', alignItems: 'center', gap: 6 },
   backBtnText: { fontSize: 14, color: '#94a3b8', fontWeight: '500' },
 
-  header: { paddingTop: 56, paddingBottom: 48, paddingHorizontal: 24, alignItems: 'center' },
+  header: { paddingTop: 56, paddingBottom: 48, alignItems: 'center' },
   headerTitle: {
-    fontSize: isWeb ? 44 : 30,
+    fontSize: 30,
     fontWeight: '800',
     color: '#ffffff',
     marginTop: 20,
     marginBottom: 10,
     textAlign: 'center',
   },
+  headerTitleWide: { fontSize: 44 },
   headerSubtitle: { fontSize: 17, color: '#94a3b8', textAlign: 'center', marginBottom: 16 },
   headerLocalePill: {
     backgroundColor: 'rgba(255,255,255,0.08)',
@@ -436,15 +449,18 @@ const styles = StyleSheet.create({
   headerLocalePillText: { fontSize: 12, fontWeight: '600', color: '#94a3b8' },
 
   content: { paddingVertical: 56 },
-  container: { maxWidth: 1100, alignSelf: 'center', width: '100%', paddingHorizontal: 24 },
+  container: { maxWidth: 1100, alignSelf: 'center', width: '100%' },
 
   grid: {
-    flexDirection: isWeb ? 'row' : 'column',
-    gap: 40,
-    alignItems: 'flex-start',
+    flexDirection: 'column',
+    gap: 32,
+    alignItems: 'stretch',
   },
-  checkoutCol: { flex: isWeb ? 1 : undefined, width: isWeb ? undefined : '100%' },
-  featuresCol: { flex: isWeb ? 1 : undefined, width: isWeb ? undefined : '100%' },
+  gridWide: { flexDirection: 'row', gap: 40, alignItems: 'flex-start' },
+  checkoutCol: { width: '100%' },
+  checkoutColWide: { flex: 1, minWidth: 0 },
+  featuresCol: { width: '100%', marginTop: 8 },
+  featuresColWide: { flex: 1, minWidth: 0, marginTop: 0 },
   colTitle: { fontSize: 22, fontWeight: '800', color: '#e8d5b7', marginBottom: 20 },
 
   planCard: {
@@ -482,13 +498,14 @@ const styles = StyleSheet.create({
   planPer: { fontSize: 15, color: '#8892a4', fontWeight: '500' },
   planTotal: { fontSize: 13, color: '#5a5a72' },
   planPriceHero: {
-    fontSize: 52,
+    fontSize: 40,
     fontWeight: '800',
     color: '#ffffff',
     textAlign: 'center',
     letterSpacing: -1,
     marginBottom: 4,
   },
+  planPriceHeroWide: { fontSize: 52 },
   planPriceCaption: {
     fontSize: 14,
     color: '#7c5ce8',
@@ -521,8 +538,10 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     gap: 10,
+    flexWrap: 'wrap',
     backgroundColor: '#7c5ce8',
-    paddingVertical: 20,
+    paddingVertical: 18,
+    paddingHorizontal: 14,
     borderRadius: 16,
     marginTop: 24,
     marginBottom: 12,
@@ -533,7 +552,13 @@ const styles = StyleSheet.create({
     elevation: 6,
   },
   checkoutBtnDisabled: { opacity: 0.7 },
-  checkoutBtnText: { fontSize: 18, fontWeight: '800', color: '#ffffff' },
+  checkoutBtnText: {
+    fontSize: 16,
+    fontWeight: '800',
+    color: '#ffffff',
+    textAlign: 'center',
+    flexShrink: 1,
+  },
 
   payDivider: {
     flexDirection: 'row',
@@ -555,14 +580,15 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     gap: 8,
+    flexWrap: 'wrap',
     paddingVertical: 16,
-    paddingHorizontal: 24,
+    paddingHorizontal: 20,
     borderRadius: 16,
     borderWidth: 1.5,
     borderColor: '#7c5ce8',
     backgroundColor: 'rgba(124,92,232,0.06)',
   },
-  checkoutBtnAltText: { fontSize: 16, fontWeight: '700', color: '#7c5ce8' },
+  checkoutBtnAltText: { fontSize: 16, fontWeight: '700', color: '#7c5ce8', flexShrink: 1, textAlign: 'center' },
   kiwifyNote: {
     fontSize: 11,
     color: '#94a3b8',
@@ -610,7 +636,7 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(16,185,129,0.15)',
     justifyContent: 'center', alignItems: 'center', flexShrink: 0,
   },
-  featureText: { fontSize: 15, color: '#8892a4', flex: 1 },
+  featureText: { fontSize: 15, color: '#8892a4', flex: 1, minWidth: 0 },
 
   cdcGuarantee: {
     backgroundColor: 'rgba(124,92,232,0.06)',

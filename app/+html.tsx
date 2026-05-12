@@ -32,6 +32,12 @@ export default function Root({ children }: PropsWithChildren) {
         <link rel="apple-touch-icon" href="/icons/icon-192.png" />
         {/* RN-web ScrollView reset — evita scroll horizontal indesejado */}
         <ScrollViewStyleReset />
+        {/* Evita barra horizontal em landings com flex row no viewport estreito (mobile browser). */}
+        <style
+          dangerouslySetInnerHTML={{
+            __html: 'html,body{max-width:100%;overflow-x:clip;margin:0;}',
+          }}
+        />
       </head>
       <body>{children}</body>
     </html>
