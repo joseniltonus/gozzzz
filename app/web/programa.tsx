@@ -34,6 +34,18 @@ import type { QuizChronotype } from '@/components/web/chronotype/ChronotypeWebIn
 
 const isWeb = Platform.OS === 'web';
 
+// Mesma base visual que `/web/sono-plus` (navy + roxo + lavanda) para continuidade entre landings.
+const ACCENT = '#7c5ce8';
+const ACCENT_LIGHT = '#a5b4fc';
+const ACCENT_DEEP = '#1e1b4b';
+const ACCENT_DIM = 'rgba(124,92,232,0.14)';
+const GOLD = ACCENT;
+const BG = '#0a0a1a';
+const BG_CARD = '#14122e';
+const TEXT_MAIN = '#e8e5df';
+const TEXT_MUTED = '#94a3b8';
+
+/** Tons distintos mas todos na família roxo/indigo (sem verde/azul/âmbar “solto”). */
 const CHRONOTYPE_META: Record<
   'dolphin' | 'lion' | 'bear' | 'wolf',
   { emoji: string; label: string; tint: string; tintBg: string; tintBorder: string }
@@ -41,30 +53,30 @@ const CHRONOTYPE_META: Record<
   dolphin: {
     emoji: '🐬',
     label: 'Golfinho',
-    tint: '#a78bfa',
-    tintBg: 'rgba(167,139,250,0.12)',
-    tintBorder: 'rgba(167,139,250,0.32)',
+    tint: ACCENT_LIGHT,
+    tintBg: 'rgba(165,180,252,0.12)',
+    tintBorder: 'rgba(165,180,252,0.28)',
   },
   lion: {
     emoji: '🦁',
     label: 'Leão',
-    tint: '#f59e0b',
-    tintBg: 'rgba(245,158,11,0.12)',
-    tintBorder: 'rgba(245,158,11,0.32)',
+    tint: '#818cf8',
+    tintBg: 'rgba(129,140,248,0.12)',
+    tintBorder: 'rgba(129,140,248,0.3)',
   },
   bear: {
     emoji: '🐻',
     label: 'Urso',
-    tint: '#10b981',
-    tintBg: 'rgba(16,185,129,0.12)',
-    tintBorder: 'rgba(16,185,129,0.32)',
+    tint: '#c4b5fd',
+    tintBg: 'rgba(196,181,253,0.1)',
+    tintBorder: 'rgba(196,181,253,0.28)',
   },
   wolf: {
     emoji: '🐺',
     label: 'Lobo',
-    tint: '#4a9eff',
-    tintBg: 'rgba(74,158,255,0.12)',
-    tintBorder: 'rgba(74,158,255,0.32)',
+    tint: '#6366f1',
+    tintBg: 'rgba(99,102,241,0.12)',
+    tintBorder: 'rgba(99,102,241,0.3)',
   },
 };
 
@@ -116,7 +128,7 @@ export default function WebProgramPage() {
       </Head>
       <ScrollView style={styles.page} showsVerticalScrollIndicator={false}>
         {/* NAV */}
-        <LinearGradient colors={['#0f172a', '#1e293b']} style={styles.nav}>
+        <LinearGradient colors={['#0c0a1f', ACCENT_DEEP]} style={styles.nav}>
         <View style={styles.navInner}>
           <TouchableOpacity onPress={() => router.push('/web')} style={styles.navBrand}>
             <Text style={styles.navBrandText}>GoZzzz</Text>
@@ -131,7 +143,7 @@ export default function WebProgramPage() {
       {/* HEADER — mesmo fundo escuro da página e dos cards de passos */}
       <View style={styles.header}>
         <View style={styles.headerBadge}>
-          <Sparkles size={14} color="#fbbf24" />
+          <Sparkles size={14} color={ACCENT_LIGHT} />
           <Text style={styles.headerBadgeText}>{t('web.badge.scienceBased')}</Text>
         </View>
         <Text style={styles.headerTitle}>{t('web.program.title')}</Text>
@@ -202,7 +214,7 @@ export default function WebProgramPage() {
               activeOpacity={0.88}
             >
               <View style={styles.quizCtaIconWrap}>
-                <Wand2 size={22} color="#fbbf24" />
+                <Wand2 size={22} color={ACCENT_LIGHT} />
               </View>
               <View style={styles.quizCtaCol}>
                 <Text style={styles.quizCtaTitle}>Personalizar minha trilha</Text>
@@ -236,12 +248,12 @@ export default function WebProgramPage() {
                       </View>
                     ) : (
                       <View style={styles.premiumBadge}>
-                        <Crown size={10} color="#f59e0b" />
+                        <Crown size={10} color={ACCENT_LIGHT} />
                         <Text style={styles.premiumBadgeText}>{t('web.program.premium')}</Text>
                       </View>
                     )}
                   </View>
-                  {!step.free && <Lock size={16} color="#94a3b8" />}
+                  {!step.free && <Lock size={16} color={TEXT_MUTED} />}
                 </View>
 
                 <Text style={[styles.stepTitle, !step.free && styles.stepTitleLocked]}>{step.title}</Text>
@@ -293,20 +305,20 @@ export default function WebProgramPage() {
 
           {/* CTA */}
           <View style={styles.ctaBox}>
-            <Crown size={40} color="#d4a96a" />
+            <Crown size={40} color={GOLD} />
             <Text style={styles.ctaTitle}>{t('web.program.ctaTitle')}</Text>
             <Text style={styles.ctaDesc}>{t('web.program.ctaDesc')}</Text>
             <View style={styles.ctaFeatures}>
               {[t('web.program.feature1'), t('web.program.feature2'), t('web.program.feature3')].map((f, i) => (
                 <View key={i} style={styles.ctaFeature}>
-                  <Check size={14} color="#d4a96a" />
+                  <Check size={14} color={ACCENT_LIGHT} />
                   <Text style={styles.ctaFeatureText}>{f}</Text>
                 </View>
               ))}
             </View>
             <View style={styles.ctaPayRow}>
               <View style={styles.ctaPayBadge}>
-                <CreditCard size={13} color="#8892a4" />
+                <CreditCard size={13} color={TEXT_MUTED} />
                 <Text style={styles.ctaPayBadgeText}>Cartão</Text>
               </View>
               <View style={styles.ctaPayBadge}>
@@ -319,15 +331,15 @@ export default function WebProgramPage() {
               </View>
             </View>
             <TouchableOpacity style={styles.ctaBtn} onPress={() => router.push('/web/assinar')}>
-              <Crown size={18} color="#0d0d16" />
+              <Crown size={18} color="#ffffff" />
               <Text style={styles.ctaBtnText}>{t('web.program.subscribeNow')}</Text>
             </TouchableOpacity>
             <View style={styles.ctaSecurityRow}>
-              <Lock size={12} color="#8892a4" />
+              <Lock size={12} color={ACCENT_LIGHT} />
               <Text style={styles.ctaSecurityText}>{t('payment.ssl')}</Text>
-              <Shield size={12} color="#8892a4" />
+              <Shield size={12} color={ACCENT_LIGHT} />
               <Text style={styles.ctaSecurityText}>Pagamento seguro via Stripe</Text>
-              <BadgeCheck size={12} color="#8892a4" />
+              <BadgeCheck size={12} color={ACCENT_LIGHT} />
               <Text style={styles.ctaSecurityText}>{t('payment.pciDss')}</Text>
             </View>
           </View>
@@ -344,7 +356,7 @@ export default function WebProgramPage() {
 }
 
 const styles = StyleSheet.create({
-  page: { flex: 1, backgroundColor: '#07070f' },
+  page: { flex: 1, backgroundColor: BG },
   nav: { paddingTop: 0, paddingBottom: 0 },
   navInner: {
     flexDirection: 'row',
@@ -359,49 +371,49 @@ const styles = StyleSheet.create({
   navBrand: { flexDirection: 'row', alignItems: 'center', gap: 8 },
   navBrandText: { fontSize: 20, fontWeight: '800', color: '#ffffff' },
   backBtn: { flexDirection: 'row', alignItems: 'center', gap: 6 },
-  backBtnText: { fontSize: 14, color: '#94a3b8', fontWeight: '500' },
+  backBtnText: { fontSize: 14, color: TEXT_MUTED, fontWeight: '500' },
 
   header: {
     paddingTop: 48,
     paddingBottom: 48,
     paddingHorizontal: 24,
     alignItems: 'center',
-    backgroundColor: '#07070f',
+    backgroundColor: BG,
   },
   headerBadge: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: 6,
-    backgroundColor: 'rgba(251,191,36,0.15)',
+    backgroundColor: ACCENT_DIM,
     borderRadius: 20,
     paddingHorizontal: 14,
     paddingVertical: 6,
     marginBottom: 20,
     borderWidth: 1,
-    borderColor: 'rgba(251,191,36,0.3)',
+    borderColor: 'rgba(165,180,252,0.25)',
   },
-  headerBadgeText: { fontSize: 13, fontWeight: '600', color: '#fbbf24' },
+  headerBadgeText: { fontSize: 13, fontWeight: '600', color: ACCENT_LIGHT },
   headerTitle: { fontSize: isWeb ? 48 : 32, fontWeight: '800', color: '#ffffff', textAlign: 'center', marginBottom: 16 },
-  headerSubtitle: { fontSize: 17, color: '#94a3b8', textAlign: 'center', lineHeight: 26, maxWidth: 580, marginBottom: 32 },
+  headerSubtitle: { fontSize: 17, color: TEXT_MUTED, textAlign: 'center', lineHeight: 26, maxWidth: 580, marginBottom: 32 },
   headerStats: {
     flexDirection: 'row',
     gap: 28,
-    backgroundColor: '#12121e',
+    backgroundColor: BG_CARD,
     borderRadius: 16,
     borderWidth: 1,
-    borderColor: 'rgba(255,255,255,0.06)',
+    borderColor: 'rgba(124,92,232,0.12)',
     paddingHorizontal: 32,
     paddingVertical: 16,
   },
   headerStat: { alignItems: 'center' },
-  headerStatNum: { fontSize: 28, fontWeight: '800', color: '#fbbf24' },
-  headerStatLabel: { fontSize: 13, color: '#94a3b8' },
+  headerStatNum: { fontSize: 28, fontWeight: '800', color: GOLD },
+  headerStatLabel: { fontSize: 13, color: TEXT_MUTED },
   headerStatDiv: { width: 1, height: 36, backgroundColor: 'rgba(255,255,255,0.1)' },
 
   content: { paddingVertical: 56 },
   container: { maxWidth: 1100, alignSelf: 'center', width: '100%', paddingHorizontal: 24 },
-  sectionTitle: { fontSize: 28, fontWeight: '800', color: '#e8d5b7', marginBottom: 8 },
-  sectionDesc: { fontSize: 16, color: '#8892a4', marginBottom: 40 },
+  sectionTitle: { fontSize: 28, fontWeight: '800', color: TEXT_MAIN, marginBottom: 8 },
+  sectionDesc: { fontSize: 16, color: TEXT_MUTED, marginBottom: 40 },
 
   stepsGrid: {
     flexDirection: isWeb ? 'row' : 'column',
@@ -409,10 +421,12 @@ const styles = StyleSheet.create({
     gap: 20,
   },
   stepCard: {
-    backgroundColor: '#12121e',
+    backgroundColor: BG_CARD,
     borderRadius: 16,
     padding: 24,
     width: isWeb ? 320 : '100%',
+    borderWidth: 1,
+    borderColor: 'rgba(124,92,232,0.08)',
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.2,
@@ -447,7 +461,7 @@ const styles = StyleSheet.create({
     borderRadius: 14,
     borderWidth: 1,
     /** Mesmo tom dos cards de lição — o tintBg do cronótipo clareava demais o bloco */
-    backgroundColor: '#12121e',
+    backgroundColor: BG_CARD,
     paddingVertical: 14,
     paddingHorizontal: 18,
     marginBottom: 32,
@@ -456,7 +470,7 @@ const styles = StyleSheet.create({
   personalizedBannerEmoji: { fontSize: 26 },
   personalizedBannerCol: { flex: 1, minWidth: 220 },
   personalizedBannerTitle: { fontSize: 15, fontWeight: '800', marginBottom: 3 },
-  personalizedBannerDesc: { fontSize: 12.5, color: '#a3b1c2', lineHeight: 18 },
+  personalizedBannerDesc: { fontSize: 12.5, color: TEXT_MUTED, lineHeight: 18 },
   personalizedBannerBtn: {
     backgroundColor: 'rgba(255,255,255,0.06)',
     paddingHorizontal: 14,
@@ -465,15 +479,15 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: 'rgba(255,255,255,0.12)',
   },
-  personalizedBannerBtnText: { fontSize: 12, fontWeight: '700', color: '#e8e5df' },
+  personalizedBannerBtnText: { fontSize: 12, fontWeight: '700', color: TEXT_MAIN },
   quizCtaBanner: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: 16,
-    backgroundColor: 'rgba(251,191,36,0.06)',
+    backgroundColor: 'rgba(124,92,232,0.08)',
     borderRadius: 14,
     borderWidth: 1,
-    borderColor: 'rgba(251,191,36,0.22)',
+    borderColor: 'rgba(165,180,252,0.2)',
     paddingVertical: 16,
     paddingHorizontal: 20,
     marginBottom: 32,
@@ -483,57 +497,61 @@ const styles = StyleSheet.create({
     width: 44,
     height: 44,
     borderRadius: 22,
-    backgroundColor: 'rgba(251,191,36,0.12)',
+    backgroundColor: ACCENT_DIM,
     alignItems: 'center',
     justifyContent: 'center',
     borderWidth: 1,
-    borderColor: 'rgba(251,191,36,0.3)',
+    borderColor: 'rgba(165,180,252,0.28)',
   },
   quizCtaCol: { flex: 1, minWidth: 220 },
-  quizCtaTitle: { fontSize: 15, fontWeight: '800', color: '#fbbf24', marginBottom: 3 },
-  quizCtaDesc: { fontSize: 12.5, color: '#a3b1c2', lineHeight: 18 },
+  quizCtaTitle: { fontSize: 15, fontWeight: '800', color: ACCENT_LIGHT, marginBottom: 3 },
+  quizCtaDesc: { fontSize: 12.5, color: TEXT_MUTED, lineHeight: 18 },
   quizCtaBtn: {
-    backgroundColor: '#fbbf24',
+    backgroundColor: GOLD,
     paddingHorizontal: 16,
     paddingVertical: 10,
     borderRadius: 10,
   },
-  quizCtaBtnText: { fontSize: 13, fontWeight: '800', color: '#0d0d16' },
+  quizCtaBtnText: { fontSize: 13, fontWeight: '800', color: '#ffffff' },
   stepHeader: { flexDirection: 'row', alignItems: 'center', marginBottom: 14, gap: 8 },
   stepNum: {
     width: 36,
     height: 36,
     borderRadius: 10,
-    backgroundColor: 'rgba(212,169,106,0.15)',
+    backgroundColor: ACCENT_DIM,
     justifyContent: 'center',
     alignItems: 'center',
   },
   stepNumLocked: { backgroundColor: 'rgba(255,255,255,0.05)' },
-  stepNumText: { fontSize: 16, fontWeight: '800', color: '#d4a96a' },
+  stepNumText: { fontSize: 16, fontWeight: '800', color: GOLD },
   stepNumTextLocked: { color: '#5a5a72' },
   stepMeta: { flex: 1 },
   freeBadge: {
-    backgroundColor: '#dcfce7',
+    backgroundColor: 'rgba(124,92,232,0.18)',
     paddingHorizontal: 8,
     paddingVertical: 3,
     borderRadius: 8,
     alignSelf: 'flex-start',
+    borderWidth: 1,
+    borderColor: 'rgba(165,180,252,0.22)',
   },
-  freeBadgeText: { fontSize: 11, fontWeight: '700', color: '#166534' },
+  freeBadgeText: { fontSize: 11, fontWeight: '700', color: ACCENT_LIGHT },
   premiumBadge: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: 4,
-    backgroundColor: '#fef3c7',
+    backgroundColor: 'rgba(165,180,252,0.1)',
     paddingHorizontal: 8,
     paddingVertical: 3,
     borderRadius: 8,
     alignSelf: 'flex-start',
+    borderWidth: 1,
+    borderColor: 'rgba(165,180,252,0.22)',
   },
-  premiumBadgeText: { fontSize: 11, fontWeight: '700', color: '#92400e' },
-  stepTitle: { fontSize: 17, fontWeight: '700', color: '#e8d5b7', marginBottom: 8 },
+  premiumBadgeText: { fontSize: 11, fontWeight: '700', color: ACCENT_LIGHT },
+  stepTitle: { fontSize: 17, fontWeight: '700', color: TEXT_MAIN, marginBottom: 8 },
   stepTitleLocked: { color: '#5a5a72' },
-  stepDesc: { fontSize: 14, color: '#8892a4', lineHeight: 20, marginBottom: 16 },
+  stepDesc: { fontSize: 14, color: TEXT_MUTED, lineHeight: 20, marginBottom: 16 },
   stepDescLocked: { color: '#3a3a52' },
   stepFooter: { marginTop: 'auto' as any },
   stepFreeFooter: { gap: 12 },
@@ -542,13 +560,13 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     gap: 6,
-    backgroundColor: '#d4a96a',
+    backgroundColor: GOLD,
     paddingHorizontal: 14,
     paddingVertical: 9,
     borderRadius: 10,
     alignSelf: 'flex-start',
   },
-  viewLessonBtnText: { fontSize: 13, fontWeight: '700', color: '#0d0d16' },
+  viewLessonBtnText: { fontSize: 13, fontWeight: '700', color: '#ffffff' },
   resourceBadge: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -558,12 +576,14 @@ const styles = StyleSheet.create({
     paddingVertical: 5,
     borderRadius: 8,
   },
-  resourceText: { fontSize: 12, fontWeight: '600', color: '#8892a4' },
+  resourceText: { fontSize: 12, fontWeight: '600', color: TEXT_MUTED },
   unlockBtn: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: 6,
-    backgroundColor: '#0f172a',
+    backgroundColor: ACCENT_DEEP,
+    borderWidth: 1,
+    borderColor: 'rgba(165,180,252,0.22)',
     paddingHorizontal: 14,
     paddingVertical: 8,
     borderRadius: 10,
@@ -572,13 +592,13 @@ const styles = StyleSheet.create({
   unlockBtnText: { fontSize: 13, fontWeight: '700', color: '#ffffff' },
 
   ctaBox: {
-    backgroundColor: '#12121e',
+    backgroundColor: BG_CARD,
     borderRadius: 24,
     padding: 40,
     marginTop: 48,
     alignItems: 'center',
     borderWidth: 1,
-    borderColor: 'rgba(255,255,255,0.06)',
+    borderColor: 'rgba(124,92,232,0.12)',
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.2,
@@ -588,12 +608,12 @@ const styles = StyleSheet.create({
   ctaTitle: {
     fontSize: 28,
     fontWeight: '800',
-    color: '#e8d5b7',
+    color: TEXT_MAIN,
     textAlign: 'center',
     marginTop: 16,
     marginBottom: 12,
   },
-  ctaDesc: { fontSize: 16, color: '#8892a4', textAlign: 'center', lineHeight: 24, maxWidth: 500, marginBottom: 28 },
+  ctaDesc: { fontSize: 16, color: TEXT_MUTED, textAlign: 'center', lineHeight: 24, maxWidth: 500, marginBottom: 28 },
   ctaFeatures: {
     flexDirection: isWeb ? 'row' : 'column',
     gap: 16,
@@ -602,23 +622,23 @@ const styles = StyleSheet.create({
     marginBottom: 32,
   },
   ctaFeature: { flexDirection: 'row', alignItems: 'center', gap: 8 },
-  ctaFeatureText: { fontSize: 14, color: '#8892a4', fontWeight: '500' },
+  ctaFeatureText: { fontSize: 14, color: TEXT_MUTED, fontWeight: '500' },
   ctaBtn: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
     gap: 8,
-    backgroundColor: '#d4a96a',
+    backgroundColor: GOLD,
     paddingHorizontal: 40,
     paddingVertical: 18,
     borderRadius: 14,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.2,
-    shadowRadius: 8,
+    shadowColor: GOLD,
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.25,
+    shadowRadius: 12,
     elevation: 3,
   },
-  ctaBtnText: { fontSize: 17, fontWeight: '800', color: '#0d0d16' },
+  ctaBtnText: { fontSize: 17, fontWeight: '800', color: '#ffffff' },
 
   ctaPayRow: {
     flexDirection: 'row',
@@ -638,8 +658,8 @@ const styles = StyleSheet.create({
     paddingVertical: 6,
     borderRadius: 8,
   },
-  ctaPayBadgeText: { fontSize: 12, fontWeight: '600', color: '#8892a4' },
-  ctaPayBadgeEmoji: { fontSize: 13, fontWeight: '700', color: '#8892a4' },
+  ctaPayBadgeText: { fontSize: 12, fontWeight: '600', color: TEXT_MUTED },
+  ctaPayBadgeEmoji: { fontSize: 13, fontWeight: '700', color: TEXT_MUTED },
   ctaSecurityRow: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -648,8 +668,8 @@ const styles = StyleSheet.create({
     marginTop: 12,
     flexWrap: 'wrap',
   },
-  ctaSecurityText: { fontSize: 11, color: '#8892a4' },
+  ctaSecurityText: { fontSize: 11, color: TEXT_MUTED },
 
-  footer: { backgroundColor: '#07070f', paddingVertical: 24, alignItems: 'center' },
-  footerText: { fontSize: 13, color: '#8892a4' },
+  footer: { backgroundColor: BG, paddingVertical: 24, alignItems: 'center' },
+  footerText: { fontSize: 13, color: TEXT_MUTED },
 });

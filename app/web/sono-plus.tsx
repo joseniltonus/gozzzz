@@ -106,11 +106,12 @@ const FOUNDER_STORY_PT = {
   label: 'HISTÓRIA DO FUNDADOR',
   headline: 'Por que eu criei o GoZzzz',
   paragraphs: [
-    'Por quase 10 anos, eu mal conseguia dormir.\nTentei remédios, melatonina, meditação.\nNada funcionou de verdade.',
-    'Então passei mais 10 anos estudando a ciência do sono — pesquisa por pesquisa, estudo por estudo. Walker, Huberman, Czeisler, Breus — mergulhei fundo em cada descoberta publicada.',
-    'O GoZzzz é o programa que eu gostaria\nde ter encontrado no início dessa jornada.',
+    'Por quase 10 anos, eu mal conseguia dormir. Tentei remédios, melatonina, meditação. Nada funcionou de verdade.',
+    'Então passei mais de 5 anos estudando a ciência do sono — pesquisa por pesquisa, estudo por estudo. Walker, Huberman, Czeisler, Breus — os maiores nomes da ciência do sono no mundo.',
+    'O GoZzzz é o programa que eu gostaria de ter encontrado no início dessa jornada.',
   ],
-  signature: 'José Nilton, Fundador do GoZzzz',
+  signatureName: 'José Nilton',
+  signatureRole: 'Fundador do GoZzzz',
   result: 'Hoje durmo 7-8 horas praticamente todas as noites.\nE você também pode.',
   ctaPrimary: 'Começar com acesso completo',
   ctaSecondary: 'Ver as 3 lições gratuitas',
@@ -134,7 +135,6 @@ export default function SonoPlusLandingPage() {
   const layoutWide = width >= 720;
   const chronoStack = width < 520;
   const quizEmailStack = width < 480;
-  const founderStack = width < 520;
   const sonoPlusStack = width < 540;
 
   const openWhatsApp = () => Linking.openURL(WHATSAPP);
@@ -689,13 +689,9 @@ export default function SonoPlusLandingPage() {
                   </Text>
                 ))}
               </View>
-              <View style={[styles.founderStorySignRow, founderStack && styles.founderStorySignRowStack]}>
-                <View style={styles.founderStoryAvatar}>
-                  <Text style={styles.founderStoryAvatarTxt}>J</Text>
-                </View>
-                <Text style={[styles.founderStorySign, founderStack && styles.founderStorySignCenter]}>
-                  {FOUNDER_STORY_PT.signature}
-                </Text>
+              <View style={styles.founderStorySignBlock}>
+                <Text style={styles.founderStorySignName}>{FOUNDER_STORY_PT.signatureName}</Text>
+                <Text style={styles.founderStorySignRole}>{FOUNDER_STORY_PT.signatureRole}</Text>
               </View>
               <View style={styles.founderStoryResultBox}>
                 <Text style={styles.founderStoryResultTxt}>{FOUNDER_STORY_PT.result}</Text>
@@ -1277,8 +1273,15 @@ const styles = StyleSheet.create({
   },
   previewCardTop: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 },
   previewNum: { fontSize: 13, fontWeight: '800', color: GOLD },
-  freePill: { backgroundColor: ACCENT_DIM, paddingHorizontal: 8, paddingVertical: 4, borderRadius: 8 },
-  freePillTxt: { color: ACCENT_LIGHT, fontSize: 10, fontWeight: '800' },
+  freePill: {
+    backgroundColor: 'rgba(34,197,94,0.18)',
+    paddingHorizontal: 8,
+    paddingVertical: 4,
+    borderRadius: 8,
+    borderWidth: 1,
+    borderColor: 'rgba(34,197,94,0.35)',
+  },
+  freePillTxt: { color: '#86efac', fontSize: 10, fontWeight: '800' },
   lockPill: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -1801,58 +1804,67 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     lineHeight: 30,
     marginBottom: 20,
+    letterSpacing: -0.3,
+    ...(isWeb
+      ? { fontFamily: 'ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif' }
+      : {}),
   },
   founderStoryHeadlineWide: {
     fontSize: 30,
     lineHeight: 38,
-    ...(isWeb ? { fontFamily: 'Georgia, "Times New Roman", serif' } : {}),
+    letterSpacing: -0.45,
+    ...(isWeb
+      ? { fontFamily: 'ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif' }
+      : {}),
   } as any,
   founderStoryDivider: {
     height: 1,
     backgroundColor: 'rgba(165,180,252,0.2)',
     marginBottom: 22,
   },
-  founderStoryBody: { gap: 18, marginBottom: 26 },
+  founderStoryBody: { gap: 20, marginBottom: 28 },
   founderStoryPara: {
     color: TEXT_MUTED,
     fontSize: 15,
-    lineHeight: 24,
+    lineHeight: 25,
     textAlign: 'center',
-    fontStyle: 'italic',
-    fontWeight: '500',
+    fontWeight: '400',
+    ...(isWeb
+      ? { fontFamily: 'ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif' }
+      : {}),
   },
   founderStoryParaWide: {
     fontSize: 16,
-    lineHeight: 26,
-    ...(isWeb ? { fontFamily: 'Georgia, "Times New Roman", serif' } : {}),
+    lineHeight: 27,
+    ...(isWeb
+      ? { fontFamily: 'ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif' }
+      : {}),
   } as any,
-  founderStorySignRow: {
-    flexDirection: 'row',
+  founderStorySignBlock: {
     alignItems: 'center',
-    justifyContent: 'center',
-    gap: 14,
-    marginBottom: 22,
+    marginBottom: 24,
+    gap: 4,
   },
-  founderStorySignRowStack: {
-    flexDirection: 'column',
-  },
-  founderStoryAvatar: {
-    width: 48,
-    height: 48,
-    borderRadius: 24,
-    backgroundColor: GOLD,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  founderStoryAvatarTxt: { fontSize: 22, fontWeight: '800', color: BG },
-  founderStorySign: {
-    color: ACCENT_LIGHT,
-    fontSize: 15,
+  founderStorySignName: {
+    color: TEXT_MAIN,
+    fontSize: 16,
     fontWeight: '700',
-    flexShrink: 1,
-    ...(isWeb ? { fontFamily: '"Brush Script MT", "Segoe Script", cursive' } : {}),
+    textAlign: 'center',
+    letterSpacing: -0.2,
+    ...(isWeb
+      ? { fontFamily: 'ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif' }
+      : {}),
   } as any,
-  founderStorySignCenter: { textAlign: 'center' },
+  founderStorySignRole: {
+    color: TEXT_MUTED,
+    fontSize: 13,
+    fontWeight: '600',
+    textAlign: 'center',
+    letterSpacing: 0.04,
+    ...(isWeb
+      ? { fontFamily: 'ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif' }
+      : {}),
+  } as any,
   founderStoryResultBox: {
     backgroundColor: ACCENT_DIM,
     borderRadius: 14,
