@@ -101,7 +101,7 @@ export default function BlogIndexPage() {
               <TouchableOpacity
                 style={styles.navGhost}
                 accessibilityRole="link"
-                onPress={() => router.push('/web/sono-plus')}
+                onPress={() => router.push('/sono')}
               >
                 <BookOpen size={16} color={ACCENT_LIGHT} />
                 <Text style={styles.navGhostTxt}>
@@ -184,7 +184,7 @@ export default function BlogIndexPage() {
             </Text>
             <TouchableOpacity
               style={styles.ctaBtn}
-              onPress={() => router.push('/web/sono-plus')}
+              onPress={() => router.push('/sono')}
               accessibilityRole="link"
             >
               <Text style={styles.ctaBtnTxt}>Conhecer o programa</Text>
@@ -198,7 +198,7 @@ export default function BlogIndexPage() {
                 <Text style={styles.footerLink}>Início</Text>
               </TouchableOpacity>
               <Text style={styles.footerSep}>·</Text>
-              <TouchableOpacity accessibilityRole="link" onPress={() => router.push('/web/sono-plus')}>
+              <TouchableOpacity accessibilityRole="link" onPress={() => router.push('/sono')}>
                 <Text style={styles.footerLink}>Programa 21 Passos</Text>
               </TouchableOpacity>
               <Text style={styles.footerSep}>·</Text>

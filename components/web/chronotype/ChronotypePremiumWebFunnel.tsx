@@ -98,7 +98,7 @@ export default function ChronotypePremiumWebFunnel({ scrollY }: Props) {
   const goQuiz = () => router.push('/(auth)/quiz');
   // Antes: secundário levava ao programa cru (lições). Agora vai para a oferta
   // /web/sono-plus, onde o preço R$ 147 e a prova social ficam acessíveis.
-  const goProgram = () => router.push('/web/sono-plus');
+  const goProgram = () => router.push('/sono');
 
   const cardBasis = width >= 640 ? '48%' : '100%';
   const maxCardW = width >= 900 ? 200 : 180;

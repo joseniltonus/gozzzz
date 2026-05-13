@@ -22,7 +22,7 @@ const today = new Date().toISOString().slice(0, 10);
 /** @type {{ loc: string; changefreq: string; priority: string; lastmod?: string }[]} */
 const ROUTES = [
   { loc: 'https://gozzzz.app/web', changefreq: 'weekly', priority: '1.0' },
-  { loc: 'https://gozzzz.app/web/sono-plus', changefreq: 'weekly', priority: '0.9' },
+  { loc: 'https://gozzzz.app/sono', changefreq: 'weekly', priority: '0.9' },
   { loc: 'https://gozzzz.app/blog', changefreq: 'weekly', priority: '0.8' },
   { loc: 'https://gozzzz.app/web/programa', changefreq: 'monthly', priority: '0.8' },
   { loc: 'https://gozzzz.app/web/assinar', changefreq: 'weekly', priority: '0.9' },

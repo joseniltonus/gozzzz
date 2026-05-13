@@ -1,5 +1,6 @@
 /**
- * JSON-LD para /web/sono-plus — HowTo, WebSite/WebPage (Speakable), Product opcional com AggregateRating.
+ * JSON-LD para a landing pública do programa (URL canónica `/sono`) —
+ * HowTo, WebSite/WebPage (Speakable), Product opcional com AggregateRating.
  *
  * AggregateRating só entra no grafo se EXPO_PUBLIC_PRODUCT_AGGREGATE_RATING_VALUE e
  * EXPO_PUBLIC_PRODUCT_REVIEW_COUNT estiverem definidos no build (avaliações reais —
@@ -11,8 +12,9 @@ import { LESSONS_DATA } from '@/data/lessons';
 const ORG_ID = 'https://gozzzz.app/#org';
 const WEBSITE_ID = 'https://gozzzz.app/#website';
 const PRODUCT_ID = 'https://gozzzz.app/#product-21';
-const WEBPAGE_ID = 'https://gozzzz.app/web/sono-plus#webpage';
-const HOWTO_ID = 'https://gozzzz.app/web/sono-plus#howto';
+const SONO_LANDING_URL = 'https://gozzzz.app/sono';
+const WEBPAGE_ID = `${SONO_LANDING_URL}#webpage`;
+const HOWTO_ID = `${SONO_LANDING_URL}#howto`;
 
 export function truncateSchemaText(raw: string, max = 300): string {
   const oneLine = raw.replace(/\s+/g, ' ').trim();
@@ -76,7 +78,7 @@ export function buildSonoPlusSchemaGraph(input: {
     name: 'Programa de Sono em 21 Passos — GoZzzz',
     description:
       'Trilha de 21 passos para reorganizar sono, ritmo circadiano e rotina com base em neurociência do sono.',
-    url: 'https://gozzzz.app/web/sono-plus',
+    url: SONO_LANDING_URL,
     image: socialImageUrl,
     brand: { '@type': 'Brand', name: 'GoZzzz' },
     offers: {
@@ -85,7 +87,7 @@ export function buildSonoPlusSchemaGraph(input: {
       priceCurrency: 'BRL',
       availability: 'https://schema.org/InStock',
       priceValidUntil: '2026-12-31',
-      url: 'https://gozzzz.app/web/sono-plus',
+      url: SONO_LANDING_URL,
       seller: { '@id': ORG_ID },
     },
   };
@@ -118,7 +120,7 @@ export function buildSonoPlusSchemaGraph(input: {
       {
         '@type': 'WebPage',
         '@id': WEBPAGE_ID,
-        url: 'https://gozzzz.app/web/sono-plus',
+        url: SONO_LANDING_URL,
         name: headTitle,
         description: headDesc,
         inLanguage: 'pt-BR',
@@ -168,7 +170,7 @@ export function buildSonoPlusSchemaGraph(input: {
             '@type': 'ListItem',
             position: 2,
             name: 'Programa 21 Passos',
-            item: 'https://gozzzz.app/web/sono-plus',
+            item: SONO_LANDING_URL,
           },
         ],
       },

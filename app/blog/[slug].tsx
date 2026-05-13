@@ -213,7 +213,7 @@ export default function BlogPostPage() {
             </Text>
             <TouchableOpacity
               style={styles.ctaBtn}
-              onPress={() => router.push('/web/sono-plus')}
+              onPress={() => router.push('/sono')}
               accessibilityRole="link"
             >
               <BookOpen size={18} color="#ffffff" />
@@ -269,7 +269,7 @@ export default function BlogPostPage() {
                 <Text style={styles.footerLink}>Blog</Text>
               </TouchableOpacity>
               <Text style={styles.footerSep}>·</Text>
-              <TouchableOpacity accessibilityRole="link" onPress={() => router.push('/web/sono-plus')}>
+              <TouchableOpacity accessibilityRole="link" onPress={() => router.push('/sono')}>
                 <Text style={styles.footerLink}>Programa 21 Passos</Text>
               </TouchableOpacity>
               <Text style={styles.footerSep}>·</Text>

@@ -31,7 +31,7 @@ function AuthGate() {
     const currentSegment = segments?.[0] as string | undefined;
     const inAuthGroup = currentSegment === '(auth)';
     const inTabsGroup = currentSegment === '(tabs)';
-    const inWebGroup = currentSegment === 'web';
+    const inWebGroup = currentSegment === 'web' || currentSegment === 'sono';
     const isPublicPage = currentSegment === 'confirm-email' || currentSegment === 'reset-password';
 
     if (inWebGroup || isPublicPage) return;
@@ -59,7 +59,7 @@ function AuthGate() {
     const currentSegment = segments?.[0] as string | undefined;
     const inTabsGroup = currentSegment === '(tabs)';
     const currentTab = segments?.[1] as string | undefined;
-    const inWebGroup = currentSegment === 'web';
+    const inWebGroup = currentSegment === 'web' || currentSegment === 'sono';
     const isPublicPage = currentSegment === 'confirm-email' || currentSegment === 'reset-password';
 
     if (!inTabsGroup || inWebGroup || isPublicPage) return;
@@ -128,6 +128,7 @@ function RootNavigator() {
           <Stack.Screen name="index" />
           <Stack.Screen name="(auth)" />
           <Stack.Screen name="(tabs)" />
+          <Stack.Screen name="sono" />
           <Stack.Screen name="web" />
           <Stack.Screen name="payment" />
           <Stack.Screen name="checkout" />

@@ -527,15 +527,15 @@ const styles = StyleSheet.create({
   stepNumTextLocked: { color: '#5a5a72' },
   stepMeta: { flex: 1 },
   freeBadge: {
-    backgroundColor: 'rgba(124,92,232,0.18)',
+    backgroundColor: 'rgba(34,197,94,0.18)',
     paddingHorizontal: 8,
     paddingVertical: 3,
     borderRadius: 8,
     alignSelf: 'flex-start',
     borderWidth: 1,
-    borderColor: 'rgba(165,180,252,0.22)',
+    borderColor: 'rgba(34,197,94,0.35)',
   },
-  freeBadgeText: { fontSize: 11, fontWeight: '700', color: ACCENT_LIGHT },
+  freeBadgeText: { fontSize: 11, fontWeight: '700', color: '#86efac' },
   premiumBadge: {
     flexDirection: 'row',
     alignItems: 'center',

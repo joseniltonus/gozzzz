@@ -332,7 +332,7 @@ export default function SonoPlusLandingPage() {
         <meta property="og:title" content={isPt ? 'Programa de Sono em 21 Passos · GoZzzz' : headTitle} />
         <meta property="og:description" content={headOgDesc} />
         <meta property="og:type" content="website" />
-        <meta property="og:url" content="https://gozzzz.app/web/sono-plus" />
+        <meta property="og:url" content="https://gozzzz.app/sono" />
         <meta property="og:image" content={socialImageUrl} />
         <meta property="og:image:width" content="1200" />
         <meta property="og:image:height" content="800" />
@@ -347,9 +347,9 @@ export default function SonoPlusLandingPage() {
           name="robots"
           content="index,follow,max-image-preview:large,max-snippet:-1,max-video-preview:-1"
         />
-        <link rel="canonical" href="https://gozzzz.app/web/sono-plus" />
-        <link rel="alternate" hrefLang="pt-BR" href="https://gozzzz.app/web/sono-plus" />
-        <link rel="alternate" hrefLang="x-default" href="https://gozzzz.app/web/sono-plus" />
+        <link rel="canonical" href="https://gozzzz.app/sono" />
+        <link rel="alternate" hrefLang="pt-BR" href="https://gozzzz.app/sono" />
+        <link rel="alternate" hrefLang="x-default" href="https://gozzzz.app/sono" />
         <link rel="preconnect" href="https://js.stripe.com" />
         <script type="application/ld+json">{JSON.stringify(schemaGraph)}</script>
       </Head>

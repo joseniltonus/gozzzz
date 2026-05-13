@@ -71,7 +71,7 @@ const CHRONOTYPE_BLOCKS: Record<Chronotype, ChronotypeBlock> = {
 };
 
 const PROGRAM_URL_DEFAULT = "https://gozzzz.app/web/programa";
-const QUIZ_URL = "https://gozzzz.app/web/sono-plus#quiz";
+const QUIZ_URL = "https://gozzzz.app/sono#quiz";
 const SUPPORT_EMAIL = "suporte@gozzzz.app";
 const COMPANY_NAME = "MORFEU SAÚDE E TECNOLOGIA LTDA";
 const COMPANY_CNPJ = "66.059.212/0001-52";
@@ -230,7 +230,7 @@ export function buildWelcomeEmail(input: WelcomeEmailInput): {
       </p>`
     : `<p class="text-soft" style="margin:14px 0 0;font-family:${FONT_STACK};font-size:12px;color:#9590b0;text-align:center;line-height:1.6;">
         Gratuito · 4 perguntas · sem cadastro · resultado na hora.<br>
-        Ou cole no navegador: <a href="${QUIZ_URL}" style="color:#7c5ce8;text-decoration:underline;">gozzzz.app/web/sono-plus#quiz</a>
+        Ou cole no navegador: <a href="${QUIZ_URL}" style="color:#7c5ce8;text-decoration:underline;">gozzzz.app/sono#quiz</a>
       </p>`;
 
   const supportNote = input.chronotype

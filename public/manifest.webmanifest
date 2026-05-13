@@ -3,7 +3,7 @@
   "name": "GoZzzz — Ciência do sono",
   "short_name": "GoZzzz",
   "description": "Programa de sono em 21 passos. Cronótipo, ritmo circadiano e hábitos — neurociência aplicada ao seu descanso.",
-  "start_url": "/web/sono-plus",
+  "start_url": "/sono",
   "scope": "/",
   "display": "standalone",
   "orientation": "portrait-primary",

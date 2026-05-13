@@ -52,7 +52,7 @@ function waUrl(message: string): string {
 }
 
 function ctaUrl(slug: string): string {
-  return `https://gozzzz.app/web/sono-plus?ct=${slug}#checkout-section`;
+  return `https://gozzzz.app/sono?ct=${slug}#checkout-section`;
 }
 
 const CONTENT_PT: Record<Chronotype, ChronotypeContent> = {

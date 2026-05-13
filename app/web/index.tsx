@@ -143,7 +143,7 @@ function WebNav({ onFaqPress }: WebNavProps) {
             <TouchableOpacity onPress={() => router.push('/web/coach')}>
               <Text style={styles.navLink}>{t('web.nav.coach')}</Text>
             </TouchableOpacity>
-            <TouchableOpacity onPress={() => router.push('/web/sono-plus')}>
+            <TouchableOpacity onPress={() => router.push('/sono')}>
               <Text style={styles.navLink}>Sono+</Text>
             </TouchableOpacity>
             <TouchableOpacity onPress={() => router.push('/web/sobre')}>
@@ -286,7 +286,7 @@ export default function WebLandingPage() {
           '@type': 'BreadcrumbList',
           itemListElement: [
             { '@type': 'ListItem', position: 1, name: 'GoZzzz', item: 'https://gozzzz.app/web' },
-            { '@type': 'ListItem', position: 2, name: 'Programa 21 Passos', item: 'https://gozzzz.app/web/sono-plus' },
+            { '@type': 'ListItem', position: 2, name: 'Programa 21 Passos', item: 'https://gozzzz.app/sono' },
           ],
         },
         {

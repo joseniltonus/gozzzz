@@ -1,6 +1,7 @@
 User-agent: *
 Allow: /
 Allow: /web/
+Allow: /sono
 Allow: /web/sono-plus
 Allow: /web/programa
 Allow: /web/coach
