@@ -101,6 +101,21 @@ const SONO_PLUS_FAQ = [
   },
 ] as const;
 
+/** Narrativa do fundador — alinhada à home /web; tom factual, sem depoimentos de terceiros. */
+const FOUNDER_STORY_PT = {
+  label: 'HISTÓRIA DO FUNDADOR',
+  headline: 'Por que eu criei o GoZzzz',
+  paragraphs: [
+    'Por quase 10 anos, eu mal conseguia dormir.\nTentei remédios, melatonina, meditação.\nNada funcionou de verdade.',
+    'Então passei mais 10 anos estudando a ciência do sono — pesquisa por pesquisa, estudo por estudo. Walker, Huberman, Czeisler, Breus — mergulhei fundo em cada descoberta publicada.',
+    'O GoZzzz é o programa que eu gostaria\nde ter encontrado no início dessa jornada.',
+  ],
+  signature: 'José Nilton, Fundador do GoZzzz',
+  result: 'Hoje durmo 7-8 horas praticamente todas as noites.\nE você também pode.',
+  ctaPrimary: 'Começar com acesso completo',
+  ctaSecondary: 'Ver as 3 lições gratuitas',
+} as const;
+
 /** Landing web: programa 21 passos como produto principal; Sono+ como opcional premium. Sem depoimentos inventados. */
 export default function SonoPlusLandingPage() {
   const router = useRouter();
@@ -456,28 +471,28 @@ export default function SonoPlusLandingPage() {
                   role: 'Professor de Neurociência — UC Berkeley',
                   field: 'Arquitetura do sono',
                   initial: 'W',
-                  color: '#4a9eff',
+                  color: ACCENT_LIGHT,
                 },
                 {
                   name: 'Andrew Huberman, PhD',
                   role: 'Professor de Neurobiologia — Stanford',
                   field: 'Ritmo circadiano e neuroplasticidade',
                   initial: 'H',
-                  color: '#10b981',
+                  color: ACCENT_LIGHT,
                 },
                 {
                   name: 'Charles A. Czeisler, MD, PhD',
                   role: 'Professor — Harvard Medical School',
                   field: 'Medicina do sono e cronobiologia',
                   initial: 'C',
-                  color: '#a78bfa',
+                  color: ACCENT_LIGHT,
                 },
                 {
                   name: 'Michael J. Breus, PhD',
                   role: 'Psicólogo clínico do sono',
                   field: 'Cronotipos e higiene do sono',
                   initial: 'B',
-                  color: '#f59e0b',
+                  color: ACCENT_LIGHT,
                 },
               ].map((researcher) => (
                 <View key={researcher.name} style={styles.researcherCard}>
@@ -583,7 +598,7 @@ export default function SonoPlusLandingPage() {
           </View>
 
           {/* Três atos */}
-          <LinearGradient colors={[BG_CARD, '#0a0a14']} style={styles.actsBand}>
+          <LinearGradient colors={[BG_CARD, BG]} style={styles.actsBand}>
             <Text style={styles.sectionKicker}>Estrutura</Text>
             <Text role="heading" aria-level={2} style={styles.h2}>21 passos em três movimentos</Text>
             {acts.map((act, idx) => (
@@ -652,25 +667,60 @@ export default function SonoPlusLandingPage() {
             <View style={[styles.benefGrid, layoutWide && styles.benefGridWide]}>
               {benefitLines.map((line, idx) => (
                 <View key={idx} style={[styles.benefCard, layoutWide && styles.benefCardWide]}>
-                  <Check size={16} color="#22c55e" />
+                  <Check size={16} color={ACCENT_LIGHT} />
                   <Text style={styles.benefTxt}>{line}</Text>
                 </View>
               ))}
             </View>
           </View>
 
-          {/* História do fundador — credibilidade humana imediatamente antes do paywall.
-              Crítico para conversão: preço entra depois de "por que confiar". */}
-          <View style={[styles.founderBlock, { paddingHorizontal: contentPadH }]}>
-            <View style={[styles.founderCard, founderStack && styles.founderCardStack]}>
-              <View style={styles.founderAvatar}>
-                <Text style={styles.founderAvatarTxt}>J</Text>
+          {/* História do fundador — credibilidade + emoção logo antes do checkout (paywall). */}
+          <View style={[styles.founderStoryOuter, { paddingHorizontal: contentPadH }]}>
+            <View style={[styles.founderStoryCard, layoutWide && styles.founderStoryCardWide]}>
+              <Text style={styles.founderStoryLabel}>{FOUNDER_STORY_PT.label}</Text>
+              <Text style={[styles.founderStoryHeadline, layoutWide && styles.founderStoryHeadlineWide]}>
+                {FOUNDER_STORY_PT.headline}
+              </Text>
+              <View style={styles.founderStoryDivider} />
+              <View style={styles.founderStoryBody}>
+                {FOUNDER_STORY_PT.paragraphs.map((para, i) => (
+                  <Text key={i} style={[styles.founderStoryPara, layoutWide && styles.founderStoryParaWide]}>
+                    {para}
+                  </Text>
+                ))}
               </View>
-              <View style={[styles.founderTextCol, founderStack && styles.founderTextColStack]}>
-                <Text style={[styles.founderQuote, founderStack && styles.founderQuoteStack]}>
-                  &ldquo;Por quase 10 anos mal conseguia dormir. Passei mais 10 estudando a ciência. GoZzzz é o programa que eu queria ter encontrado no início da jornada.&rdquo;
+              <View style={[styles.founderStorySignRow, founderStack && styles.founderStorySignRowStack]}>
+                <View style={styles.founderStoryAvatar}>
+                  <Text style={styles.founderStoryAvatarTxt}>J</Text>
+                </View>
+                <Text style={[styles.founderStorySign, founderStack && styles.founderStorySignCenter]}>
+                  {FOUNDER_STORY_PT.signature}
                 </Text>
-                <Text style={[styles.founderSign, founderStack && styles.founderQuoteStack]}>José Nilton — Fundador do GoZzzz</Text>
+              </View>
+              <View style={styles.founderStoryResultBox}>
+                <Text style={styles.founderStoryResultTxt}>{FOUNDER_STORY_PT.result}</Text>
+              </View>
+              <View style={styles.founderStoryCtas}>
+                <TouchableOpacity
+                  style={styles.founderStoryCtaPrimary}
+                  activeOpacity={0.88}
+                  onPress={() =>
+                    KIWIFY_PARCELADO_URL
+                      ? Linking.openURL(KIWIFY_PARCELADO_URL)
+                      : router.push('/web/assinar')
+                  }
+                >
+                  <Crown size={18} color="#ffffff" />
+                  <Text style={styles.founderStoryCtaPrimaryTxt}>{FOUNDER_STORY_PT.ctaPrimary}</Text>
+                </TouchableOpacity>
+                <TouchableOpacity
+                  style={styles.founderStoryCtaGhost}
+                  activeOpacity={0.85}
+                  onPress={() => router.push('/web/programa')}
+                >
+                  <BookOpen size={16} color={ACCENT_LIGHT} />
+                  <Text style={styles.founderStoryCtaGhostTxt}>{FOUNDER_STORY_PT.ctaSecondary}</Text>
+                </TouchableOpacity>
               </View>
             </View>
           </View>
@@ -780,17 +830,17 @@ export default function SonoPlusLandingPage() {
                 </Text>
                 <View style={styles.securityBadgesCk}>
                   <View style={styles.securityBadgeCk}>
-                    <Lock size={14} color="#10b981" />
+                    <Lock size={14} color={ACCENT_LIGHT} />
                     <Text style={styles.securityBadgeCkTxt}>{t('payment.ssl')}</Text>
                   </View>
                   <View style={styles.securityBadgeCk}>
-                    <Shield size={14} color="#3b82f6" />
+                    <Shield size={14} color={ACCENT_LIGHT} />
                     <Text style={styles.securityBadgeCkTxt}>
                       {STRIPE_ENABLED ? 'Stripe Secure' : 'Kiwify · Pagamento Seguro'}
                     </Text>
                   </View>
                   <View style={styles.securityBadgeCk}>
-                    <BadgeCheck size={14} color="#f59e0b" />
+                    <BadgeCheck size={14} color={ACCENT_LIGHT} />
                     <Text style={styles.securityBadgeCkTxt}>{t('payment.pciDss')}</Text>
                   </View>
                 </View>
@@ -808,14 +858,14 @@ export default function SonoPlusLandingPage() {
                   ].map((feature, i) => (
                     <View key={i} style={styles.featureItemCk}>
                       <View style={styles.featureCheckCk}>
-                        <Check size={14} color="#10b981" />
+                        <Check size={14} color={ACCENT_LIGHT} />
                       </View>
                       <Text style={styles.featureTextCk}>{feature}</Text>
                     </View>
                   ))}
                 </View>
                 <View style={styles.guaranteeCardCk}>
-                  <BadgeCheck size={28} color="#10b981" />
+                  <BadgeCheck size={28} color={ACCENT_LIGHT} />
                   <View style={{ flex: 1 }}>
                     <Text style={styles.guaranteeTitleCk}>Garantia de 7 dias por lei</Text>
                     <Text style={styles.guaranteeDescCk}>
@@ -828,7 +878,7 @@ export default function SonoPlusLandingPage() {
           </View>
 
           {/* Sono+ — opcional, secundário */}
-          <LinearGradient colors={['#120f0a', '#1a1610']} style={styles.sonoPlusBand}>
+          <LinearGradient colors={[ACCENT_DEEP, BG_CARD]} style={styles.sonoPlusBand}>
             <View style={[styles.sonoPlusRow, sonoPlusStack && styles.sonoPlusRowStack]}>
               <View style={sonoPlusStack ? { alignSelf: 'center', marginBottom: 4 } : {}}>
                 <Crown size={28} color={GOLD} />
@@ -1016,7 +1066,7 @@ const styles = StyleSheet.create({
     borderColor: 'rgba(255,255,255,0.12)',
     backgroundColor: 'rgba(255,255,255,0.06)',
   },
-  navGhostTxt: { color: '#94a3b8', fontWeight: '600', fontSize: 13 },
+  navGhostTxt: { color: TEXT_MUTED, fontWeight: '600', fontSize: 13 },
   navGold: { paddingHorizontal: 16, paddingVertical: 10, borderRadius: 10, backgroundColor: GOLD },
   navGoldTxt: { color: '#ffffff', fontWeight: '800', fontSize: 13 },
 
@@ -1138,7 +1188,7 @@ const styles = StyleSheet.create({
   researchersKicker: {
     fontSize: 11,
     fontWeight: '800',
-    color: '#64748b',
+    color: TEXT_MUTED,
     textTransform: 'uppercase',
     letterSpacing: 1.5,
     textAlign: 'center',
@@ -1174,21 +1224,21 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   researcherInitial: { fontSize: 15, fontWeight: '800' },
-  researcherName: { fontSize: 13, fontWeight: '700', color: '#e8e5df', marginBottom: 1, flexShrink: 1 },
-  researcherRole: { fontSize: 11, color: '#64748b', fontWeight: '500', flexShrink: 1 },
+  researcherName: { fontSize: 13, fontWeight: '700', color: TEXT_MAIN, marginBottom: 1, flexShrink: 1 },
+  researcherRole: { fontSize: 11, color: TEXT_MUTED, fontWeight: '500', flexShrink: 1 },
   researcherField: { fontSize: 10, fontWeight: '700', marginTop: 2 },
   researchersDisclaimer: {
     fontSize: 11,
-    color: '#374151',
+    color: TEXT_MUTED,
     textAlign: 'center',
     marginTop: 14,
     lineHeight: 17,
   },
   urgencyTag: {
-    backgroundColor: 'rgba(239,68,68,0.08)',
+    backgroundColor: ACCENT_DIM,
     borderRadius: 10,
     borderWidth: 1,
-    borderColor: 'rgba(239,68,68,0.2)',
+    borderColor: 'rgba(165,180,252,0.22)',
     paddingVertical: 10,
     paddingHorizontal: 14,
     marginBottom: 16,
@@ -1200,7 +1250,7 @@ const styles = StyleSheet.create({
   urgencyTxt: {
     flex: 1,
     fontSize: 12,
-    color: '#fca5a5',
+    color: ACCENT_LIGHT,
     lineHeight: 18,
     fontWeight: '500',
   },
@@ -1227,8 +1277,8 @@ const styles = StyleSheet.create({
   },
   previewCardTop: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 },
   previewNum: { fontSize: 13, fontWeight: '800', color: GOLD },
-  freePill: { backgroundColor: 'rgba(34,197,94,0.15)', paddingHorizontal: 8, paddingVertical: 4, borderRadius: 8 },
-  freePillTxt: { color: '#86efac', fontSize: 10, fontWeight: '800' },
+  freePill: { backgroundColor: ACCENT_DIM, paddingHorizontal: 8, paddingVertical: 4, borderRadius: 8 },
+  freePillTxt: { color: ACCENT_LIGHT, fontSize: 10, fontWeight: '800' },
   lockPill: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -1429,7 +1479,7 @@ const styles = StyleSheet.create({
     shadowRadius: 10,
     elevation: 4,
   },
-  planTotalCk: { fontSize: 15, color: '#8892a4', fontWeight: '600', lineHeight: 22 },
+  planTotalCk: { fontSize: 15, color: TEXT_MUTED, fontWeight: '600', lineHeight: 22 },
   priceHeadline: {
     fontSize: 34,
     fontWeight: '800',
@@ -1440,7 +1490,7 @@ const styles = StyleSheet.create({
   },
   priceHeadlineWide: { fontSize: 44, lineHeight: 50 },
   priceLaunchTag: {
-    color: '#EF9F27',
+    color: ACCENT_LIGHT,
     fontSize: 13,
     textAlign: 'center',
     marginTop: 4,
@@ -1450,7 +1500,7 @@ const styles = StyleSheet.create({
   priceCaption: {
     marginTop: 6,
     fontSize: 14,
-    color: '#cbd1de',
+    color: TEXT_MUTED,
     fontWeight: '500',
     textAlign: 'center',
   },
@@ -1479,7 +1529,7 @@ const styles = StyleSheet.create({
     flexShrink: 1,
   },
   chronoBannerTip: {
-    color: '#94a3b8',
+    color: TEXT_MUTED,
     fontSize: 12,
     marginTop: 1,
     flexShrink: 1,
@@ -1538,7 +1588,7 @@ const styles = StyleSheet.create({
     marginBottom: 8,
     fontStyle: 'italic',
   },
-  disclaimerCk: { fontSize: 12, color: '#94a3b8', textAlign: 'center', lineHeight: 18, marginBottom: 16 },
+  disclaimerCk: { fontSize: 12, color: TEXT_MUTED, textAlign: 'center', lineHeight: 18, marginBottom: 16 },
   securityBadgesCk: { flexDirection: 'row', gap: 8, justifyContent: 'center', flexWrap: 'wrap' },
   securityBadgeCk: {
     flexDirection: 'row',
@@ -1551,8 +1601,8 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: 'rgba(255,255,255,0.1)',
   },
-  securityBadgeCkTxt: { fontSize: 11, fontWeight: '700', color: '#8892a4' },
-  colTitleCk: { fontSize: 20, fontWeight: '800', color: '#e8d5b7', marginBottom: 16 },
+  securityBadgeCkTxt: { fontSize: 11, fontWeight: '700', color: TEXT_MUTED },
+  colTitleCk: { fontSize: 20, fontWeight: '800', color: TEXT_MAIN, marginBottom: 16 },
   featuresCardCk: {
     backgroundColor: BG_CARD,
     borderRadius: 16,
@@ -1566,25 +1616,25 @@ const styles = StyleSheet.create({
     width: 24,
     height: 24,
     borderRadius: 12,
-    backgroundColor: 'rgba(16,185,129,0.15)',
+    backgroundColor: 'rgba(124,92,232,0.18)',
     justifyContent: 'center',
     alignItems: 'center',
     flexShrink: 0,
   },
-  featureTextCk: { fontSize: 14, color: '#94a3b8', flex: 1, minWidth: 0, lineHeight: 21 },
+  featureTextCk: { fontSize: 14, color: TEXT_MUTED, flex: 1, minWidth: 0, lineHeight: 21 },
   guaranteeCardCk: {
     flexDirection: 'row',
     alignItems: 'flex-start',
     gap: 14,
-    backgroundColor: 'rgba(16,185,129,0.08)',
+    backgroundColor: 'rgba(124,92,232,0.1)',
     borderRadius: 16,
     padding: 18,
     borderWidth: 1,
-    borderColor: 'rgba(16,185,129,0.2)',
+    borderColor: 'rgba(165,180,252,0.22)',
     marginTop: 20,
   },
-  guaranteeTitleCk: { fontSize: 15, fontWeight: '700', color: '#e8d5b7', marginBottom: 6 },
-  guaranteeDescCk: { fontSize: 13, color: '#10b981', lineHeight: 20 },
+  guaranteeTitleCk: { fontSize: 15, fontWeight: '700', color: TEXT_MAIN, marginBottom: 6 },
+  guaranteeDescCk: { fontSize: 13, color: ACCENT_LIGHT, lineHeight: 20 },
 
   sonoPlusBand: {
     marginTop: 32,
@@ -1658,7 +1708,7 @@ const styles = StyleSheet.create({
   ctaPanel: {
     marginTop: 36,
     alignItems: 'center',
-    backgroundColor: '#0f1624',
+    backgroundColor: BG_CARD,
     borderRadius: 20,
     padding: 24,
     borderWidth: 1,
@@ -1700,52 +1750,160 @@ const styles = StyleSheet.create({
     marginBottom: 12,
     paddingHorizontal: 16,
   },
-  footerLink: { color: '#cbd1de', fontSize: 13, fontWeight: '600' },
+  footerLink: { color: ACCENT_LIGHT, fontSize: 13, fontWeight: '600' },
   footerSep: { color: 'rgba(203,209,222,0.4)', fontSize: 12 },
   footerCopy: { fontSize: 12, color: TEXT_MUTED, textAlign: 'center', paddingHorizontal: 16 },
   footerSupport: { fontSize: 12, color: TEXT_MUTED, textAlign: 'center', paddingHorizontal: 16, marginTop: 2 },
   footerSupportEmail: { color: ACCENT_LIGHT, fontWeight: '600' },
 
-  // ─── História do fundador ─────────────────────────────────────
-  founderBlock: {
+  // ─── História do fundador (Sono+) — paleta roxa / lavanda da página ─────
+  founderStoryOuter: {
     maxWidth: 1100,
     width: '100%',
     alignSelf: 'center',
-    marginTop: 32,
-    marginBottom: 8,
+    marginTop: 28,
+    marginBottom: 4,
   },
-  founderCard: {
-    backgroundColor: '#0e0e1c',
-    borderRadius: 16,
-    borderWidth: 1,
-    borderColor: 'rgba(124,92,232,0.18)',
-    padding: 22,
-    flexDirection: 'row',
-    gap: 16,
-    alignItems: 'flex-start',
-  },
-  founderCardStack: {
-    flexDirection: 'column',
-    alignItems: 'center',
-  },
-  founderAvatar: {
-    width: 44,
-    height: 44,
+  founderStoryCard: {
+    backgroundColor: BG_CARD,
     borderRadius: 22,
+    borderWidth: 1,
+    borderColor: 'rgba(124,92,232,0.28)',
+    paddingVertical: 28,
+    paddingHorizontal: 22,
+    alignSelf: 'center',
+    width: '100%',
+    maxWidth: 720,
+    shadowColor: ACCENT,
+    shadowOffset: { width: 0, height: 6 },
+    shadowOpacity: isWeb ? 0.12 : 0.08,
+    shadowRadius: 20,
+    elevation: 4,
+    ...(isWeb ? { boxShadow: '0 8px 40px rgba(124,92,232,0.12)' } : {}),
+  } as any,
+  founderStoryCardWide: {
+    paddingVertical: 36,
+    paddingHorizontal: 36,
+  },
+  founderStoryLabel: {
+    color: ACCENT_LIGHT,
+    fontSize: 11,
+    fontWeight: '800',
+    letterSpacing: 1.4,
+    textTransform: 'uppercase',
+    textAlign: 'center',
+    marginBottom: 14,
+  },
+  founderStoryHeadline: {
+    color: TEXT_MAIN,
+    fontSize: 24,
+    fontWeight: '800',
+    textAlign: 'center',
+    lineHeight: 30,
+    marginBottom: 20,
+  },
+  founderStoryHeadlineWide: {
+    fontSize: 30,
+    lineHeight: 38,
+    ...(isWeb ? { fontFamily: 'Georgia, "Times New Roman", serif' } : {}),
+  } as any,
+  founderStoryDivider: {
+    height: 1,
+    backgroundColor: 'rgba(165,180,252,0.2)',
+    marginBottom: 22,
+  },
+  founderStoryBody: { gap: 18, marginBottom: 26 },
+  founderStoryPara: {
+    color: TEXT_MUTED,
+    fontSize: 15,
+    lineHeight: 24,
+    textAlign: 'center',
+    fontStyle: 'italic',
+    fontWeight: '500',
+  },
+  founderStoryParaWide: {
+    fontSize: 16,
+    lineHeight: 26,
+    ...(isWeb ? { fontFamily: 'Georgia, "Times New Roman", serif' } : {}),
+  } as any,
+  founderStorySignRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 14,
+    marginBottom: 22,
+  },
+  founderStorySignRowStack: {
+    flexDirection: 'column',
+  },
+  founderStoryAvatar: {
+    width: 48,
+    height: 48,
+    borderRadius: 24,
     backgroundColor: GOLD,
     alignItems: 'center',
     justifyContent: 'center',
-    flexShrink: 0,
   },
-  founderAvatarTxt: { fontSize: 20, fontWeight: '800', color: BG },
-  founderTextCol: { flex: 1, minWidth: 0 },
-  founderTextColStack: { width: '100%', alignItems: 'center' },
-  founderQuote: {
-    color: '#e8d5b7',
-    fontSize: 14,
+  founderStoryAvatarTxt: { fontSize: 22, fontWeight: '800', color: BG },
+  founderStorySign: {
+    color: ACCENT_LIGHT,
+    fontSize: 15,
+    fontWeight: '700',
+    flexShrink: 1,
+    ...(isWeb ? { fontFamily: '"Brush Script MT", "Segoe Script", cursive' } : {}),
+  } as any,
+  founderStorySignCenter: { textAlign: 'center' },
+  founderStoryResultBox: {
+    backgroundColor: ACCENT_DIM,
+    borderRadius: 14,
+    borderWidth: 1,
+    borderColor: 'rgba(124,92,232,0.22)',
+    paddingVertical: 18,
+    paddingHorizontal: 20,
+    marginBottom: 24,
+  },
+  founderStoryResultTxt: {
+    color: TEXT_MAIN,
+    fontSize: 15,
     fontWeight: '600',
-    lineHeight: 22,
+    textAlign: 'center',
+    lineHeight: 23,
   },
-  founderQuoteStack: { textAlign: 'center' },
-  founderSign: { color: GOLD, fontSize: 12, fontWeight: '700', marginTop: 8 },
+  founderStoryCtas: {
+    flexDirection: 'column',
+    gap: 12,
+    width: '100%',
+    alignItems: 'stretch',
+    maxWidth: 420,
+    alignSelf: 'center',
+  },
+  founderStoryCtaPrimary: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 10,
+    backgroundColor: GOLD,
+    paddingVertical: 16,
+    paddingHorizontal: 20,
+    borderRadius: 14,
+    shadowColor: GOLD,
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.3,
+    shadowRadius: 10,
+    elevation: 5,
+  },
+  founderStoryCtaPrimaryTxt: { fontSize: 15, fontWeight: '800', color: '#ffffff', textAlign: 'center', flexShrink: 1 },
+  founderStoryCtaGhost: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 8,
+    borderWidth: 1.5,
+    borderColor: 'rgba(165,180,252,0.45)',
+    paddingVertical: 14,
+    paddingHorizontal: 16,
+    borderRadius: 12,
+    backgroundColor: 'rgba(20,18,46,0.6)',
+  },
+  founderStoryCtaGhostTxt: { fontSize: 14, fontWeight: '700', color: ACCENT_LIGHT },
 });

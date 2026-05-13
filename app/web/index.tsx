@@ -130,7 +130,7 @@ function WebNav({ onFaqPress }: WebNavProps) {
       <View style={[styles.navInner, { paddingHorizontal: navPadH }]}>
         <TouchableOpacity onPress={() => router.push('/web')} style={styles.navBrand}>
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: 24, height: 24 }}>
-            <Moon size={24} color="#fbbf24" strokeWidth={2} />
+            <Moon size={24} color={GOLD} strokeWidth={2} />
           </div>
           <Text style={styles.navBrandText}>GoZzzz</Text>
         </TouchableOpacity>
@@ -190,12 +190,12 @@ export default function WebLandingPage() {
     ? [
         { num: 1, icon: Brain, color: '#d4a96a', bg: 'rgba(212,169,106,0.12)', title: 'Entenda Sua Biologia', desc: 'Aprenda como o ritmo circadiano funciona e por que o sono importa' },
         { num: 2, icon: Sun, color: '#d4a96a', bg: 'rgba(212,169,106,0.12)', title: 'Domine a Exposição à Luz', desc: 'Controle sua exposição à luz para otimizar seu relógio biológico' },
-        { num: 3, icon: Coffee, color: '#10b981', bg: 'rgba(16,185,129,0.12)', title: 'Otimize Seus Horários', desc: 'Aprenda quando comer, exercitar e descansar para dormir melhor' },
+        { num: 3, icon: Coffee, color: '#d4a96a', bg: 'rgba(212,169,106,0.12)', title: 'Otimize Seus Horários', desc: 'Aprenda quando comer, exercitar e descansar para dormir melhor' },
       ]
     : [
         { num: 1, icon: Brain, color: '#d4a96a', bg: 'rgba(212,169,106,0.12)', title: 'Understand Your Biology', desc: 'Learn how your circadian rhythm works and why sleep matters' },
         { num: 2, icon: Sun, color: '#d4a96a', bg: 'rgba(212,169,106,0.12)', title: 'Master Light Exposure', desc: 'Control your light exposure to optimize your body clock' },
-        { num: 3, icon: Coffee, color: '#10b981', bg: 'rgba(16,185,129,0.12)', title: 'Optimize Timing', desc: 'Learn when to eat, exercise, and rest for better sleep' },
+        { num: 3, icon: Coffee, color: '#d4a96a', bg: 'rgba(212,169,106,0.12)', title: 'Optimize Timing', desc: 'Learn when to eat, exercise, and rest for better sleep' },
       ];
 
   const sciencePillars = language === 'pt'
@@ -799,8 +799,8 @@ const styles = StyleSheet.create({
     backgroundColor: 'transparent',
   } as any,
   navScrolled: {
-    backgroundColor: 'rgba(15,23,42,0.96)',
-    boxShadow: isWeb ? '0 2px 20px rgba(0,0,0,0.3)' : undefined,
+    backgroundColor: 'rgba(7,7,15,0.96)',
+    boxShadow: isWeb ? '0 2px 20px rgba(0,0,0,0.35)' : undefined,
     backdropFilter: isWeb ? 'blur(12px)' : undefined,
   } as any,
   navInner: {
@@ -840,18 +840,20 @@ const styles = StyleSheet.create({
   navGhostLinkText: { fontSize: 14, fontWeight: '700', color: GOLD },
 
   chronotypeBanner: {
-    backgroundColor: '#7c6fff',
+    backgroundColor: 'rgba(212,169,106,0.12)',
     borderRadius: 999,
     paddingHorizontal: 14,
     paddingVertical: 6,
     alignSelf: 'center',
     marginTop: 8,
     marginBottom: 4,
+    borderWidth: 1,
+    borderColor: 'rgba(212,169,106,0.32)',
   },
   chronotypeBadgeText: {
     fontSize: 13,
     fontWeight: '700',
-    color: '#ffffff',
+    color: '#e8d5b7',
   },
 
   container: { maxWidth: 1100, alignSelf: 'center', width: '100%' },
@@ -909,9 +911,9 @@ const styles = StyleSheet.create({
 
   journeySection: {
     paddingVertical: 64,
-    backgroundColor: '#080810',
+    backgroundColor: '#0d0d16',
     borderTopWidth: 1,
-    borderTopColor: 'rgba(212,169,106,0.08)',
+    borderTopColor: 'rgba(255,255,255,0.06)',
   },
   journeyHeadline: { marginBottom: 10 },
   journeySub: { marginBottom: 32 },
@@ -1265,22 +1267,19 @@ const styles = StyleSheet.create({
 
   founderSection: {
     paddingVertical: 80,
-    backgroundColor: '#080810',
+    backgroundColor: '#0d0d16',
   },
   founderCard: {
-    backgroundColor: '#0e0e1c',
+    backgroundColor: '#12121e',
     borderRadius: 24,
     padding: 32,
     borderWidth: 1,
-    borderColor: 'rgba(212,169,106,0.18)',
+    borderColor: 'rgba(255,255,255,0.06)',
+    borderTopWidth: 3,
+    borderTopColor: GOLD,
     maxWidth: 780,
     alignSelf: 'center',
     width: '100%',
-    shadowColor: '#d4a96a',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.06,
-    shadowRadius: 40,
-    boxShadow: isWeb ? '0 4px 60px rgba(212,169,106,0.07)' : undefined,
   } as any,
   founderCardWide: { padding: 56 } as any,
   founderLabel: {
@@ -1316,7 +1315,7 @@ const styles = StyleSheet.create({
   },
   founderParagraph: {
     fontSize: 16,
-    color: '#a8b3c4',
+    color: '#8892a4',
     lineHeight: 26,
     textAlign: 'center',
     fontStyle: 'italic',
