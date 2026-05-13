@@ -96,6 +96,8 @@ export default function WebProgramPage() {
   const chronotype = persistedChronotype ?? chronotypeFromHook;
   const meta = chronotype ? CHRONOTYPE_META[chronotype] : null;
   const quizEmailStack = width < 480;
+  /** Três colunas + labels PT estouram em ~320–390px — empilhar fica seguro em qualquer telefone. */
+  const headerStatsStacked = width < 560;
 
   const handleNavBack = () => {
     if (router.canGoBack()) {
@@ -148,18 +150,18 @@ export default function WebProgramPage() {
         </View>
         <Text style={styles.headerTitle}>{t('web.program.title')}</Text>
         <Text style={styles.headerSubtitle}>{t('web.program.subtitle')}</Text>
-        <View style={styles.headerStats}>
-          <View style={styles.headerStat}>
+        <View style={[styles.headerStats, headerStatsStacked && styles.headerStatsStacked]}>
+          <View style={[styles.headerStat, headerStatsStacked && styles.headerStatStacked]}>
             <Text style={styles.headerStatNum}>21</Text>
             <Text style={styles.headerStatLabel}>{t('web.program.steps')}</Text>
           </View>
-          <View style={styles.headerStatDiv} />
-          <View style={styles.headerStat}>
+          {!headerStatsStacked ? <View style={styles.headerStatDiv} /> : <View style={styles.headerStatSep} />}
+          <View style={[styles.headerStat, headerStatsStacked && styles.headerStatStacked]}>
             <Text style={styles.headerStatNum}>3</Text>
             <Text style={styles.headerStatLabel}>{t('web.program.freeLessons')}</Text>
           </View>
-          <View style={styles.headerStatDiv} />
-          <View style={styles.headerStat}>
+          {!headerStatsStacked ? <View style={styles.headerStatDiv} /> : <View style={styles.headerStatSep} />}
+          <View style={[styles.headerStat, headerStatsStacked && styles.headerStatStacked]}>
             <Text style={styles.headerStatNum}>5 min</Text>
             <Text style={styles.headerStatLabel}>{t('web.program.eachStep')}</Text>
           </View>
@@ -397,18 +399,49 @@ const styles = StyleSheet.create({
   headerSubtitle: { fontSize: 17, color: TEXT_MUTED, textAlign: 'center', lineHeight: 26, maxWidth: 580, marginBottom: 32 },
   headerStats: {
     flexDirection: 'row',
-    gap: 28,
+    alignItems: 'stretch',
+    justifyContent: 'space-between',
+    gap: 12,
     backgroundColor: BG_CARD,
     borderRadius: 16,
     borderWidth: 1,
     borderColor: 'rgba(124,92,232,0.12)',
-    paddingHorizontal: 32,
+    paddingHorizontal: 16,
     paddingVertical: 16,
+    width: '100%',
+    alignSelf: 'center',
   },
-  headerStat: { alignItems: 'center' },
-  headerStatNum: { fontSize: 28, fontWeight: '800', color: GOLD },
-  headerStatLabel: { fontSize: 13, color: TEXT_MUTED },
-  headerStatDiv: { width: 1, height: 36, backgroundColor: 'rgba(255,255,255,0.1)' },
+  headerStatsStacked: {
+    flexDirection: 'column',
+    gap: 0,
+    paddingHorizontal: 18,
+    paddingVertical: 12,
+  },
+  headerStat: {
+    alignItems: 'center',
+    flex: 1,
+    minWidth: 0,
+    paddingHorizontal: 4,
+  },
+  headerStatStacked: {
+    flex: 0,
+    width: '100%',
+    paddingVertical: 8,
+    maxWidth: '100%',
+  },
+  headerStatNum: { fontSize: 26, fontWeight: '800', color: GOLD },
+  headerStatLabel: {
+    fontSize: 13,
+    color: TEXT_MUTED,
+    textAlign: 'center',
+    flexShrink: 1,
+  },
+  headerStatDiv: { width: 1, alignSelf: 'stretch', minHeight: 44, backgroundColor: 'rgba(255,255,255,0.1)' },
+  headerStatSep: {
+    height: StyleSheet.hairlineWidth,
+    width: '100%',
+    backgroundColor: 'rgba(255,255,255,0.1)',
+  },
 
   content: { paddingVertical: 56 },
   container: { maxWidth: 1100, alignSelf: 'center', width: '100%', paddingHorizontal: 24 },

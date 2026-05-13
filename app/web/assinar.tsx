@@ -282,9 +282,7 @@ export default function WebAssinarPage() {
                           : 'Comprar agora — R$ 147 à vista ou em até 6x'}
                       </Text>
                     </TouchableOpacity>
-                    <Text style={styles.kiwifyNote}>
-                      via Kiwify · cartão de crédito · acesso liberado após confirmação
-                    </Text>
+                    <Text style={styles.kiwifyNote}>via Kiwify · cartão de crédito</Text>
 
                     {STRIPE_ENABLED && (
                       <>
