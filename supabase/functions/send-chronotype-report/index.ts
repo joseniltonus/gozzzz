@@ -31,6 +31,8 @@ const VALID_CHRONOTYPES: Chronotype[] = ["dolphin", "lion", "bear", "wolf"];
 const VALID_LANGUAGES: Language[] = ["pt", "en"];
 const VALID_SOURCES = new Set([
   "web_quiz_inline",
+  "web_quiz_inline_programa",
+  "web_quiz_inline_sono",
   "modal_quiz",
   "web_funnel",
   "test",

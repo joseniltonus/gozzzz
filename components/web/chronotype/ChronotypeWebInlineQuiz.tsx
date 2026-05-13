@@ -185,6 +185,7 @@ export default function ChronotypeWebInlineQuiz({
   const [quizEmail, setQuizEmail] = useState('');
   const [quizEmailDone, setQuizEmailDone] = useState(false);
   const [quizEmailSending, setQuizEmailSending] = useState(false);
+  const [quizEmailError, setQuizEmailError] = useState<string | null>(null);
 
   const currentQuizScreen = QUIZ_SCREENS[quizScreen];
   const currentQuizAnswers = quizAnswers[quizScreen] ?? [];
@@ -246,6 +247,8 @@ export default function ChronotypeWebInlineQuiz({
     if (!trimmed.includes('@') || trimmed.length < 5) return;
     if (!quizResult) return;
 
+    setQuizEmailError(null);
+
     if (typeof window !== 'undefined' && window.localStorage) {
       try {
         window.localStorage.setItem('gozzzz_lead_email', trimmed);
@@ -257,7 +260,6 @@ export default function ChronotypeWebInlineQuiz({
     }
 
     setQuizEmail(trimmed);
-    setQuizEmailDone(true);
     setQuizEmailSending(true);
 
     void (async () => {
@@ -272,10 +274,17 @@ export default function ChronotypeWebInlineQuiz({
           },
         });
         if (error) {
-          console.warn('[chronotype-report] dispatch failed:', error.message);
+          setQuizEmailError(
+            error.message ||
+              'Não foi possível enviar o e-mail agora. Confira a conexão e toque em Enviar de novo.',
+          );
+          return;
         }
+        setQuizEmailDone(true);
       } catch (err) {
-        console.warn('[chronotype-report] dispatch threw:', err);
+        setQuizEmailError(
+          err instanceof Error ? err.message : 'Erro de rede. Tente novamente em alguns segundos.',
+        );
       } finally {
         setQuizEmailSending(false);
       }
@@ -290,6 +299,7 @@ export default function ChronotypeWebInlineQuiz({
     setQuizEmail('');
     setQuizEmailDone(false);
     setQuizEmailSending(false);
+    setQuizEmailError(null);
   };
 
   const scrollToPrimaryCta = () => {
@@ -394,26 +404,38 @@ export default function ChronotypeWebInlineQuiz({
 
             {!quizEmailDone ? (
               <View style={styles.quizEmailWrap}>
-                <Text style={styles.quizEmailLabel}>📩 Receba seu plano personalizado por e-mail</Text>
+                <Text style={styles.quizEmailLabel}>
+                  📩 Para receber o plano por e-mail, digite abaixo e toque em Enviar
+                </Text>
                 <View style={[styles.quizEmailRow, quizEmailStack && styles.quizEmailRowStack]}>
                   <TextInput
                     value={quizEmail}
-                    onChangeText={setQuizEmail}
+                    onChangeText={(t) => {
+                      setQuizEmail(t);
+                      if (quizEmailError) setQuizEmailError(null);
+                    }}
                     placeholder="seu@email.com"
                     placeholderTextColor="rgba(148,163,184,0.5)"
                     keyboardType="email-address"
                     autoCapitalize="none"
+                    editable={!quizEmailSending}
                     onSubmitEditing={handleQuizEmail}
                     style={[styles.quizEmailInput, quizEmailStack && styles.quizEmailInputStack]}
                   />
                   <TouchableOpacity
                     onPress={handleQuizEmail}
+                    disabled={quizEmailSending}
                     style={[styles.quizEmailBtn, quizEmailStack && styles.quizEmailBtnStack]}
                     activeOpacity={0.88}
                   >
-                    <Text style={styles.quizEmailBtnTxt}>Enviar</Text>
+                    <Text style={styles.quizEmailBtnTxt}>
+                      {quizEmailSending ? 'Enviando…' : 'Enviar'}
+                    </Text>
                   </TouchableOpacity>
                 </View>
+                {quizEmailError ? (
+                  <Text style={styles.quizEmailError}>{quizEmailError}</Text>
+                ) : null}
                 <Text style={styles.quizEmailDisclaimer}>Sem spam. Só seu plano e dicas do programa.</Text>
               </View>
             ) : (
@@ -591,6 +613,15 @@ const styles = StyleSheet.create({
     fontWeight: '600',
     textAlign: 'center',
     marginBottom: 10,
+  },
+  quizEmailError: {
+    color: '#fca5a5',
+    fontSize: 13,
+    textAlign: 'center',
+    marginTop: 8,
+    lineHeight: 19,
+    marginBottom: 4,
+    paddingHorizontal: 8,
   },
   quizEmailRow: { flexDirection: 'row', gap: 8, alignItems: 'stretch' },
   quizEmailRowStack: { flexDirection: 'column' },

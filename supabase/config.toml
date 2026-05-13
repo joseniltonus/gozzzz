@@ -8,3 +8,8 @@ verify_jwt = false
 # valida o secret no handler — verify_jwt do Supabase precisa ficar OFF.
 [functions.kiwify-webhook]
 verify_jwt = false
+
+# Quiz na landing (/sono, /web, /programa): visitantes sem login — o gateway
+# do Supabase rejeita invoke sem JWT se verify_jwt ficar true (401 antes do handler).
+[functions.send-chronotype-report]
+verify_jwt = false

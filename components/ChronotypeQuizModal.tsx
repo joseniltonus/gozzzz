@@ -254,6 +254,7 @@ export default function ChronotypeQuizModal({
   const [emailInput, setEmailInput] = useState('');
   const [emailSubmitted, setEmailSubmitted] = useState(false);
   const [emailSending, setEmailSending] = useState(false);
+  const [emailSubmitError, setEmailSubmitError] = useState<string | null>(null);
   const scienceGlow = useRef(new Animated.Value(0)).current;
 
   const handleEmailSubmit = useCallback(() => {
@@ -271,11 +272,9 @@ export default function ChronotypeQuizModal({
       }
     }
 
-    // Otimismo na UI: marca como enviado imediatamente. Se a edge function
-    // falhar, o lead fica no localStorage e o usuário ainda vê confirmação
-    // (o relatório real chega em segundo plano; em caso de falha de rede
-    // exibimos uma mensagem suave abaixo, mas não derrubamos a captura).
-    setEmailSubmitted(true);
+    // Só marcamos sucesso após a edge function responder — visitantes web
+    // frequentemente não têm sessão; falhas de rede/JWT precisam ser visíveis.
+    setEmailSubmitError(null);
     setEmailSending(true);
 
     void (async () => {
@@ -293,10 +292,23 @@ export default function ChronotypeQuizModal({
           },
         );
         if (error) {
-          console.warn('[chronotype-report] dispatch failed:', error.message);
+          setEmailSubmitError(
+            error.message ||
+              (lang === 'pt'
+                ? 'Não foi possível enviar agora. Tente de novo em instantes.'
+                : 'Could not send right now. Please try again.'),
+          );
+          return;
         }
+        setEmailSubmitted(true);
       } catch (err) {
-        console.warn('[chronotype-report] dispatch threw:', err);
+        setEmailSubmitError(
+          err instanceof Error
+            ? err.message
+            : lang === 'pt'
+              ? 'Erro de rede. Tente novamente.'
+              : 'Network error. Please try again.',
+        );
       } finally {
         setEmailSending(false);
       }
@@ -583,19 +595,22 @@ export default function ChronotypeQuizModal({
                 <View style={styles.emailGateRow}>
                   <TextInput
                     value={emailInput}
-                    onChangeText={setEmailInput}
+                    onChangeText={(t) => {
+                      setEmailInput(t);
+                      if (emailSubmitError) setEmailSubmitError(null);
+                    }}
                     placeholder={lang === 'pt' ? 'seu@email.com' : 'your@email.com'}
                     placeholderTextColor="rgba(148,163,184,0.5)"
                     keyboardType="email-address"
                     autoCapitalize="none"
-                    editable={!emailSubmitted}
+                    editable={!emailSubmitted && !emailSending}
                     style={styles.emailGateInput}
                     onSubmitEditing={handleEmailSubmit}
                   />
                   <TouchableOpacity
                     onPress={handleEmailSubmit}
                     activeOpacity={0.85}
-                    disabled={emailSubmitted}
+                    disabled={emailSubmitted || emailSending}
                     style={[
                       styles.emailGateBtn,
                       emailSubmitted && styles.emailGateBtnDone,
@@ -606,7 +621,10 @@ export default function ChronotypeQuizModal({
                     </Text>
                   </TouchableOpacity>
                 </View>
-                {emailSubmitted && (
+                {emailSubmitError ? (
+                  <Text style={styles.emailGateError}>{emailSubmitError}</Text>
+                ) : null}
+                {(emailSending || emailSubmitted) && (
                   <Text style={styles.emailGateConfirm}>
                     {emailSending
                       ? lang === 'pt'
@@ -921,6 +939,12 @@ const styles = StyleSheet.create({
     color: '#ffffff',
     fontWeight: '700',
     fontSize: 13,
+  },
+  emailGateError: {
+    color: '#fca5a5',
+    fontSize: 12,
+    marginTop: 8,
+    lineHeight: 17,
   },
   emailGateConfirm: {
     color: 'rgba(196,181,253,0.85)',

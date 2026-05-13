@@ -549,7 +549,7 @@ export default function SonoPlusLandingPage() {
           variant="landing"
           enableHashAutostart
           nativeId="quiz"
-          reportSource="web_quiz_inline"
+          reportSource={sonoStandalone ? 'web_quiz_inline_sono' : 'web_quiz_inline'}
         />
 
         {/* Prévia horizontal — lições gratuitas */}
