@@ -1,4 +1,4 @@
-import { useMemo, useState, useEffect } from 'react';
+import { useMemo, useState, useEffect, useRef } from 'react';
 import {
   View,
   Text,
@@ -10,7 +10,7 @@ import {
   useWindowDimensions,
 } from 'react-native';
 import Head from 'expo-router/head';
-import { useRouter } from 'expo-router';
+import { useRouter, usePathname } from 'expo-router';
 import { LinearGradient } from 'expo-linear-gradient';
 import {
   ArrowRight,
@@ -120,6 +120,11 @@ const FOUNDER_STORY_PT = {
 /** Landing web: programa 21 passos como produto principal; Sono+ como opcional premium. Sem depoimentos inventados. */
 export default function SonoPlusLandingPage() {
   const router = useRouter();
+  const pathname = usePathname();
+  const scrollRef = useRef<ScrollView>(null);
+  /** Landing curta só em `/sono`: sem fuga para home/blog pelo header/rodapé. */
+  const sonoStandalone =
+    typeof pathname === 'string' && pathname.replace(/\/$/, '') === '/sono';
   const { width } = useWindowDimensions();
   const { t: translate } = useLanguage();
   const language: 'pt' = 'pt';
@@ -354,33 +359,51 @@ export default function SonoPlusLandingPage() {
         <script type="application/ld+json">{JSON.stringify(schemaGraph)}</script>
       </Head>
 
-      <ScrollView style={styles.page} showsVerticalScrollIndicator={false}>
+      <ScrollView ref={scrollRef} style={styles.page} showsVerticalScrollIndicator={false}>
         {/* Nav — alinhado a /web/assinar */}
         <LinearGradient colors={['#0c0a1f', ACCENT_DEEP]} style={styles.navGrad}>
-          <View style={[styles.navInner, navStacked && styles.navInnerStacked, { paddingHorizontal: contentPadH }]}>
+          <View
+            style={[
+              styles.navInner,
+              navStacked && styles.navInnerStacked,
+              sonoStandalone && styles.navInnerSonoOnly,
+              { paddingHorizontal: contentPadH },
+            ]}
+          >
             <TouchableOpacity
-              style={[styles.brand, navStacked && styles.brandStacked]}
-              accessibilityRole="link"
-              onPress={() => router.push('/web')}
+              style={[
+                styles.brand,
+                navStacked && !sonoStandalone && styles.brandStacked,
+                sonoStandalone && styles.brandSonoOnly,
+              ]}
+              accessibilityRole={sonoStandalone ? 'button' : 'link'}
+              accessibilityLabel={sonoStandalone ? 'Voltar ao topo da página' : 'GoZzzz — início'}
+              onPress={() =>
+                sonoStandalone
+                  ? scrollRef.current?.scrollTo({ y: 0, animated: true })
+                  : router.push('/web')
+              }
             >
               <Text style={styles.brandText}>GoZzzz</Text>
             </TouchableOpacity>
-            <View style={[styles.navRight, navStacked && styles.navRightStacked]}>
-              <TouchableOpacity style={styles.navGhost} accessibilityRole="link" onPress={() => router.push('/blog')}>
-                <Text style={styles.navGhostTxt}>Blog</Text>
-              </TouchableOpacity>
-              <TouchableOpacity style={styles.navGhost} accessibilityRole="link" onPress={() => router.push('/web/programa')}>
-                <BookOpen size={16} color={ACCENT_LIGHT} />
-                <Text style={styles.navGhostTxt}>
-                  {navShortLabels ? '21 passos' : 'Programa 21 Passos'}
-                </Text>
-              </TouchableOpacity>
-              <TouchableOpacity style={styles.navGold} accessibilityRole="link" onPress={() => router.push('/web/assinar')}>
-                <Text style={styles.navGoldTxt}>
-                  {navShortLabels ? t('web.nav.subscribe') : t('coach.ctaSubscribe')}
-                </Text>
-              </TouchableOpacity>
-            </View>
+            {!sonoStandalone && (
+              <View style={[styles.navRight, navStacked && styles.navRightStacked]}>
+                <TouchableOpacity style={styles.navGhost} accessibilityRole="link" onPress={() => router.push('/blog')}>
+                  <Text style={styles.navGhostTxt}>Blog</Text>
+                </TouchableOpacity>
+                <TouchableOpacity style={styles.navGhost} accessibilityRole="link" onPress={() => router.push('/web/programa')}>
+                  <BookOpen size={16} color={ACCENT_LIGHT} />
+                  <Text style={styles.navGhostTxt}>
+                    {navShortLabels ? '21 passos' : 'Programa 21 Passos'}
+                  </Text>
+                </TouchableOpacity>
+                <TouchableOpacity style={styles.navGold} accessibilityRole="link" onPress={() => router.push('/web/assinar')}>
+                  <Text style={styles.navGoldTxt}>
+                    {navShortLabels ? t('web.nav.subscribe') : t('coach.ctaSubscribe')}
+                  </Text>
+                </TouchableOpacity>
+              </View>
+            )}
           </View>
         </LinearGradient>
 
@@ -966,31 +989,33 @@ export default function SonoPlusLandingPage() {
           </View>
 
           <View style={styles.footer}>
-            {/* Internal linking para SEO — Google entende hierarquia entre as páginas */}
-            <View style={styles.footerNav}>
-              <TouchableOpacity accessibilityRole="link" onPress={() => router.push('/web')}>
-                <Text style={styles.footerLink}>GoZzzz — Início</Text>
-              </TouchableOpacity>
-              <Text style={styles.footerSep}>·</Text>
-              <TouchableOpacity accessibilityRole="link" onPress={() => router.push('/web/programa')}>
-                <Text style={styles.footerLink}>Programa 21 Passos</Text>
-              </TouchableOpacity>
-              <Text style={styles.footerSep}>·</Text>
-              <TouchableOpacity accessibilityRole="link" onPress={() => router.push('/blog')}>
-                <Text style={styles.footerLink}>Blog</Text>
-              </TouchableOpacity>
-              <Text style={styles.footerSep}>·</Text>
-              <TouchableOpacity accessibilityRole="link" onPress={() => router.push('/web/assinar')}>
-                <Text style={styles.footerLink}>Assinar</Text>
-              </TouchableOpacity>
-              <Text style={styles.footerSep}>·</Text>
-              <TouchableOpacity
-                accessibilityRole="link"
-                onPress={() => Linking.openURL('mailto:suporte@gozzzz.app?subject=Suporte%20GoZzzz')}
-              >
-                <Text style={styles.footerLink}>Suporte</Text>
-              </TouchableOpacity>
-            </View>
+            {!sonoStandalone ? (
+              <View style={styles.footerNav}>
+                {/* Internal linking para SEO — Google entende hierarquia entre as páginas */}
+                <TouchableOpacity accessibilityRole="link" onPress={() => router.push('/web')}>
+                  <Text style={styles.footerLink}>GoZzzz — Início</Text>
+                </TouchableOpacity>
+                <Text style={styles.footerSep}>·</Text>
+                <TouchableOpacity accessibilityRole="link" onPress={() => router.push('/web/programa')}>
+                  <Text style={styles.footerLink}>Programa 21 Passos</Text>
+                </TouchableOpacity>
+                <Text style={styles.footerSep}>·</Text>
+                <TouchableOpacity accessibilityRole="link" onPress={() => router.push('/blog')}>
+                  <Text style={styles.footerLink}>Blog</Text>
+                </TouchableOpacity>
+                <Text style={styles.footerSep}>·</Text>
+                <TouchableOpacity accessibilityRole="link" onPress={() => router.push('/web/assinar')}>
+                  <Text style={styles.footerLink}>Assinar</Text>
+                </TouchableOpacity>
+                <Text style={styles.footerSep}>·</Text>
+                <TouchableOpacity
+                  accessibilityRole="link"
+                  onPress={() => Linking.openURL('mailto:suporte@gozzzz.app?subject=Suporte%20GoZzzz')}
+                >
+                  <Text style={styles.footerLink}>Suporte</Text>
+                </TouchableOpacity>
+              </View>
+            ) : null}
             <Text style={styles.footerCopy}>{t('web.footer.copyright')}</Text>
             <Text style={styles.footerSupport}>
               Dúvidas? Escreva pra{' '}
@@ -1034,8 +1059,12 @@ const styles = StyleSheet.create({
     gap: 12,
     paddingVertical: 12,
   },
+  navInnerSonoOnly: {
+    justifyContent: 'center',
+  },
   brand: { flexDirection: 'row', gap: 10, alignItems: 'center' },
   brandStacked: { alignSelf: 'flex-start' },
+  brandSonoOnly: { alignSelf: 'center' },
   brandText: { fontSize: 20, fontWeight: '800', color: '#ffffff' },
   navRight: {
     flexDirection: 'row',
