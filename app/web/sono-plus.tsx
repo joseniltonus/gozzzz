@@ -122,7 +122,7 @@ export default function SonoPlusLandingPage() {
   const router = useRouter();
   const pathname = usePathname();
   const scrollRef = useRef<ScrollView>(null);
-  /** Landing curta só em `/sono`: sem fuga para home/blog pelo header/rodapé. */
+  /** Landing curta só em `/sono`: logo não envia para /web; rodapé sem mapa do site. */
   const sonoStandalone =
     typeof pathname === 'string' && pathname.replace(/\/$/, '') === '/sono';
   const { width } = useWindowDimensions();
@@ -366,16 +366,11 @@ export default function SonoPlusLandingPage() {
             style={[
               styles.navInner,
               navStacked && styles.navInnerStacked,
-              sonoStandalone && styles.navInnerSonoOnly,
               { paddingHorizontal: contentPadH },
             ]}
           >
             <TouchableOpacity
-              style={[
-                styles.brand,
-                navStacked && !sonoStandalone && styles.brandStacked,
-                sonoStandalone && styles.brandSonoOnly,
-              ]}
+              style={[styles.brand, navStacked && styles.brandStacked]}
               accessibilityRole={sonoStandalone ? 'button' : 'link'}
               accessibilityLabel={sonoStandalone ? 'Voltar ao topo da página' : 'GoZzzz — início'}
               onPress={() =>
@@ -386,24 +381,22 @@ export default function SonoPlusLandingPage() {
             >
               <Text style={styles.brandText}>GoZzzz</Text>
             </TouchableOpacity>
-            {!sonoStandalone && (
-              <View style={[styles.navRight, navStacked && styles.navRightStacked]}>
-                <TouchableOpacity style={styles.navGhost} accessibilityRole="link" onPress={() => router.push('/blog')}>
-                  <Text style={styles.navGhostTxt}>Blog</Text>
-                </TouchableOpacity>
-                <TouchableOpacity style={styles.navGhost} accessibilityRole="link" onPress={() => router.push('/web/programa')}>
-                  <BookOpen size={16} color={ACCENT_LIGHT} />
-                  <Text style={styles.navGhostTxt}>
-                    {navShortLabels ? '21 passos' : 'Programa 21 Passos'}
-                  </Text>
-                </TouchableOpacity>
-                <TouchableOpacity style={styles.navGold} accessibilityRole="link" onPress={() => router.push('/web/assinar')}>
-                  <Text style={styles.navGoldTxt}>
-                    {navShortLabels ? t('web.nav.subscribe') : t('coach.ctaSubscribe')}
-                  </Text>
-                </TouchableOpacity>
-              </View>
-            )}
+            <View style={[styles.navRight, navStacked && styles.navRightStacked]}>
+              <TouchableOpacity style={styles.navGhost} accessibilityRole="link" onPress={() => router.push('/blog')}>
+                <Text style={styles.navGhostTxt}>Blog</Text>
+              </TouchableOpacity>
+              <TouchableOpacity style={styles.navGhost} accessibilityRole="link" onPress={() => router.push('/web/programa')}>
+                <BookOpen size={16} color={ACCENT_LIGHT} />
+                <Text style={styles.navGhostTxt}>
+                  {navShortLabels ? '21 passos' : 'Programa 21 Passos'}
+                </Text>
+              </TouchableOpacity>
+              <TouchableOpacity style={styles.navGold} accessibilityRole="link" onPress={() => router.push('/web/assinar')}>
+                <Text style={styles.navGoldTxt}>
+                  {navShortLabels ? t('web.nav.subscribe') : t('coach.ctaSubscribe')}
+                </Text>
+              </TouchableOpacity>
+            </View>
           </View>
         </LinearGradient>
 
@@ -1059,12 +1052,8 @@ const styles = StyleSheet.create({
     gap: 12,
     paddingVertical: 12,
   },
-  navInnerSonoOnly: {
-    justifyContent: 'center',
-  },
   brand: { flexDirection: 'row', gap: 10, alignItems: 'center' },
   brandStacked: { alignSelf: 'flex-start' },
-  brandSonoOnly: { alignSelf: 'center' },
   brandText: { fontSize: 20, fontWeight: '800', color: '#ffffff' },
   navRight: {
     flexDirection: 'row',
