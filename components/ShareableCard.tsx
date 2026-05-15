@@ -3,6 +3,7 @@ import { useEffect, useRef } from 'react';
 import { MessageCircle } from 'lucide-react-native';
 import { FontAwesome5 } from '@expo/vector-icons';
 import { useTheme } from '@/contexts/ThemeContext';
+import { WEB_PUBLIC_LANDING_URL } from '@/lib/webOgConstants';
 
 interface ShareableCardProps {
   chronotypeName: string;
@@ -34,7 +35,7 @@ export function ShareableCard({
   };
 
   const handleWhatsAppShare = async () => {
-    const text = encodeURIComponent(`${message}\n\nDescobri no GoZzzz 🌙\nhttps://gozzzz.app`);
+    const text = encodeURIComponent(`${message}\n\nDescobri no GoZzzz 🌙\n${WEB_PUBLIC_LANDING_URL}`);
     const url = `https://wa.me/?text=${text}`;
     await Linking.openURL(url);
     onShare?.(message);

@@ -1,6 +1,7 @@
 import { createContext, useContext, useState, ReactNode, useEffect } from 'react';
 import { Platform } from 'react-native';
 import * as Localization from 'expo-localization';
+import { WEB_PUBLIC_LANDING_URL } from '@/lib/webOgConstants';
 
 export type Language = 'pt' | 'en';
 
@@ -995,7 +996,7 @@ const translations = {
     'card.viral5': '21 dias. 1 programa. 1 sono transformado. GoZzzz.',
     'card.viral6': 'Cansado de estar cansado? GoZzzz tem a ciência que você precisa.',
     'card.tips': 'Dicas para Compartilhar',
-    'card.shareMsg': 'GoZzzz - Programa científico de sono em 21 passos 🌙\n\nTransforme seu sono com ciência.\n\nBaixe agora: https://gozzzz.app',
+    'card.shareMsg': `GoZzzz - Programa científico de sono em 21 passos 🌙\n\nTransforme seu sono com ciência.\n\nBaixe agora: ${WEB_PUBLIC_LANDING_URL}`,
 
     // Error Messages
     'error.paymentFailed': 'Erro ao iniciar pagamento.',
@@ -2030,7 +2031,7 @@ const translations = {
     'card.viral5': '21 days. 1 program. 1 transformed sleep. GoZzzz.',
     'card.viral6': 'Tired of being tired? GoZzzz has the science you need.',
     'card.tips': 'Sharing Tips',
-    'card.shareMsg': 'GoZzzz - Science-based sleep program in 21 steps 🌙\n\nTransform your sleep with science.\n\nDownload now: https://gozzzz.app',
+    'card.shareMsg': `GoZzzz - Science-based sleep program in 21 steps 🌙\n\nTransform your sleep with science.\n\nDownload now: ${WEB_PUBLIC_LANDING_URL}`,
 
     // Error Messages
     'error.paymentFailed': 'Failed to start payment.',

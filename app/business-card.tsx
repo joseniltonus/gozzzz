@@ -2,6 +2,7 @@ import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Share } from 'rea
 import { LinearGradient } from 'expo-linear-gradient';
 import { Moon, Share2, Sparkles } from 'lucide-react-native';
 import { useRouter } from 'expo-router';
+import { WEB_PUBLIC_LANDING_URL } from '@/lib/webOgConstants';
 
 export default function BusinessCardScreen() {
   const router = useRouter();
@@ -9,7 +10,7 @@ export default function BusinessCardScreen() {
   const handleShare = async () => {
     try {
       await Share.share({
-        message: `GoZzzz - Programa científico de sono em 21 passos 🌙\n\nTransforme seu sono com ciência.\n\nBaixe agora: https://gozzzz.app`,
+        message: `GoZzzz - Programa científico de sono em 21 passos 🌙\n\nTransforme seu sono com ciência.\n\nBaixe agora: ${WEB_PUBLIC_LANDING_URL}`,
         title: 'GoZzzz - Sleep Science App',
       });
     } catch (error) {

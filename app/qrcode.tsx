@@ -3,10 +3,11 @@ import { useState } from 'react';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Moon, Share2, ExternalLink } from 'lucide-react-native';
 import { useRouter } from 'expo-router';
+import { WEB_PUBLIC_LANDING_URL } from '@/lib/webOgConstants';
 
 export default function QRCodeScreen() {
   const router = useRouter();
-  const appUrl = 'https://gozzzz.app';
+  const appUrl = WEB_PUBLIC_LANDING_URL;
   const [imageLoaded, setImageLoaded] = useState(false);
   const [imageError, setImageError] = useState(false);
 
@@ -62,7 +63,7 @@ export default function QRCodeScreen() {
                 )}
                 {imageError ? (
                   <View style={styles.qrErrorBox}>
-                    <Text style={styles.qrErrorText}>gozzzz.app</Text>
+                    <Text style={styles.qrErrorText}>gozzzz.app/sono</Text>
                   </View>
                 ) : (
                   <Image
