@@ -165,11 +165,10 @@ export function buildSonoPlusSchemaGraph(input: {
       {
         '@type': 'BreadcrumbList',
         itemListElement: [
-          { '@type': 'ListItem', position: 1, name: 'GoZzzz', item: 'https://gozzzz.app/web' },
           {
             '@type': 'ListItem',
-            position: 2,
-            name: 'Programa 21 Passos',
+            position: 1,
+            name: isPt ? 'Programa de Sono em 21 Passos — GoZzzz' : 'GoZzzz · 21-Step Sleep Program',
             item: SONO_LANDING_URL,
           },
         ],

@@ -3,6 +3,13 @@
   "outputDirectory": "dist",
   "installCommand": "npm install",
   "cleanUrls": true,
+  "redirects": [
+    {
+      "source": "/",
+      "destination": "/sono",
+      "permanent": true
+    }
+  ],
   "rewrites": [
     {
       "source": "/(.*)",
