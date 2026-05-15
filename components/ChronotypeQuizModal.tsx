@@ -17,6 +17,7 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { useAuth } from '@/contexts/AuthContext';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { supabase } from '@/lib/supabase';
+import { describeChronotypeReportInvokeError } from '@/lib/describeChronotypeReportInvokeError';
 import { syncQuizCompletionFromServer } from '@/lib/syncQuizCompletion';
 import { savePreRegistrationQuizDone } from '@/lib/quizDevicePersistence';
 import { ShareableCard } from './ShareableCard';
@@ -293,10 +294,7 @@ export default function ChronotypeQuizModal({
         );
         if (error) {
           setEmailSubmitError(
-            error.message ||
-              (lang === 'pt'
-                ? 'Não foi possível enviar agora. Tente de novo em instantes.'
-                : 'Could not send right now. Please try again.'),
+            await describeChronotypeReportInvokeError(error, lang === 'pt' ? 'pt' : 'en'),
           );
           return;
         }

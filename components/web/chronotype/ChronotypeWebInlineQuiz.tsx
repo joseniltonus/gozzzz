@@ -13,6 +13,7 @@ import {
   Platform,
 } from 'react-native';
 import { Crown } from 'lucide-react-native';
+import { describeChronotypeReportInvokeError } from '@/lib/describeChronotypeReportInvokeError';
 import { supabase } from '@/lib/supabase';
 
 const isWeb = Platform.OS === 'web';
@@ -274,10 +275,7 @@ export default function ChronotypeWebInlineQuiz({
           },
         });
         if (error) {
-          setQuizEmailError(
-            error.message ||
-              'Não foi possível enviar o e-mail agora. Confira a conexão e toque em Enviar de novo.',
-          );
+          setQuizEmailError(await describeChronotypeReportInvokeError(error, 'pt'));
           return;
         }
         setQuizEmailDone(true);
