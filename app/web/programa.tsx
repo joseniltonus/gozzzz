@@ -96,8 +96,8 @@ export default function WebProgramPage() {
   const chronotype = persistedChronotype ?? chronotypeFromHook;
   const meta = chronotype ? CHRONOTYPE_META[chronotype] : null;
   const quizEmailStack = width < 480;
-  /** Três colunas + labels PT estouram em ~320–390px — empilhar fica seguro em qualquer telefone. */
-  const headerStatsStacked = width < 560;
+  /** Três colunas + labels PT estouram em telemóveis — empilhar até ~640px evita overflow no web. */
+  const headerStatsStacked = width < 640;
 
   const handleNavBack = () => {
     if (router.canGoBack()) {
@@ -151,17 +151,35 @@ export default function WebProgramPage() {
         <Text style={styles.headerTitle}>{t('web.program.title')}</Text>
         <Text style={styles.headerSubtitle}>{t('web.program.subtitle')}</Text>
         <View style={[styles.headerStats, headerStatsStacked && styles.headerStatsStacked]}>
-          <View style={[styles.headerStat, headerStatsStacked && styles.headerStatStacked]}>
+          <View
+            style={[
+              styles.headerStat,
+              !headerStatsStacked && styles.headerStatRow,
+              headerStatsStacked && styles.headerStatStacked,
+            ]}
+          >
             <Text style={styles.headerStatNum}>21</Text>
             <Text style={styles.headerStatLabel}>{t('web.program.steps')}</Text>
           </View>
           {!headerStatsStacked ? <View style={styles.headerStatDiv} /> : <View style={styles.headerStatSep} />}
-          <View style={[styles.headerStat, headerStatsStacked && styles.headerStatStacked]}>
+          <View
+            style={[
+              styles.headerStat,
+              !headerStatsStacked && styles.headerStatRow,
+              headerStatsStacked && styles.headerStatStacked,
+            ]}
+          >
             <Text style={styles.headerStatNum}>3</Text>
             <Text style={styles.headerStatLabel}>{t('web.program.freeLessons')}</Text>
           </View>
           {!headerStatsStacked ? <View style={styles.headerStatDiv} /> : <View style={styles.headerStatSep} />}
-          <View style={[styles.headerStat, headerStatsStacked && styles.headerStatStacked]}>
+          <View
+            style={[
+              styles.headerStat,
+              !headerStatsStacked && styles.headerStatRow,
+              headerStatsStacked && styles.headerStatStacked,
+            ]}
+          >
             <Text style={styles.headerStatNum}>5 min</Text>
             <Text style={styles.headerStatLabel}>{t('web.program.eachStep')}</Text>
           </View>
@@ -409,24 +427,28 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
     paddingVertical: 16,
     width: '100%',
+    maxWidth: '100%',
     alignSelf: 'center',
+    overflow: 'visible',
   },
   headerStatsStacked: {
     flexDirection: 'column',
+    alignItems: 'stretch',
     gap: 0,
     paddingHorizontal: 18,
-    paddingVertical: 12,
+    paddingTop: 12,
+    paddingBottom: 18,
   },
   headerStat: {
     alignItems: 'center',
-    flex: 1,
     minWidth: 0,
     paddingHorizontal: 4,
   },
+  /** Só em linha (ecrã largo): reparte espaço entre as 3 colunas. */
+  headerStatRow: { flex: 1 },
   headerStatStacked: {
-    flex: 0,
     width: '100%',
-    paddingVertical: 8,
+    paddingVertical: 10,
     maxWidth: '100%',
   },
   headerStatNum: { fontSize: 26, fontWeight: '800', color: GOLD },
@@ -435,6 +457,8 @@ const styles = StyleSheet.create({
     color: TEXT_MUTED,
     textAlign: 'center',
     flexShrink: 1,
+    maxWidth: '100%',
+    paddingHorizontal: 8,
   },
   headerStatDiv: { width: 1, alignSelf: 'stretch', minHeight: 44, backgroundColor: 'rgba(255,255,255,0.1)' },
   headerStatSep: {

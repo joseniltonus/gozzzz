@@ -1437,10 +1437,11 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     gap: 0,
     paddingVertical: 18,
-    alignItems: 'center',
+    alignItems: 'stretch',
   },
-  stat: { flex: 1, alignItems: 'center' },
-  statWide: { minWidth: 110 },
+  /** Coluna: sem flex:1 nos filhos (evita overflow no RN Web). Linha: flex em statWide. */
+  stat: { alignItems: 'center', minWidth: 0, width: '100%' },
+  statWide: { flex: 1, minWidth: 110 },
   statDivider: {
     width: '80%',
     height: StyleSheet.hairlineWidth,
@@ -1453,7 +1454,15 @@ const styles = StyleSheet.create({
     minHeight: 40,
   },
   statNum: { color: TEXT_MAIN, fontSize: 26, fontWeight: '800' },
-  statLbl: { color: TEXT_MUTED, fontSize: 11, marginTop: 4, textAlign: 'center' },
+  statLbl: {
+    color: TEXT_MUTED,
+    fontSize: 11,
+    marginTop: 4,
+    textAlign: 'center',
+    maxWidth: '100%',
+    paddingHorizontal: 6,
+    flexShrink: 1,
+  },
 
   benefGrid: { flexDirection: 'column', flexWrap: 'wrap', gap: 10, marginTop: 8 },
   benefGridWide: { flexDirection: 'row' },
