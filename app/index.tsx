@@ -1,10 +1,13 @@
-import { View, ActivityIndicator, StyleSheet } from 'react-native';
+import { View, ActivityIndicator, StyleSheet, Platform } from 'react-native';
 import { Redirect } from 'expo-router';
 import { useAuth } from '@/contexts/AuthContext';
 import EntryScreen from '@/src/screens/EntryScreen';
+import WebMarketingLanding from '@/components/web/WebMarketingLanding';
 
 /**
- * Entrada unificada (web + mobile): mesmo ecrã premium; utilizadores autenticados vão para a home.
+ * Mobile (guest): EntryScreen.
+ * Web (guest): landing marketing em gozzzz.app (separada de /sono).
+ * Autenticados: home nas tabs.
  */
 export default function Index() {
   const { user, loading } = useAuth();
@@ -19,6 +22,10 @@ export default function Index() {
 
   if (user) {
     return <Redirect href="/(tabs)/home" />;
+  }
+
+  if (Platform.OS === 'web') {
+    return <WebMarketingLanding />;
   }
 
   return <EntryScreen />;
